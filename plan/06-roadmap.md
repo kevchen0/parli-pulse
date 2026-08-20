@@ -15,8 +15,13 @@ Repo, workspace, Drizzle schema, CI. Article XXI constants encoded as typed data
 - [x] `packages/rules/src/elim.ts` + tests (47 passing, including the structural
       invariant that the table's stepped border follows bracket size)
 - [x] Tabroom payload types
-- [ ] Drizzle schema
+- [x] Drizzle schema + generated initial migration (`npm run db:generate`)
 - [ ] Neon + Vercel provisioning — **blocked on your accounts**
+
+Phase 2 arrived early: the Tabroom normalizer, sheet reader, Article XXI
+engine, and a three-stage backtest all landed while validating Phase 0. What
+remains of Phase 2 is loading the normalized data into Postgres, which needs
+the database.
 
 ### Phase 1 — Sheet mirror
 Ingest every tab. Ship team / individual / school / TOC-qual rankings with

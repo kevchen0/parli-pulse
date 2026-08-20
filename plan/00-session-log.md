@@ -108,10 +108,19 @@ breaks. Corrected and re-verified against the `Entry` tab: **Berkeley 31**
 - Entity matching by normalized surname pair (255 sheet rows still unmatched).
 
 ### Next
-- Close the `+1` NYPDL bucket (90 rows) — likely an AFS band edge.
-- Close the `-4` bucket (43 rows) — non-breakers scoring 0.
-- Improve entity matching to recover the 255 unmatched sheet rows.
-- Then: Drizzle schema, sheet mirror UI.
+- **Entity matching** is now the biggest lever: 255 unmatched sheet rows and
+  155 partnerships with no Tabroom data, versus only 47 rows failing on
+  arithmetic. Surname-pair matching is the bottleneck; Tabroom student ids
+  should replace it.
+- Load normalized data into Postgres (needs the database).
+- Sheet mirror UI (Phase 1).
+
+### Schema notes
+`packages/db/src/schema.ts` holds the Drizzle schema; `npm run db:generate`
+regenerates migrations. Two deliberate choices: official figures are mirrored
+into separate `official*` tables and never merged with ours, and every Article
+XXI adjustment gets its own column so a disagreement names the rule that
+diverged rather than an opaque total.
 
 ### Blocked
 - Neon + Vercel provisioning (needs your accounts).
