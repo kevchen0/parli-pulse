@@ -94,21 +94,28 @@ export function scoreEntry(
     return { ...empty, basePoints: null };
   }
 
-  const prelimAdj = prelimCountAdjustment(ctx.prelimCount);
-  const breakPenalty = breakPercentagePenalty(ctx.breakPct);
-  let points = base + prelimAdj + breakPenalty + walkover;
   let floorApplied: ScoreBreakdown['floorApplied'] = 'none';
 
   // XXI.3.B -- a breaking team with a winning prelim record receives at least
   // what the lowest-seeded breaking team with a winning record would have
   // earned on prelims alone.
+  //
+  // The floor lifts the *base*, and adjustments then apply on top of the
+  // lifted value; it is not a floor on the final total. Verified at NYPDL
+  // September OL, where a 4-1 breaking record floors octofinalists from 8 to
+  // 10 and the -1 break penalty still takes them to 9, not 10.
+  let effectiveBase = base;
   if (hasWinningRecord(perf.wins, perf.losses) && ctx.breakingRecord) {
     const floor = prelimPoints(ctx.breakingRecord.wins, ctx.breakingRecord.losses);
-    if (floor > points) {
-      points = floor;
+    if (floor > effectiveBase) {
+      effectiveBase = floor;
       floorApplied = 'pointsFloor';
     }
   }
+
+  const prelimAdj = prelimCountAdjustment(ctx.prelimCount);
+  const breakPenalty = breakPercentagePenalty(ctx.breakPct);
+  let points = effectiveBase + prelimAdj + breakPenalty + walkover;
 
   // XXI.2.F -- no team shall lose points from attending a tournament.
   if (points < 0) {
@@ -118,7 +125,7 @@ export function scoreEntry(
 
   return {
     points,
-    basePoints: base,
+    basePoints: effectiveBase,
     prelimCountAdjustment: prelimAdj,
     breakPenalty,
     walkoverAdjustment: walkover,
@@ -199,7 +206,11 @@ export function scoreToc(perf: TocPerformance, breakPct: number): ScoreBreakdown
     (perf.broke ? TOC_POINTS.breakBonus : 0) +
     perf.elimWins * TOC_POINTS.elimWin +
     (perf.champion ? TOC_POINTS.championshipBonus : 0);
-  const penalty = perf.broke ? breakPercentagePenalty(breakPct) : 0;
+  // XXI.4.A applies the break-percentage penalty of 2.D without limiting it to
+  // breaking teams, and the sheet bears that out: prelim-only competitors at
+  // the 2025-26 TOC show odd totals (5, 7) that a 2-points-per-ballot schedule
+  // cannot produce on its own.
+  const penalty = breakPercentagePenalty(breakPct);
   return {
     points: Math.max(0, base + penalty),
     basePoints: base,

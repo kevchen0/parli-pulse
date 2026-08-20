@@ -96,11 +96,15 @@ export interface NormalizedEvent {
    */
   publishedPrelimWins: Map<string, number>;
   /**
-   * Entry the `Final Places` result set marks as champion, if any. Only used
-   * to break ties when a final carries no ballot result; place labels are far
-   * too inconsistent to drive anything else. See plan/02-findings.md.
+   * Entries the `Final Places` result set marks as champion. Normally one, but
+   * a closeout (XXI.5.B) produces several -- Tabroom writes "Co-Champion", and
+   * some tournaments simply list two "1st" rows.
+   *
+   * This is the one place place-labels earn their keep. Round data alone
+   * cannot distinguish a closeout from a final whose result was never entered,
+   * and the two differ by a full level: 6 points in every band.
    */
-  finalPlacesWinner: string | null;
+  finalPlacesChampions: Set<string>;
 }
 
 export interface NormalizedTournament {
@@ -230,14 +234,14 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         }
       }
 
-      let finalPlacesWinner: string | null = null;
+      const finalPlacesChampions = new Set<string>();
       for (const rs of ev.result_sets ?? []) {
         if (rs.tag !== 'final') continue;
         for (const res of rs.results ?? []) {
-          if (/^(1st|1|first|champion)/i.test((res.place ?? '').trim())) {
-            finalPlacesWinner = id(res.entry);
-            break;
-          }
+          const place = (res.place ?? '').trim();
+          if (!/^(1st|1|first|champion|co-?champ)/i.test(place)) continue;
+          const e = id(res.entry);
+          if (e) finalPlacesChampions.add(e);
         }
       }
 
@@ -251,7 +255,7 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         rounds,
         prelimCount: rounds.filter((r) => r.isPrelim).length,
         publishedPrelimWins,
-        finalPlacesWinner,
+        finalPlacesChampions,
       });
     }
   }
@@ -363,6 +367,8 @@ export function computeFieldStats(event: NormalizedEvent): EventFieldStats {
           anyScored = true;
           if (r.isPrelim) scoredPrelims.set(b.entryId, (scoredPrelims.get(b.entryId) ?? 0) + 1);
         } else if (r.isPrelim && s.isBye) {
+          // Counted as a win in computeEntryPerformances; here it only needs to
+          // not look like a forfeit.
           prelimByes.set(b.entryId, (prelimByes.get(b.entryId) ?? 0) + 1);
         }
       }
@@ -456,30 +462,56 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
   };
   for (const entryId of event.entries.keys()) get(entryId);
 
+  // A round is won on a majority of its ballots, not per ballot: where prelims
+  // are panelled, counting ballots turns a 4-round tournament into a 6-0
+  // record and puts the team outside the XXI.3.A table entirely.
   const debated = new Map<string, number>();
   for (const r of event.rounds) {
     if (!r.isPrelim) continue;
+    const perEntry = new Map<string, { won: number; total: number }>();
     for (const s of r.sections) {
       for (const b of s.ballots) {
-        if (!b.entryId || b.won === null) continue;
-        const p = get(b.entryId);
-        debated.set(b.entryId, (debated.get(b.entryId) ?? 0) + 1);
-        if (b.won) p.wins++;
-        else p.losses++;
+        if (!b.entryId) continue;
+        // A prelim bye is a win, not an unplayed round: the team sat alone in
+        // the section and advances with the round credited to it.
+        if (b.won === null) {
+          if (!s.isBye) continue;
+          const t = perEntry.get(b.entryId) ?? { won: 0, total: 0 };
+          t.total++;
+          t.won++;
+          perEntry.set(b.entryId, t);
+          continue;
+        }
+        const t = perEntry.get(b.entryId) ?? { won: 0, total: 0 };
+        t.total++;
+        if (b.won) t.won++;
+        perEntry.set(b.entryId, t);
       }
+    }
+    for (const [entryId, t] of perEntry) {
+      const p = get(entryId);
+      debated.set(entryId, (debated.get(entryId) ?? 0) + 1);
+      if (t.won * 2 > t.total) p.wins++;
+      else p.losses++;
     }
   }
 
-  // Where tab published win totals, trust them: a ballot whose result was
-  // never entered otherwise silently shortens a team's record, which drops it
-  // out of the XXI.3.A table entirely.
+  // Where tab published win totals, trust them over counted ballots.
   const prelimCount = event.rounds.filter((r) => r.isPrelim).length;
   for (const [entryId, wins] of event.publishedPrelimWins) {
     const p = out.get(entryId);
-    if (!p) continue;
-    const rounds = Math.max(debated.get(entryId) ?? 0, prelimCount);
-    p.wins = wins;
-    p.losses = Math.max(0, rounds - wins);
+    if (p) p.wins = wins;
+  }
+
+  // Losses are the rounds a team did not win, not the losses we could find a
+  // ballot for. An unscored ballot otherwise shortens the record -- 2-1 becomes
+  // 2-0 -- and a short record is absent from the XXI.3.A table, so the team
+  // silently scores nothing. The league counts the full round schedule; teams
+  // that genuinely stopped competing are removed by the forfeit rule instead.
+  for (const [entryId, p] of out) {
+    if (!event.entries.has(entryId)) continue;
+    const played = Math.max(debated.get(entryId) ?? 0, prelimCount);
+    p.losses = Math.max(0, played - p.wins);
   }
 
   const { main } = partitionElimRounds(event.rounds);
@@ -505,18 +537,28 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
       }
     }
   }
-  // An unscored championship round is ambiguous: it is a closeout (XXI.5.B,
-  // both teams champions) only when the finalists share a school. Otherwise
-  // the result simply was not entered, and promoting the runner-up to champion
-  // overstates them by a full level -- exactly 6 points in every band.
-  //
-  // For the not-entered case the round data cannot name a winner, so this is
-  // the one place `Final Places` labels earn their keep: they are the only
-  // remaining signal. Resolved by the caller via `finalPlacesWinner`.
+  // Resolve the championship round. Two failure modes matter and pull in
+  // opposite directions: a closeout gives every finalist champion points, and
+  // a final whose result was never entered gives none of them champion points.
+  // Round data cannot tell them apart, so `Final Places` decides where it
+  // speaks -- this is the only judgement it is trusted with.
   const championship = ordered[0];
   if (championship && championship.sections.length === 1) {
     const sec = championship.sections[0]!;
-    if (sec.unscored && sec.entryIds.length > 1) {
+    const champions = event.finalPlacesChampions;
+    const knownHere = sec.entryIds.filter((e) => champions.has(e));
+
+    if (knownHere.length > 0) {
+      for (const entryId of sec.entryIds) {
+        const p = out.get(entryId);
+        if (!p) continue;
+        const isChampion = champions.has(entryId);
+        p.elimLevel = isChampion ? 'first' : 'second';
+        p.wonFinal = isChampion;
+      }
+    } else if (sec.unscored && sec.entryIds.length > 1) {
+      // No result and no label. Same school means a closeout; otherwise the
+      // result is merely missing and nobody may be promoted to champion.
       const schools = new Set(
         sec.entryIds.map((e) => event.entries.get(e)?.schoolId).filter((x): x is string => !!x),
       );
@@ -524,13 +566,8 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
       for (const entryId of sec.entryIds) {
         const p = out.get(entryId);
         if (!p) continue;
-        if (isCloseout) { p.elimLevel = 'first'; p.wonFinal = true; }
-        else if (p.elimLevel === 'first') { p.elimLevel = 'second'; p.wonFinal = false; }
-      }
-      if (!isCloseout) {
-        const winner = event.finalPlacesWinner;
-        const wp = winner ? out.get(winner) : undefined;
-        if (wp && sec.entryIds.includes(winner!)) { wp.elimLevel = 'first'; wp.wonFinal = true; }
+        p.elimLevel = isCloseout ? 'first' : 'second';
+        p.wonFinal = isCloseout;
       }
     }
   }

@@ -38,18 +38,36 @@ against the official sheet. Points engine not yet written.
 | elim field | 75/79 (95%) |
 | prelim # | 70/79 (89%) |
 
-**Stage 2 — per-entry points** (vs `Entry` tab): **1082/1329 (81%)**
-CHSSA 66% · NYPDL 88% · Regular 81% · broke 85% · prelims-only 78% ·
-hybrids 86% · base points 87% · prelim+break adj **100%**
+**Stage 2 — per-entry points** (vs `Entry` tab): **1212/1329 (91%)**
+NYPDL **100%** · Regular 91% · CHSSA 71% · broke **97%** · prelims-only 86% ·
+hybrids **100%** · prelim+break adjustment 100%
 
-**Stage 3 — aggregates**: individual 63%, team 71%, school 26%
-(school is lowest because one wrong entry poisons a whole school's sum).
+**Partnerships** (`backtest-teams.ts`, vs `team_calc`): **527/675 (78%) exact**,
+81% within 2 points. Restricted to teams whose every result we reproduce:
+**526/530 = 99%**, so XXI.7 weighting is correct and the remainder is per-entry
+coverage. Failure attribution: 105/148 a per-entry score disagrees, 39/148
+missing a tournament, **4/148 aggregation-only**.
 
-**Top remaining delta buckets**: `+1` (90 rows, NYPDL base off by 2 — AFS band
-edge), `-4` (43, non-breakers scored 0 where sheet gives 4), `+6` (24,
-champion-vs-finalist), `-7` (23, mixed).
+**Aggregates**: individual 63%, team 71%, school 26% (school is worst because
+one wrong entry poisons a whole school's sum).
+
+**Remaining weak spots**: CHSSA 71%, region CA3 39% / CA4 50% / OR 60%,
+255 sheet rows still unmatched by surname pair.
 
 ### Key decisions made this session
+0. **Rule-order and data-shape fixes found by backtesting** (81% -> 91%):
+   - **The XXI.3.B points floor lifts the *base*, then adjustments apply on
+     top** — it is not a floor on the final total. NYPDL 88% -> 98%. Settles
+     open question Q4.
+   - **XXI.4.A's break penalty applies to non-breaking TOC teams too** (their
+     totals are odd numbers, impossible from a 2-per-ballot schedule).
+   - **A prelim round is won on a majority of ballots, not per ballot** —
+     panelled prelims otherwise produce a 6-0 record in a 4-round tournament.
+   - **A prelim bye is a win**, not an unplayed round.
+   - **`Final Places` decides the championship round.** Round data cannot
+     distinguish a closeout (everyone champion) from an unentered final
+     (nobody champion), and they differ by 6 points in every band. This is the
+     only judgement place-labels are trusted with.
 1. **Elim data comes from `rounds[]`/`sections[]`, never from `Bracket` result
    sets or place labels.** A survey found 41+ label spellings for 7 levels
    (`Octos`/`Octofina`/`Octafina`/`Octas`/`Octo`/`Octs`/`OCT`/`VO`...), some
