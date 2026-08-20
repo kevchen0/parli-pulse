@@ -1,0 +1,1425 @@
+﻿BYLAWS
+of National Parliamentary Debate League
+(a California Nonprofit Public Benefit Corporation)
+
+
+ARTICLE I: DEFINITIONS
+
+
+I.1: Name
+A. The name of this corporation is National Parliamentary Debate League.
+B. These Bylaws may also refer to National Parliamentary Debate League as ‘NPDL’ or ‘league’ or ‘corporation.’
+
+
+I.2: Purposes
+(see Article II of NPDL Articles of Incorporation)
+A. This corporation is a Nonprofit Public Benefit Corporation and is not organized for the private gain of any person. It is organized under the California Nonprofit Public Benefit Corporation Law for public and charitable purposes.
+B. The specific purpose of this corporation is to facilitate democratic participation in the parliamentary debate community and promote the education of parliamentary debate students.
+C. To accomplish its purposes, NPDL shall aim to do the following:
+1) Organize the NPDL Tournament of Champions.
+2) Report on important news in the parliamentary debate community.
+3) Oversee the creation and compilation of free and publicly available educational resources for parliamentary debate students and coaches.
+4) Support the tournaments, high school clubs, and other events that offer parliamentary debate.
+5) Increase access to parliamentary debate for socioeconomically, racially, or regionally disadvantaged students and schools.
+6) Provide democratic representation to the high school parliamentary debate community.
+
+
+I.3: Structure
+League Rules consist of the Bylaws and the Code. The Code consists of the Legislative Code and the Board Code.
+
+
+I.4: Hierarchy of Authority
+A. The NPDL hierarchy of authority shall be as follows:
+1) The Bylaws
+2) The Legislative Code and the non-expired temporary measures
+3) The Board Code and the non-expired Board decisions
+4) The decisions of directors performing their duties
+B. If two rules/decisions contradict each other, the one higher on the hierarchy shall be followed. If two rules/decisions on the same level of the hierarchy contradict each other, the one adopted more recently shall be followed.
+
+
+I.5: Deadlines
+A. A deadline stated as being ‘N’ days prior to a given event shall be defined as being exactly ‘N×24’ hours prior to 11:59:59 PM (Pacific Time) of the day on which that event starts.
+B. A deadline stated as being ‘N’ days after a given event shall be defined as being exactly ‘N×24’ hours after 11:59:59 PM (Pacific Time) of the day on which that event ends.
+C. If something is allowed no earlier than ‘N’ days after a given event, then it is allowed no earlier than exactly ‘(N−1)×24’ hours after 11:59:59 PM (Pacific Time) of the day on which that event ends.
+D. A deadline stated as being on a given day shall be defined as being at 11:59:59 PM (Pacific Time) of that day.
+E. If a section stating a particular deadline conflicts with this section, the section stating that particular deadline shall take precedence.
+
+
+I.6: Parliamentary Debate
+For purposes of membership eligibility, “parliamentary debate” is a debate between two two-student teams. The exact text of the resolution is given to students no earlier than 60 minutes prior to the start of the round and no later than 10 minutes prior to the start of the round. The combined duration of all speeches in the round is at least 30 minutes. Each team delivers at least three speeches. This definition does not limit what types of arguments the teams may present in the round or the discretion of tournaments to be managed independently.
+
+
+I.7: Term
+A term shall last one year, shall begin on July 1 and end on June 30.
+
+
+I.8: Fiscal Year
+Unless changed by the Board, the fiscal year of NPDL shall begin on July 1 and end on June 30.
+
+
+I.9: School
+A “school” is an institution in the United States of America that serves students in grades 9 (or 10) through 12, is an accredited public school or a registered private school, and graduating from which grants its students a high school diploma.
+
+
+I.10: Tournament
+For the purposes of membership eligibility, a “tournament” shall consist of at least three preliminary rounds of parliamentary debate (see 6) held during a given term on one day or on consecutive days and shall fall into at least one of the two categories below:
+1) The tournament is open to all schools, and is open to any high school student a school wishes to enter. A tournament may, however, restrict the number of entries per school and/or cap the total number of entries.
+2) The tournament is directly run by
+- NPDL; or
+- NYPDL; or
+- CHSSA or one of its constituent leagues; or
+- OHSSL-CA or one of its constituent districts.
+
+
+I.11: Debate Program Supervisor
+A. A “debate program supervisor” is a person officially authorized by the school to supervise the debate club/team. This may be a school administrator, a club adviser, or a head coach.
+B. The Board Code may establish a procedure to verify the debate program supervisor.
+C. In case of a dispute, the school principal shall have final say over who shall count as the debate program supervisor.
+
+
+I.12: Region
+A. A “region” is any state in the United States of America, with the exception of California, that contains at least three members.
+B. In addition, the following sets of California counties shall be regions, so long as they contain at least three members:
+1) Alameda, Contra Costa, Del Norte, Humboldt Lake, Marin, Mendocino, Monterey, Napa, San Francisco, San Benito, San Mateo, Santa Clara, Santa Cruz, Siskiyou (West of Yreka), Solano (South-West of Highway 12), Sonoma, Trinity;
+2) Alpine, Amador, Butte, Calaveras, Colusa, El Dorado, Fresno, Glenn, Inyo, Kern, Kings, Lassen, Madera, Mariposa, Merced, San Joaquin, Modoc, Nevada,  Placer, Plumas, Sacramento, Shasta, Sierra, Siskiyou (East of Yreka), Solano (North-East of Highway 12), Stanislaus, Sutter, Tehama, Tulare, Tuolumne, Yolo;
+3) Los Angeles (Except Bonita, Claremont, and Pomona school districts), San Luis Obispo, Santa Barbara, and Ventura;
+4) Imperial, Los Angeles (Only Bonita, Claremont, and Pomona School Districts), Orange County, Riverside, San Bernardino, San Diego.
+
+
+I.13: Numbering
+A. Changing the order and/or numbering/lettering of articles/sections/subsections in the League Rules without changing their text or their place in the hierarchy of authority shall not require an amendment and may be done by the Board.
+B. When the League Rules or the California Codes are amended, the Secretary shall adjust the numbering and references throughout the League Rules to maintain consistency. The Secretary shall inform the Board of the adjustments made.
+
+
+I.14: Construction
+Unless the context requires otherwise, the general provisions, rules of construction, and definitions in the California Nonprofit Public Benefit Corporation Law shall govern the construction of these Bylaws.
+
+
+
+
+ARTICLE II: MEMBERSHIP
+
+
+II.1: Voting Members
+A. Meeting both of the following criteria is necessary and sufficient to be eligible to become an NPDL member:
+1) Being either
+- a non-charter public school (see I.9), or
+- a private or charter school (see I.9) that enrolls at least 100 students in grades 9 (or 10) through 12.
+2) Attending at least three tournaments (see I.10). A tournament shall only count if
+- at least one team consisting of two students from that school
+- competed in parliamentary debate (see I.6) at that tournament
+- during the current term or the immediately preceding term.
+B. A school becomes a member (or renews its membership) upon
+- completing its membership registration for the current term, and
+- notifying the Secretary in writing that it meets all membership criteria (see A).
+The Code may determine the registration and notification procedures.
+
+
+II.2: Observers
+A. A school (see I.9) that has current registration (see 1.B) but does not meet one or more criteria for membership (see 1.A) shall be classified as an observer school.
+B. An observer school shall have the same rights as a member school, except the right to vote.
+
+
+II.3: Termination of Membership
+A. A school’s membership registration for a given term shall expire (see CORP § 5340) on October 31 of the next term.
+B. The Board may amend subsection A of this section to change the expiration date, so long the date is no earlier than September 1 and no later than June 30 of the next term. Notwithstanding Article III and Article IV, such an amendment shall not require ratification by the Legislature. The amendment shall take effect 35 days after the Board provides notice to the membership.
+C. Other than expiration because of nonrenewal, a school's membership may be terminated only by the school itself, upon written notice to the Board by the debate program supervisor or representative (see CORP § 5340). If a school no longer satisfies the membership criteria at a time prior to the expiration of its membership, that shall not affect the good standing of its membership.
+D. Being ineligible for renewal (see 1.B) does not constitute an expulsion, a suspension, or a termination of membership (see CORP § 5341).
+
+
+II.4: Disclaimers
+A. NPDL is organized with members, but without capital stock.
+B. Membership in NPDL does not constitute an ownership interest in any asset of NPDL at any time. Termination of membership for any reason shall not give rise to any liability by the NPDL or its directors. Each member is received into membership on its express agreement to this provision. This provision is not for the purpose of penalizing any school whose membership shall be forfeited, or otherwise terminated, but rather because no membership will have any real or intrinsic value.
+C. A membership or any right arising from membership may not be transferred to another school or person.
+D. No school shall hold more than one membership in NPDL.
+E. Except as limited by law, no member is liable for NPDL’s debts, liabilities, or obligations.
+
+
+II.5: School Representatives
+A. The Board Code shall create a procedure for schools to designate or change their representatives. The debate program supervisor (see I.11) must be notified of any designation or change. In case of a dispute, the debate program supervisor shall have final say over who shall count as their school’s representative(s).
+B. The initial adult representative shall be designated by the debate program supervisor. The adult representative of a member school must be a natural person who is a high school graduate, is at least 18 years old, and works with the school’s parliamentary debate club/team. No person shall be the adult representative for more than two schools.
+C. The debate program supervisor may create a procedure for the selection of a student representative from the same school.
+
+
+D. No school may have more than one adult representative. No school may have more than one student representative. A school need not have an adult representative and need not have a student representative.
+II.6: Legislature
+A. The Legislature shall be composed of representatives of the member schools.
+B. Every representative shall have one vote.
+
+
+II.7: Powers
+A. The Legislature may
+- amend the League Rules,
+- pass temporary measures,
+- pass motions during its meetings of members,
+- elect the Board.
+B. Decisions of the Legislature may cover the following subjects:
+- the conduct of meetings of members, written ballots, and Board elections,
+- league finances and records,
+- tournament logistics and rules.
+
+
+II.8: Temporary Measures
+A. A temporary measure may
+- suspend sections of the Code,
+- add pilot sections to the Code,
+- interpret League Rules and enforce the NPDL hierarchy of authority,
+- give direction to the Board or to individual directors.
+B. A temporary measure shall expire at the end of the term that immediately follows the term during which it was passed, unless an earlier expiration date is specified in the measure.
+
+
+
+
+ARTICLE III: LEGISLATION BY WRITTEN BALLOT
+III.1: Scope
+A. The Legislature may pass proposals by a Written Ballot.
+B. All voting on Written Ballot proposals shall occur during a voting period. Representatives may vote by submitting their ballots to the Board email. The Code may establish additional ways for representatives to vote.
+C. There shall be two regular voting periods per term, scheduled by the Legislative Code.
+D. A Written Ballot proposal may be a League Rules amendment or a temporary measure.
+E. The Written Ballot shall include all proposals submitted as prescribed by Section 2, Section 3, or the Code.
+
+
+III.2: Proposal Submission by the Board
+A. The ballot shall include all eligible proposals approved by a two-thirds majority of the Board.
+B. Proposal drafts must be submitted to representatives for review and comment at least 10 days (see I.5.A) prior to the final vote by the Board.
+
+
+III.3: Proposal Submission by a Legislative Committee
+A. The ballot shall also include all eligible proposals approved by
+- a majority of a legislative committee, not counting explicitly abstaining votes, AND
+- at least 4 members of that legislative committee, AND
+- members of that legislative committee from at least 2 different regions.
+B. A legislative committee is a teleconferencing meeting of representatives called to review proposals for a voting period. Any representative may attend a legislative committee. A legislative committee must include at least two adult representatives at all times.
+C. A legislative committee member is any representative present for the vote who attended that legislative committee for at least 20 minutes.
+D. Any representative may sponsor a proposal for approval by a legislative committee. To do so, the sponsor should submit the draft text of the proposal in writing (or have the Secretary submit it on the sponsor’s behalf) to the other representatives.
+E. The legislative committee meeting time shall be set by the sponsor, provided that:
+- the committee may meet no earlier than 10 days after the proposal was submitted to the representatives (see I.5.C);
+- committees may meet during weekdays between 4 PM and 7PM (Pacific Time);
+- committees may meet during other time slots, but only if no representative who wishes to serve on the committee objects;
+- committee meeting times must be announced to representatives at least 3 days in advance (see I.5.A).
+F. Legislative committees may revise the text of proposals submitted to them.
+G. Each legislative committee may approve no more than 3 proposals.
+H. After a committee approves a proposal, the final draft and the vote count must be submitted to the Board in writing within 7 days. The proposal shall then be included on the first Written Ballot scheduled to start at least 7 days after the proposal was submitted to the Board.
+
+
+III.4: Proposal Submission Guidelines
+A. The Code may:
+- specify how proposals ought to be submitted, and
+- create proposal formatting criteria.
+Notwithstanding Sections 1-3, proposals that do not satisfy these requirements shall be excluded from the Written Ballot.
+B. If a proposal draft (see 3.D) does not satisfy a requirement in sub-section A, but the sponsor was not notified of this in writing prior to the legislative committee meeting, that requirement shall not be enforced.
+C. Any Board amendment to the Code language pertaining to this section shall take effect immediately after the end of the first subsequent regular voting period.
+
+
+III.5: Passing a Proposal
+A. For each proposal, the ballot shall include four options:
+- Yes;
+- No;
+- Abstain;
+- Table until the next meeting of members.
+B. A proposal that amends the Bylaws (or both the Bylaws and the Code) shall be considered passed by the Legislature if during the voting period:
+- 90% of the representatives who submit their vote, not counting representatives who explicitly abstained, vote Yes on the proposal, and
+- 20% of the total number of representatives in the league, not counting representatives who explicitly abstained, vote Yes on the proposal.
+C. A proposal that amends the Code (but not the Bylaws), and is not a temporary measure, shall be considered passed by the Legislature if during the voting period:
+- two thirds of the representatives who submit their vote, not counting representatives who explicitly abstained, vote Yes on the proposal, and
+- 20% of the total number of representatives in the league, not counting representatives who explicitly abstained, vote Yes on the proposal.
+D. A temporary measure proposal shall be considered passed by the Legislature if during the voting period:
+- a majority of the representatives who submit their vote, not counting representatives who explicitly abstained, vote Yes on the proposal.
+E. A proposal shall be considered rejected by the Legislature if during the voting period:
+- a majority of the representatives who submit their vote, not counting explicitly abstaining votes, vote No on the proposal.
+F. All other proposals on the Written Ballot shall be tabled until the next meeting of members.
+
+
+III.6: Contradictions
+A. The Board may, within the limits established by the Code, determine that two or more proposals on the same Written Ballot contradict each other.
+B. The Written Ballot shall then include another question asking representatives to rank the proposals that were determined to contradict each other.
+C. The winning proposal shall be determined using the IRV (Instant Runoff Voting) method. The Code may specify the implementation of this method. The winning proposal shall be considered passed by the Legislature if it satisfies the criteria listed in Section 5.
+D. Notwithstanding Section 5, all proposals that were determined to contradict the winning proposal shall be considered rejected by the Legislature.
+
+
+III.7: Special Voting Periods
+A. The Code may create a procedure for scheduling special voting periods.
+B. The Code may create additional requirements for submitting a proposal for or passing a proposal during a special voting period, beyond those specified in this article.
+
+
+
+
+ARTICLE IV: MEETINGS OF MEMBERS
+IV.1: Scheduling
+A. The Code or the Board shall schedule a special meeting of members between the end of each regular voting period and the start of the next regular voting period.
+B. Additional special meetings of members may be scheduled as specified in the CA Corporations Code (see CORP § 5510(e)).
+C. A written notice of a meeting of members shall be given to the representatives at least 35 days prior to that meeting. The notice shall include:
+- the date and time of the meeting;
+- the location of the meeting (a physical location and/or a teleconferencing platform).
+
+
+IV.2: Quorum
+A. The quorum for a meeting of members shall consist of 20% of the total number of representatives in the league, present physically or via teleconferencing or represented by proxy.
+B. The members present at a duly called or held meeting at which a quorum is present may continue to transact business until adjournment notwithstanding the withdrawal of enough members to leave less than a quorum, if any action taken is approved by at least a majority of the members required to constitute a quorum (see CORP § 5512).
+C. The Board may amend subsection A of this section to lower the quorum. Notwithstanding Article III and Article IV, such an amendment shall not require ratification by the Legislature. The amendment shall take effect 35 days after the Board provides notice to the membership.
+
+
+IV.3: Agenda
+A. The agenda for a meeting of members shall include all proposals tabled during any of the voting periods (see III.5.F) held since the immediately preceding meeting of members.
+B. The Code may create additional ways to add proposals to the agenda for a meeting of members.
+
+
+IV.4: Motions
+A. The Code may prescribe the procedures and the majority/supermajority requirements by which the Legislature may pass motions during a meeting of members to:
+- split a proposal into multiple proposals;
+- modify proposal text.
+B. During a meeting of members, the Legislature may, by a two-thirds vote (see 8.B), pass a motion to add to the meeting agenda a temporary measure proposal.
+
+
+IV.5: Remote Participation
+The Code may create procedures for representatives to participate in and vote in meetings of members remotely.
+
+
+IV.6: Proxies
+A. Any adult representative can choose another school’s adult representative to serve as a proxy and empower that proxy to cast a vote on any given proposal on the representative’s behalf at a meeting of members.
+B. Any student representative can choose another school’s student representative to serve as a proxy and empower that proxy to cast a vote on any given proposal on the representative’s behalf at a meeting of members.
+C. No representative may hold more than six proxies.
+D. No proxy shall be allowed to cast more than 20% of the votes on any proposal.
+E. The representative designating a proxy must correspond with the Secretary in writing to make this official.
+F. If a meeting of members is held at a tournament, a representative shall not transfer their vote to a proxy if that representative’s school is attending the tournament.
+G. A vote cast by a proxy on a representative’s behalf is final and shall count as that representative’s vote on any proposal voted on by the Legislature.
+
+
+IV.7: Passing a Proposal
+A. Except where specified otherwise in these Bylaws, being passed by the Legislature shall require approval by a simple majority of the representatives who cast a vote at a meeting of members, not counting representatives who explicitly abstained.
+B. Amending the Bylaws shall require a two-thirds vote of the Legislature. A two-thirds vote of the Legislature means approval by a two-thirds majority of the representatives who cast a vote at a meeting of members, not counting representatives who explicitly abstained.
+
+
+IV.8: Dissolution
+A. The process for dissolving this corporation shall be the same as the process for amending the bylaws (see III, IV).  If the membership votes in favor of dissolution, the directors shall promptly cease operations and proceed to dissolve the corporation.
+B. Upon the dissolution of the corporation, its assets remaining after payment, or provision for payment, of all debts and liabilities of this corporation shall be distributed to a nonprofit organization which is organized and operated exclusively for charitable purposes and which has established its tax exempt status under Section 501(c)(3) of the Internal Revenue Code.
+ARTICLE V: BOARD OF DIRECTORS
+V.1: Powers
+A. The Board of Directors (“Board”)  shall have the power to make all decisions about the league, so long as these decisions are consistent with the Hierarchy of Authority (see I.4).
+B. Except as specified otherwise in the Bylaws or the Legislative Code, the Board may amend the Board Code.
+C. The Board shall have the power to determine its internal procedures, within the limits established by these Bylaws and by the law (see CORP § 5210-5215).
+
+
+V.2: Composition
+A. There shall be 7 Board seats.
+B. The 5 Board positions shall be:
+- President (1 seat),
+- Secretary (1 seat),
+- Treasurer (1 seat),
+- TOC Director (1 seat),
+- Outreach Director (3 seats).
+C. Each seat shall be held by one natural person, who may be referred to as a director or a Board member.
+D. No person may hold more than one Board seat at a time.
+
+
+V.3: Board Meetings
+A. The Board may hold meetings in person or via teleconferencing.
+B. 4 directors present at the meeting shall constitute a quorum for the transaction of business.
+C. Regular Board meetings shall be scheduled by the Board Code.
+D. The Board may only amend the regular Board meeting schedule by a unanimous vote.
+E. The Board may not amend the regular Board meeting schedule between March 1 and June 30.
+F. A regular Board meeting may be canceled prior to that meeting by the Board or by a written request of any 4 directors.
+G. A special Board meeting may be scheduled, rescheduled, or canceled by a written request of any 4 directors.
+
+
+V.4: Board Decisions
+A. Every director shall have one vote on the Board. 
+B. Directors may not, in their capacity as directors, vote by proxy.
+C. Except as specified otherwise in the Bylaws or the Legislative Code, the Board shall make decisions by a simple majority vote.
+D. When calculating Board majority or supermajority requirements, the denominator shall include all directors who vote Yes, vote No, are absent, or did not vote. The denominator shall not include directors who explicitly abstained.
+E. Board decisions made without a meeting shall require unanimous written consent of the directors (see CORP § 5211(b)).
+F. Except as specified otherwise in the Bylaws or the Legislative Code, the Board shall appoint people by a plurality vote if there are multiple candidates.
+G. Any Board decision not codified in the Board Code shall expire at the end of the term during which it was made, unless an earlier expiration date is specified in the decision.
+
+
+V.5: Term Limits
+A. No person shall serve on the Board (regardless of the specific position) for more than five consecutive terms, with serving for part of a term counting the same as serving for a full term.
+B. A break in service allowing a person to run for and serve on the Board again after being term-limited is defined as one full term.
+
+
+V.6: Vacancies
+A. A proposal to remove a director from the Board shall require the approval of 5 directors. That director can then be removed from the Board, with or without cause, by the Legislature via a Written Ballot in which at least 20% of the representatives vote Yes, No, or Abstain.
+B. The Board may adopt a resolution of vacancy in the office of a director who has been declared of unsound mind by an order of court, convicted of a felony, or found by final order or judgment of any court to have breached a duty under the California Nonprofit Public Benefit Corporation Law.
+C. Any director who misses 3 consecutive regular Board meetings for any reason shall automatically lose their seat on the Board.
+D. A director may resign by submitting a resignation in writing to the Board.
+E. A Board vacancy may occur if no candidates run for a position or if a single candidate runs for a non-Outreach position but a majority of ballots cast are explicitly against the candidate, or if there are fewer Outreach Director candidates than there are Outreach Director positions. A ballot that contains no vote for the race in question will not be considered “against the candidate.”
+F. In the event of a Board vacancy, the remaining directors shall, as soon as possible, appoint a replacement director (see 4.F). If there are fewer than 4 remaining directors, the remaining director(s) may fill the director vacancies by unanimous written consent. Once appointed, the replacement director shall, unless removed, serve until June 30.
+
+
+V.7: Contracts
+A. Only the Board and its designees shall have the power to enter binding contracts on behalf of NPDL.
+B. The Board and its designees shall not, without the approval of the Legislature, incur debts on behalf of NPDL that exceed what the total monetary assets of NPDL are at the time that the debt is incurred.
+C. The Board and its designees shall not, without the approval of the Legislature, make any non-monetary commitments on behalf of NPDL that bind NPDL for longer than two years.
+D. The Board will adopt a Conflict of Interest Policy and each Board member shall annually sign a statement that they have received, read, understood, and agreed to comply with such policy.
+
+
+V.8: Compensation and Reimbursement
+A. Directors shall not receive compensation for their services on the Board.
+B. Directors may receive such reimbursement of expenses as the Board may determine by resolution to be fair and reasonable at the time that the resolution is adopted.
+
+
+V.9: Property Rights
+No director shall have any property rights in any assets of the corporation.
+
+
+V.10: Officers
+A. Each director shall be an officer of this corporation. Only directors may be officers of this corporation.
+B. The 7 officer positions shall be:
+- President,
+- Secretary,
+- Treasurer (who shall be the chief financial officer),
+- TOC Director,
+- 3 Outreach positions, as defined by the Board Code.
+C. No person may hold more than one officer position at a time.
+D. The Board Code shall, in a manner consistent with the Bylaws, define the duties of each officer position.
+E. The Board may only amend officer duties by a unanimous vote.
+F. The Board may not amend officer duties between March 1 and June 30.
+G. The director who placed first in the STV election shall choose any one of the three Outreach positions. The director who placed second shall then choose either one of the two remaining Outreach positions. The director who placed third shall then serve in the remaining Outreach position. Declaring a candidacy for Outreach Director indicates willingness to serve in any Outreach position.
+H. All officers shall have read through the full current text of these Bylaws.
+I. Any officer may temporarily transfer some of their duties to a designee.
+
+
+
+
+ARTICLE VI: BOARD ELECTIONS
+VI.1: Scheduling
+Regular elections for all Board positions shall be scheduled by the Code to occur in March, April, or May and shall be announced to the representatives at least 30 days prior to the start of the elections. The Code shall designate a voting period during which representatives can vote on candidates for the Board.
+
+
+VI.2: Inspector of Elections
+A. The Board shall appoint the Inspector of Election. Any two Board members may jointly appoint an assistant Inspector of Election, but no Board member may do so for more than one assistant.
+B. Board elections shall be conducted via written ballot in a manner determined by the Inspector of Election within the limits established by the League Rules.
+C. Counting votes and other elections logistics shall be the duty of the Inspector of Election.
+D. An Inspector of Election (including assistants) may not be a candidate in the elections they supervise.
+
+
+VI.3: Candidacy Declarations
+A. Candidacies must be declared in writing to the representatives by the candidate (or the Inspector of Election declaring on behalf of the candidate) at least 15 days prior to the elections.
+B. The Code may establish additional candidacy declaration procedures.
+C. No person may run for more than one Board position at a time.
+D. No person who is younger than 18 years old or who is enrolled in high school may run for or serve on the Board.
+E. No person who is term-limited may run for or serve on the Board (see V.5).
+F. All other people may run for the Board, so long as they follow the candidacy declaration procedures.
+
+
+VI.4: Election Procedures
+A. All directors other than Outreach Directors shall be elected as follows:
+1) If there is only one candidate for a Board position, that candidate shall be elected if they are confirmed by a simple majority vote of all representatives who cast a ballot.
+2) If there are two candidates for a Board position, the candidate receiving more votes shall be elected.
+3) If there are three or more candidates for a Board position, the IRV (Instant Runoff Voting) method shall be used. The school representatives shall rank the candidates from most to least preferred. The ballots shall be counted, and the candidate with the smallest number of voters who picked them as their top choice shall be eliminated. The voters who voted for the eliminated candidate shall have their ballots re-distributed to their second choice, if indicated, then their third choice, and so on. This procedure shall be repeated until only one candidate remains. That candidate shall be elected.
+B. Outreach Directors shall be elected using the STV (Single Transferable Vote) method.
+C. A tie at any of the steps shall be resolved in favor of the candidate who is the top choice for the greater number of people, then, if that is also a tie, the second choice, and so on.
+If the election takes place during an even calendar year, otherwise unbreakable ties shall be broken in favor of the candidate whose last name, as it appeared on the ballot, comes first alphabetically. If the election takes place during an odd calendar year, otherwise unbreakable ties shall be broken in favor of the candidate whose last name, as it appeared on the ballot, comes last alphabetically.
+
+
+D. The Code shall create procedures to ensure that
+- all voters are guaranteed a secret ballot,
+- the vote count is verifiable, and 
+- no person casts more votes than they are entitled to cast.
+
+
+VI.5: Term
+A. Once elected, a director’s term shall start on July 1 and shall conclude on the following June 30.
+B. If a director is elected to fill a vacancy, that director’s term shall start immediately after the election and shall conclude at the end of the term during which the election was held.
+
+
+VI.6: Special Elections
+A. Special elections for all Outreach Director positions and/or for one or more non-Outreach Director Board positions, whether vacant or not, may also be called at any point during the term by a petition listing the proposed special voting period (see III.7) for the elections, the Inspector(s) of Election, and supported in writing by the majority of all representatives in the league.
+B. If the incumbent director declines to run in the special election or loses the special election, their term shall end as soon as the election results are certified. The winning candidate shall then become a director, and shall serve until June 30.
+
+
+
+
+ARTICLE VII: RECORDS AND REPORTS
+VII.1: League Rules
+The Board shall ensure that the official copies of the Articles of Incorporation, the Bylaws, and the Code are available to the membership and are updated within 60 days of any amendment (see CORP § 5160).
+
+
+VII.2: Minutes
+A. The Board shall ensure that the minutes from any meeting of members or of the Board (see CORP § 6320) are made available to the membership within 60 days of the meeting.
+B. For every vote of the membership at a meeting or via written ballot, the Board shall keep a record of how many representatives voted for each option (see CORP § 6325).
+
+
+VII.3: Board Roster
+A. The Board shall keep a record of each director’s name, address, telephone number, and email address.
+B. The Board shall ensure that the membership is notified of any change in the composition of the Board within 60 days of the change.
+
+
+VII.4: Member Roster
+A. The Board shall ensure that prior to any vote of the membership, a roster listing the names and school affiliation of all representatives eligible to participate in that vote is made available to the membership (see CORP § 6330).
+B. For each member school that requests to receive notices electronically, the Board shall record the email(s) of the school’s representative(s) and debate program supervisor. For each member school that requests to receive notices by regular mail, the Board shall record the school’s mailing address (see CORP § 6320).
+
+
+VII.5: Finances
+A. The Board shall keep adequate and correct books and records of account (see CORP § 6320).
+B. Every director shall have the absolute right at any reasonable time to inspect and copy all books, records and documents of every kind (see CORP § 6334).
+C. The Board shall release an annual financial summary to the members.
+
+
+
+
+________________
+
+
+LEGISLATIVE CODE
+
+
+ARTICLE XI: NPDL TOURNAMENT OF CHAMPIONS PROCEDURES
+
+
+XI.1: Dates
+The NPDL Tournament of Champions (NPDL-TOC) shall be held each year between March 20 and May 31 at a site selected no later than December 20 of a season.
+
+
+XI.2: Qualification
+A. The Board Code shall establish a ranking system by which teams may earn points through tournament competition (see XXI). Any team which reaches the autoqualification point threshold by the deadline set by the Board Code shall autoqualify to NPDL-TOC.
+B. The autoqualification point threshold shall equal the average (rounded to the closest nearest integer) of:
+- the points earned by the lowest-ranked team among the top 25 unique teams from one season ago, as of that season’s autoqualification deadline, and
+- the points earned by the lowest-ranked team among the top 25 unique teams from two seasons ago, as of that season’s autoqualification deadline.
+C. The Board Code shall establish a way for teams to qualify to NPDL-TOC with an at-large bid (see XXII.2). The number of available at-large bids shall be set by the TOC Director. 
+D. The Board shall not substantively amend the sections of the Board Code described in sub-sections A and C between October 1 and the conclusion of NPDL-TOC.
+E. All qualified teams shall be allowed to compete in NPDL-TOC, except as specified in the Eligibility section (see 3) and the Equity article (see XIV).
+
+
+XI.3: Eligibility
+A. Students who compete at NPDL-TOC must be enrolled in an accredited high school.
+B. No school may be accepted to NPDL-TOC until it is an NPDL member/observer. Students who do not attend an NPDL member/observer school may compete as independents.
+C. Students must be accompanied at the tournament site by an adult chaperon. This chaperon’s name and contact information must be submitted to the TOC Director.
+D. Chaperones accompanying school-sponsored students must be approved by the school/district.
+E. Chaperones accompanying students competing independently must be approved in writing by the parent/guardian of each student they are chaperoning.
+F. All students shall be registered under their school or designated as “[SCHOOL NAME] Independent”. Hybrid teams of students from different schools shall be registered using both school names.
+G. If a school sponsors at least one student, no student who attends that school may compete as an independent.
+H. Students may compete under their school name only if allowed to do so in writing by their school administrator and their head coach.
+I. Students may compete independently only if allowed to do so in writing by their school administrator and their head coach.
+J. Notwithstanding sub-section I, the Board may grant exceptions to allow qualified teams to compete independently without school administrator approval if both partners attend the same school, receive the written approval of their head coach, and fulfill all other requirements for independent entries. The Board may withdraw the exception if the school requests that it do so, or if circumstances otherwise warrant. Teams admitted by this process may not exceed 20% of the overall entries.
+K. The Board Code may establish additional eligibility requirements related to tournament logistics. The Board shall not substantively amend these sections of the Board Code between October 1 and the conclusion of NPDL-TOC. The Board shall notify representatives of such requirements in writing between October 1 and February 1.
+
+
+XI.4: Judging
+A. Each team entered in the tournament shall be responsible for providing one judge, or for requesting that a judge be hired on their behalf (subject to approval by the TOC Director).
+B. The judging burden or hire cost for a team may be waived at the TOC Director’s discretion to promote tournament access.
+C. Except for judges provided by the teams in competition (see A) and volunteer judges chosen by the TOC Director (see D), judges for NPDL-TOC shall be selected by the Judge Selection Committee, composed of the TOC Director or designee and at least 2 additional members appointed by the Board. The committee must vote unanimously in favor of all judges. 
+D. The TOC director may appoint additional volunteer judges for the NPDL-TOC. Any volunteer judge appointed in this way and not selected by the Judge Selection Committee shall be a free strike for all teams at TOC. The TOC Director shall advise the committee of the names of all volunteer judges not provided by schools competing at the tournament before the committee meets, or, for individuals who volunteer later, shall promptly advise the committee of the judge’s name. Any Judge Selection Committee member may veto any such judge not voted on by the committee.
+E. The TOC Director should determine ahead of time how many judges are needed for TOC logistics. Notwithstanding subsection C, if by 5 days prior to TOC, the committee has not approved enough judges, the Board or designee should approve additional judges, but may not remove the judges that the committee has already approved.
+F. All judges must have graduated from high school. Any judge who has at least one year of experience competing in or judging parliamentary debate shall be considered a qualified judge.
+G. Judges shall be required to disclose decisions and reasons for decision orally.
+H. Judges must provide substantive answers to the Judge Preference survey at least 7 days prior to the tournament. Judges who do not do so shall not count toward the judge requirement for a school.
+The Judge Preference survey shall be created by the Judge Survey Committee, and shall be composed of but not limited to questions regarding judging experience and preferences on content, style, and arguments. The Judge Survey Committee shall be made up of the three outreach directors; alternatively, each outreach director may appoint a designee to the committee in their stead. The survey results should be made publicly available by the Judge Survey Committee.
+I. The Curriculum Director or designee(s) shall create a guide to debate jargon found in written paradigms. The Board may edit the jargon guide. The jargon guide shall be sent to all tournament participants at least 2 days prior to the deadline for judge preference submission.
+J. Each team shall be allowed to strike a number of judges designated by the TOC Director. Judges who have not filled out the judge survey shall be free strikes. Other judge preferencing systems may be used at the TOC Director’s discretion but must be announced at least 7 days prior to the tournament.
+
+
+XI.5: Schedule
+A. At least seven preliminary rounds shall be run.
+B. Breaks shall consist of no less than 20% of the field, at the discretion of the Tab Director.
+C. Each round shall have three possible topics. Before the preparation period, teams shall strike topics as follows: The Opposition team shall strike one of the three topics, and then the Government team shall strike one of the remaining two.
+
+
+XI.6: Resolutions
+A. Each round shall have three possible resolutions. Before the preparation period, teams shall strike resolutions as follows: The Opposition team shall strike one of the three resolutions, and then the Government team shall strike one of the remaining two.
+B. Topic areas (see XII.3) shall be published at least 30 days prior to NPDL-TOC.
+
+
+XI.7: Tournament Staff
+A. The TOC Director shall appoint a Tab Director, who shall be responsible for choosing tabulation methods and for running tabulation at NPDL-TOC.
+B. The TOC Director shall appoint a Topic Committee, to be comprised of at least three members. The TOC Director shall make all efforts to assemble a regionally diverse committee of people with significant experience in writing parliamentary debate resolutions. 
+C. The TOC Director shall appoint a Protest Committee.
+D. For all appointed TOC staff positions listed in this article or in the Equity article (see XIV), the Board shall publicly solicit applications from league members, giving them sufficient time to respond.
+E. The TOC Director shall review staff applications with the Board. The Board may veto any staff member appointed by the TOC Director.
+F. The TOC Director shall publicly announce the Tab Director, Topic Committee, Protest Committee, the Equity Officer (see XIV.1.C) and Judge Selection Committee no later than 2 days prior to the deadline for acceptance of an autoqualification bid to NPDL-TOC.
+G. Notwithstanding the rest of this section, 4.C, XIV.1, and XIV.3.A.1:
+- The Board may, by a two-thirds majority (see V.4.D), remove any tournament staff.
+- The relevant appointing authority may fill vacancies resulting from staff members resigning or being removed.
+- Changes to the Tab Director, Topic Committee, Protest Committee, Judge Selection Committee, Equity Officer, or Equity Committee shall be announced to the attendees by the TOC Director within 2 days. If the new staff member is appointed fewer than 2 days before the start of the tournament, the change shall be announced as soon as is practicable.
+- The TOC Director may appoint a temporary replacement for a staff member who recused themselves from a decision, or is otherwise temporarily unavailable.
+
+
+ARTICLE XII: PARLIAMENTARY DEBATE ROUND RULES
+
+
+XII.1: Roles
+A*. A debate consists of two teams. The Government team consists of two debaters - the Prime Minister and the Member of Government. The Opposition team consists of two debaters - the Leader of Opposition and the Member of Opposition.
+B. The Government proposes a case to uphold the resolution. The Opposition opposes the Government’s case.
+
+
+XII.2: Resolutions
+A. Resolutions will be announced by the tournament at the start of preparation time.
+B. A different resolution will be used each round.
+
+
+XII.3: Speech Time
+A. Except for brief non-argumentative roadmaps and content warnings, speech time begins as soon as the debater begins speaking.
+B. The judge shall not factor into their decision any arguments made by a debater outside of that debater's allotted speech time.
+
+
+XII.4: Format
+A. Prime Minister Constructive (PMC): 7 minutes
+B. Leader of Opposition Constructive (LOC): 8 minutes
+C. Member of Government Constructive (MGC): 8 minutes
+D. Member of Opposition Constructive (MOC): 8 minutes
+E. Leader of Opposition Rebuttal (LOR): 4 minutes
+F. Prime Minister Rebuttal (PMR): 5 minutes
+G*. Debaters have 20 minutes of preparation time between the time the resolution is announced and the time they report to their judge(s) to start the debate.
+H. There is no preparation time between speeches.
+
+
+XII.5: Points of Information
+A. A Point of Information (POI) is a single short (< 15 seconds) question that a member of the opposing team asks a debater giving a constructive speech.
+B. The debater who has the floor may accept or decline each POI. A follow-up question is a separate POI.
+C. Speech time does not stop during a POI.
+D. Debaters may not raise POIs during protected time, which shall be the first and last minute of any constructive speech, unless invited to do so by the debater who has the floor.
+
+
+XII.6: Points of Order
+A. A debater may state “Point of Order” to object to
+- a new argument in a rebuttal speech,
+- a speech more than 10 seconds over time, or
+- tag-teaming.
+B. After a Point of Order is called, time should stop. The debater then has 15 seconds to explain the Point of Order. The opposing team then has 15 seconds to respond to the Point of Order.
+C. Judges may choose whether to announce their rulings on Points of Order. If there is a judge panel, judges may not announce their rulings on Points of Order during the round. Time shall resume immediately after a judge announces a ruling on a Point of Order. If the judge does not announce a ruling, time shall resume immediately after the response is finished.
+D. Judges should disregard new arguments (including new responses) during rebuttal speeches, regardless of whether a Point of Order was raised. The exception is that the PMR may respond to new arguments made in the MOC. Rephrasing or new analysis of prior arguments is allowed in rebuttal speeches.
+
+
+XII.7: Points of Clarification
+A. A Point of Clarification is a question that a member of the opposing team asks a debater giving a PMC or an LOC. The question shall aim to clarify the speaker's advocacy or interpretation of the resolution.
+B. The speaker may not decline a Point of Clarification.
+C. Speech time stops for Points of Clarification and resumes once they are answered.
+XII.8: Communication During the Round
+A*. During the preparation time and the debate:
+- a debater may not communicate with anyone other than their partner, their opponents, their judge(s), and tournament staff;
+- judges and tournament staff may not help the debaters with their debate performance.
+B. No tag-teaming: while a debater has the floor, they may communicate with their partner in writing, but not verbally.
+C. A debater may communicate with their partner, both verbally and in writing, while their opponent has the floor, so long as this does not disrupt their opponent’s speech.
+
+
+XII.9.1: Materials Allowed in In-Person Debates
+A*. Debaters are not allowed to access computers after preparation time ends (except a device used only as a timer and in “airplane mode” if available).
+B*. A debater may access notes that were handwritten on paper by the debater or their partner after the resolution was announced. The debater may access notes that were handwritten on paper and given to them by the opposing team after the resolution was announced. The debater may access and refer to a printed copy of the tournament round rules. Other than that, the debater may not access any written material after preparation time ends.
+
+
+XII.9.2: Materials Allowed in Online Debates
+A*. After preparation time ends, debaters may not access evidence not found during preparation time.
+B. During the debate, debaters may access and refer to the tournament round rules.
+
+
+XII.10: Materials Allowed in Prep
+A. During preparation time, debaters may consult both physical and electronic copies of any material, including both prepared notes and published sources. Debaters may use computers and the internet to store and to retrieve this material.
+
+
+XII.11: Evidence
+A. Debaters should primarily rely on logic and general knowledge.
+B. Debaters should not cite published sources during the round. Judges should enforce this rule by giving a claim supported by a citation the same weight as they would give a claim not supported by a citation.
+
+
+XII.12: Judge Conduct
+A. The judge should award a win to the team that did the better debating.
+B*. The judge must award a win to exactly one team.
+C*. The judge may not confer with anyone when making their decision. The exception is that the judge may communicate with tournament staff to clarify rules.
+D*. The judge must be present and conscious during all speeches.
+E*. The judge may not interrupt any speech. The judge may not make verbal comments about any arguments in the debate before every judge in the round has selected the winning team on their ballot (except see 6.C). Judge comments are permissible as needed to address immediate technical or logistical issues.
+F*. A judge should not judge a round for which they have a conflict (see XIII.4).
+
+
+XII.13: Enforcement
+A. During the debate, these round rules shall be enforced by the judges. Judges should not direct students to deviate from these rules or encourage students to violate them.
+B. Sub-sections also enforceable by the Protest Committee (see XIII.1) are marked with an asterisk.
+
+
+XII.14: Scope
+A. This Article shall be used at tournaments run by NPDL. The Board may, by a unanimous vote, modify these rules for a particular NPDL tournament held during that Board’s term.  
+B. Any tournament not run by NPDL may adopt the NPDL round rules. Such a tournament may specify in its invitation any round rules which deviate from the NPDL rules.
+C. The tournament director may make exceptions to any of these round rules in order to accommodate persons with disabilities.
+
+
+ARTICLE XIII: TOURNAMENT OPERATION
+
+
+XIII.1: Protest Committee
+A. Judge decisions about round outcomes shall be final, unless overruled by a majority vote of the Protest Committee.
+B. Violations may be reported to the Protest Committee only by the coaches of the teams involved or by tournament staff.
+C. When a protest occurs, the Protest Committee shall notify designated chaperones of all affected students prior to ruling on any actions associated with a protest. The Protest Committee shall vote in private as to the resolution of the protest, the result of which vote shall be binding and announced to all affected students and their designated chaperones.
+D. In ruling on protests, the Protest Committee shall consider all facts and circumstances associated with the violation, including whether it
+- was intentional;
+- was unethical;
+- whether, based on conversations with the judge(s), the violation appears to have affected the round outcome;
+- violated the purpose behind a rule in addition to its express language.
+E. The Protest Committee may impose any of the following consequences:
+- issue a warning and/or reprimand, including a statement of consequences for a further violation;
+- require the round be repeated under terms;
+- impose a round forfeit on the team in violation; or
+- disqualify the team in violation from the tournament.
+F. If the team that filed the protest, and that lost a ballot, was put at a competitive disadvantage by the violation, the Protest Committee may reverse the ballot. If the violation did not create a competitive disadvantage, the loss shall stand.
+G. In the event of a an egregious violation by a judge (see XII.12) that appears to have caused one team to receive a loss, the Protest Committee may additionally impose any of the following consequences:
+- in a round with one judge, award both teams a BYE;
+- if the round had two judges, disregard the ballot of the judge in violation, and count the other judge’s ballot twice (unless both judges committed an egregious violation, in which case both teams may be awarded a BYE).
+H. In the event of an abnormal disruption to the debate round, which appears to have caused one team to receive a loss, and which was outside of the debaters’ control, the Protest Committee may
+- require the round be repeated; or
+- award both teams a BYE.
+I. If a tournament does not have a Protest Committee, the Tournament Director may assume the functions of the Protest Committee.
+
+
+XIII.2: Tabulation
+A. Tabulation procedures shall be published on the tournament invitation prior to the start of the tournament. Any change in procedures mid-tournament due to constraints of the field, judges, or brackets, shall be immediately reported to all competitors.
+B. Elimination brackets shall not be broken to prevent same-school competitors from hitting one another. The coach/adult chaperon (or coaches, in the case of hybrids) shall determine whether a debate will take place or, if not, which team will advance.
+
+
+XIII.3: Topic Areas
+A. A topic area is announced prior to the start of the tournament. It allows students to research for a resolution, but does not disclose the wording of that resolution.
+B. A minimum of one and a maximum of two preliminary rounds shall use topic areas. If there are two topic area rounds, they may share a topic area or use two different topic areas.
+C. If a topic area round has multiple resolutions or flights, all shall be based on the same topic area.
+
+
+XIII.4: Judge Conflicts
+A. A judge may not judge a student if the judge and the student may be perceived to have a competitive or financial agreement that may bias the judge’s impartial evaluation of the round. Examples include but are not limited to the following:
+- The student attends a school (or a collaboration of schools) that the judge attended, coached for, or competed with in the past six years.  
+- The judge has a paid or unpaid coaching, consulting, or judging relationship with the student or school during the same academic year. NOTE: Serving as a tournament-hired judge does not constitute a conflict of interest.
+- The judge is involved in ongoing negotiations to provide future paid or unpaid coaching, consulting, or judging to a school or student, or otherwise anticipates providing such coaching.
+- The judge has provided exclusive pre-round preparation to a student either before or during a tournament through any method including electronically, verbally, or through the transfer of resources. NOTE: Sharing of information does not constitute preparation, but the discussion of strategies, arguments, evidence, etc., would constitute preparation. If such preparation is provided during a tournament, the judge should immediately (before pairings are released) recuse themself from judging the student they prepared for the rest of the tournament. In general, scrimmage/practice rounds between schools do not create conflicts, but if a given person frequently (more than five times in the preceding six months) judges and gives feedback to a student from another school in a scrimmage round, the judge is conflicted against judging that student at a tournament. An oral RFD (reason for decision) given after a round to which the tournament assigned the judge and the student does not constitute “preparation” for purposes of this rule.
+- The judge was a paid staff member at a summer debate institution (or winter or spring debate institution of at least five-day duration) during the same summer (or winter or spring) that the student attended the institution, or has been hired to be on staff for the upcoming summer and is aware that the student will attend during that summer.
+B. A judge may not judge a student if the judge and the student may be perceived to have a personal or social arrangement that may bias the judge’s impartial evaluation of the round. Examples include but are not limited to the following:
+- The judge and the student may be perceived to have had a personal relationship that may bias the judge’s impartial evaluation of the round.
+- The judge and the student are or have been in a familial, physical, or emotional relationship.
+- The judge and the student have communications of a personal nature over email, telephone, or the internet including social networking sites that goes beyond casual exchanges. For example, communications that are extensive and/or repetitive may create a conflict. Judges who socialize with the student outside of the competition arena are considered to have established a personal or social relationship with that student. 
+C.  A judge may not judge a student if the judge does not believe they are able to fairly and impartially adjudicate a competition involving a particular student for whatever reason. 
+D. A judge may choose to recuse from adjudicating a student under the following conditions: if the judge shares transportation and/or lodging with the student’s team on a regular basis, or if the judge has a personal, financial, or familial relationship with the student’s coach or member of the student’s family. It is the affirmative duty of the judge to make such information publicly available prior to the round beginning. 
+E. The expectation of competitors, judges, and coaches is to engage in the highest levels of professionalism and integrity. While the responsibility is on judges to aide transparency, coaches and student competitors should as well. It is the affirmative duty of all coaches and debaters to assist efforts in transparency.
+
+
+XIII.5: Flex Time [not currently in force]
+A. Each team will be given 2 minutes of flex time, to be used in any allotment before any of their speeches, during which they may choose to prepare their next speech or ask their opponents questions.
+B. Section A shall only take effect at tournaments run by NPDL once at least three of the following add flex time or cross-examination to its parliamentary debate rules: CHSSA, OSAA, NYPDL, Yale Invitational, Stanford Invitational, Jack Howe Memorial Tournament, Jean Ward Invitational.
+
+
+XIII.6: Scope
+This Article shall be used at tournaments run by NPDL. The Board may, by a unanimous vote, modify these rules for a particular NPDL tournament held during that Board’s term.
+
+
+
+
+ARTICLE XIV: EQUITY
+
+
+XIV.1: Inclusion, Harassment, Non-Discrimination Policy
+A. The National Parliamentary Debate League is committed to providing its participants, judges, coaches, staff, and volunteers the opportunity to pursue excellence in their endeavors. This opportunity can exist only when each member of our community is assured an atmosphere of mutual respect. The NPDL prohibits all forms of harassment and discrimination.
+B. All forms of harassment and discrimination are antithetical to the NPDL’s mission. This includes all harassment and discrimination (whether written or oral, and whether at the NPDL-TOC or in other contexts connected to the League) based on race, color, ethnicity, religion, sex, gender identity or expression, sexual orientation, marital status, citizenship, national origin, age, disability, genetic information; or based on any other characteristic protected by any applicable federal, state, or local law; or based on any aspect of a person’s identity or inherent characteristics.
+
+
+XIV.2: Timing
+A. The Board shall adopt a Code of Conduct in alignment with the NPDL Non-Discrimination Policy (see 1).
+B. The Board shall appoint the Equity Officer for the tournament. The Equity Officer may not hold any other staff position at that tournament.
+C. The Board or tournament director shall announce the Equity Officer and the Code of Conduct no later than 7 days prior to the tournament, unless a different deadline applies (e.g., see XI.6.F).
+
+
+XIV.3: Code of Conduct
+A. Any Code of Conduct implemented under this section shall ensure that all participants at the relevant edition of an NPDL-organized tournament:
+- have opportunities equal with other participants to have their needs accommodated in order to participate in the NPDL-organized tournament;
+- are not prevented from accessing these opportunities by discrimination on the basis of race, nationality, ethnicity, color, religion, age, sex, sexual orientation, gender identity, or disability;
+- are free from harassment and intimidation during their participation in the NPDL-organized tournament; and
+- have access to reporting mechanisms in the event that these standards are violated.
+B. Any Code of Conduct implemented under this section shall include but is not limited to provisions that describe:
+- the principles of the NPDL Non-Discrimination Policy;
+- the expected conduct of all participants;
+- enforcement, reporting, and appeal mechanisms for that Code of Conduct.
+C. Each participant must sign and return a copy of the Code of Conduct for the relevant edition of the NPDL-organized tournament prior to participating in the tournament.
+
+
+XIV.4: Duties of the Equity Officer
+A. The Equity Officer of the NPDL-TOC shall have the following responsibilities:
+1) To form an Equity Committee by selecting at least one or more other individuals as Equity Committee Members, subject to approval by the Board. These Members shall be proposed by the Equity Officer at least 30 days prior to that edition of the NPDL-TOC, shall be approved by the Board at least 14 days prior to the NPDL-TOC, and shall be announced immediately. These Members may, by the designation of the Equity Officer, be deputized to conduct any/all Equity Officer responsibilities and use any/all of the Equity Officer’s powers.
+2) To ensure that all participants are made aware of their rights and responsibilities under the Code of Conduct;
+3) To review all debate topics for equity issues before topics are provided to debaters for a given round;
+4) To hear all Code of Conduct complaints brought up during the NPDL-organized tournament;
+5) To make any necessary enforcement orders for breach of the Code of Conduct, per the guidelines provided in the Code of Conduct;
+6) To make any necessary enforcement orders for breach of an order issued by the Equity Committee in response to a breach of the Code of Conduct, as allowed by the Code of Conduct;
+7) To arrange for the hearing of any appeals filed against the decisions of the Equity Committee; and
+8) To make themselves available to participants at the relevant edition of the NPDL-organized tournament for a sufficient amount of time to allow the filing of any Code of Conduct complaints;
+9) To notify the tournament director about the filing and resolution of equity complaints, and
+10) To report to the Board regarding the completion of these duties.
+B. The Equity Officer of any NPDL-organized tournament other than the NPDL-TOC will have no obligation to form an Equity Committee (see A.1), but shall be responsible for all other obligations relevant to that tournament. 
+
+
+XIV.5: Powers of the Equity Officer
+A. The Equity Officer of the NPDL-TOC or any other NPDL-organized tournament shall have such powers as are necessary for them to perform their duties (see 4). These powers shall include but not be limited to the following:
+- report conduct to relevant authorities, including but not limited to a Team’s coach, a Team’s affiliated institution and school administration, or law enforcement;
+- recommend to the Board that a participant be prohibited from participating in future editions of the NPDL-organized tournaments, or be removed from a position of authority under this Code;
+- remove and/or disqualify a participant, judge, coach, spectator, TOC staff, NPDL Board Officer, or any other individual attending or connected to NPDL events from the NPDL-organized tournament; and
+- conduct any other such orders as allowed by the Code of Conduct.
+B. Notwithstanding subsection A, a member school representative cannot be prohibited from attending and voting in a meeting of the members.
+
+
+XIV.6: Appeals from the Equity Committee
+A. Any party to a Code of Conduct complaint made to the Equity Committee or Officer may appeal from the resolution ordered by the Equity Committee or Officer through an appeals process set out in the Code of Conduct.
+B. Any appeals process must involve the hearing of the matter by at least three people, at least two of whom were not involved in hearing the original complaint.
+C. The outcome of such an appeal shall be final.
+
+
+XIV.7: Non-tournament Complaints
+A. Complaints related to the NPDL Non-Discrimination Policy and other applicable policies for events arising outside of the NPDL-organized tournaments shall be reported to, investigated, and decided by the Board.
+B. The Board shall have the above responsibilities (see 4) and powers (see 5) of the Equity Officer as related to the hearing, investigation, and possible sanctioning of involved parties.
+
+
+XIV.8: Norms for Tournament Officials
+A. The Equity Committee, Protest Committee, Board, and other tournament officials shall recuse themselves from hearing any Code of Conduct complaint, protest, or non-discrimination or harassment complaint that they may be unable or be seen to be unable to assess in a manner fair to all parties, including but not limited to reasons of:
+- shared past, present, or future school affiliation with a subject or filer of a complaint,
+- personal relationship with a subject or filer of a complaint, and/or
+- previous coaching relationship with a subject of filer of a complaint.
+B. The Equity Committee, Protest Committee, Board, and other tournament officials shall not engage in unethical activities in the course of their duties as tournament officials. Unethical activities include but are not limited to the following:
+- sharing nonpublic information about topics that might/will be used for that edition of the NPDL-organized tournament with anyone outside of the Topic Committee or the Equity Committee;
+- disclosing the content of or individuals involved in equity complaints, protests, or other confidential requests from tournament participants, to anyone outside the intended scope of the petitioner/initiator of the complaint, protest, or request;
+- otherwise abusing the power vested in their positions to alter round outcomes or the experience of tournament participants.
+
+
+XIV.9: Violations by Tournament Officials
+A. Violations of Section 8 by a member of the Equity Committee, Protest Committee, Board, or other tournament official shall be reported to, investigated, and decided by the Board.
+B. The Board shall have the above responsibilities (see 4) and powers (see 5) of the Equity Officer as related to the hearing, investigation, and possible sanctioning of involved parties.
+
+
+XIV.10: Sanctions
+All forms of harassment are prohibited, whether committed by participants, judges, coaches, spectators, TOC staff, NPDL Board Officers, or any other individuals attending or connected to NPDL events. Individuals who are found to have violated this policy will be subject to the full range of sanctions, up to and including disqualification from competing, judging, or attending the TOC, removal from the TOC tournament premises, and reporting to local law enforcement and/or affiliated schools as appropriate.
+
+
+
+
+ARTICLE XV: VOTING PERIODS
+(see I.5)
+
+
+XV.1: Fall Voting Period
+The Fall regular voting period (see III.1.C) shall be held annually, begin on the first Wednesday after Thanksgiving and end the next Tuesday.
+
+
+XV.2: Spring Voting Period
+The Spring regular voting period (see III.1.C) shall be held annually May 1-7, unless rescheduled by the Board to coincide with Board elections.
+
+
+XV.3: Special Voting Periods
+Voting shall close no earlier than the 7th day of a voting period.
+
+
+
+
+ARTICLE XVI: TRANSPARENCY
+
+
+XVI.1: Public Comment
+A. The Board shall designate at least 20 minutes at each regular Board meeting as a public comment period.
+B. The Board Code shall schedule at least two regular Board meetings September to December and at least two more January to May.
+C. During public comment, any school representative may address the Board for up to 2 minutes. The Board may extend this time.
+D. A representative may ask a question to a Board member. If that Board member is absent, or if they do not respond during the public comment period, they must provide an answer in writing within 7 days.
+E. Public comments, including Board member answers, shall be reflected in the minutes.
+
+
+
+
+
+
+________________
+
+
+BOARD CODE
+
+
+ARTICLE XXI: RANKINGS
+
+
+XXI.1: Points Eligibility
+A. Only results from open (a.k.a. “varsity”) divisions of parliamentary debate (see I.6) shall count for points.
+B. A tournament shall only count for points if it is an invitational (see C) or if it is explicitly mentioned in this article (see 4).
+C. An invitational is a tournament that:
+- is open to all schools (see I.9), and
+- is open to any high school student a school wishes to enter.
+An invitational may, however, restrict the number of entries per school and/or cap the total number of entries (see I.10.1).
+D. An invitational shall count for points only if its open division of parliamentary debate (see I.6) has:
+- at least 5 schools (see I.9) and
+- at least 10 teams
+- for at least 3 preliminary rounds.
+E. Online tournaments shall count for points, but only if sanctioned by the Board (see 11).
+F. Only tournaments that publicly announce their date and location prior to October 1 of the season in which they occur or at least 30 days prior to the start of the tournament shall count for points.
+G. Only two-person teams are eligible for points.
+H. Tournaments held in June, July, August, or between December 24 and January 2 shall not count for points.
+I. Tournaments shall only count for points if their logistics and finances are run by:
+- a debate program and/or booster club affiliated with a high school (see I.9), or
+- a debate program affiliated with an accredited college or university (as listed in the Database of Accredited Postsecondary Institutions and Programs), or
+- a debate league in which at least 5 high schools (see I.9) are voting members, or
+- an urban debate league recognized by the National Association for Urban Debate Leagues.
+
+
+XXI.2: Elimination Rounds at Invitationals
+A. Adjusted field size (AFS) shall be calculated using the following formula:
+(Open Field Size) +
+(Novice/JV Field Size)
+Teams that forfeited two or more prelims shall not count toward field size.
+B. A breaking team shall receive points based on the column for the highest level it reached in elims, as per the Elim Points Table below:
+  
+
+All adjustments to the Elim Points Table can be found in this article (see 2.C, 2.D, 2.E, 2.F, 3.B, and 5.C).
+C. A team that had a losing/even record in prelims shall not receive points, unless it reached an elim in which no more than one third of the open field debated or advanced without debating.
+D. A standard invitational breaks at least 27% of its open field to open elims. The following penalties are applied (to breaking teams only) if this percentage is lower:
+0.0%  ≤  break < 4.8%                6-point penalty
+        4.8%  ≤  break < 6.7%                5-point penalty
+        6.7%  ≤  break < 9.5%                4-point penalty
+        9.5%  ≤  break < 13.5%        3-point penalty
+        13.5% ≤ break < 19.0%        2-point penalty
+        19.0% ≤ break < 26.9%        1-point penalty
+E. A standard  invitational has 5 prelims. The following adjustments are applied (to breaking teams only) if the number of prelims is different:
+7 or more prelims: 3-point bonus
+6 prelims: 1-point bonus
+4 prelims: 3-point penalty
+3 prelims: 6-point penalty
+F. No team shall lose points from attending a tournament.
+
+
+XXI.3: Preliminary Rounds at Invitationals
+A. Teams that do not break shall receive points based on their prelim record as follows:
+2-1 = 4 points
+3-0 = 8 points
+3-1 = 7 points
+4-0 = 11 points
+3-2 = 4 points
+4-1 = 10 points
+5-0 = 14 points
+4-2 = 6 points
+5-1 = 12 points
+6-0 = 16 points
+B. Points Floor
+A breaking team that had a winning record in prelims shall receive the higher of the two:
+1) the points it would receive based on the other sections of this article;
+2) the points that the lowest-seeded breaking team that had a winning record in prelims would have received based on its prelim record (see A) had it not broken.
+
+
+XXI.4: Other Tournaments Eligible for Points
+A. Points for competing at the NPDL Tournament of Champions shall be as follows:
+prelim ballot won = 2 points
+break = 2 bonus points
+elim win = 4 points
+championship = 2 bonus points.
+Break percentage penalties shall be the same as for invitationals (see 2.D).
+B. The first three regular-season parli tournaments organized by a CHSSA member league (CFL, GGSA, YFL, SVFL Kern, SVFL Redwood, CVFL, SCDL, TCFL, WBFL, CBSR, OCSL, or SDIVSL) shall count for points.
+All rounds shall count as prelims. Only the first four rounds shall count for points.
+Only the following records shall count for points:
+2-1 = 2 points
+3-0 = 5 points
+3-1 = 4 points
+4-0 = 9 points
+C. CHSSA state qualifying tournaments and OSAA district tournaments shall count for points as follows:
+alternate: 4 points (but only if the tournament has 20 or more entries)
+qualifier: 8 points (but only if the tournament has 10 or more entries)
+The points awarded under this subsection shall not count toward NPDL-TOC qualification (see XXII) and shall not be added to the rankings until March 2 or later.
+
+
+XXI.5: Walkovers and Closeouts
+A. A walkover occurs when one team advances over another team in elims based on the decision of their school(s) rather than of the judge(s).
+B. A closeout occurs when more than one team is declared tournament champion.
+C. The following adjustments are applied if both teams are from the same school:
+being walked over: 2-point bonus
+walking over another team: 2-point penalty
+finals closeout: 3-point penalty
+D. A closeout by three (or more) teams from the same school shall count as a walkover (or a series of walkovers) followed by a finals closeout.
+E. A walkover in which the two teams are from different schools shall count as a forfeit by the team that is being walked over.
+F. A closeout by two or more teams that are from different schools shall count as a forfeit by all the teams involved.
+G. If at least one partner in a team is from the same school as at least one partner in another team, those two teams shall count as being from the same school.
+
+
+XXI.6: Unusual Circumstances
+A. If an invitational has no regular elims, its hidden elims shall count as prelims.
+If an invitational does have regular elims, its hidden elims shall count as regular elims.
+B. If a team does not break due to a tab error, and the tournament director confirms the improper break, that team shall receive points for breaking to the first elimination round.
+C. If an invitational has more than one open division, each of its open divisions shall count as a separate tournament. Its novice/JV division(s) should then not be counted when calculating the adjusted field size (see 2.A).
+D. A tournament held on non-consecutive days shall be treated as separate tournaments for purposes of points.
+E. The Reporting Director may determine that, as a result of an irregular tournament format, a teams’ performance at a tournament is not covered by the language of this article. That team shall then not receive points, unless the Board, by a two-thirds vote, awards that team a reasonable number of points on an ad hoc basis.
+
+
+XXI.7: Team Rankings
+A. The total point value for each team shall be calculated using the diminishing marginal returns formula, as follows:
+(points from best tournament performance) (1) +
+        (points from second best tournament performance) (0.9) +
+        (points from third best tournament performance) (0.6) +
+        (points from fourth best tournament performance) (0.3) +
+        (points from fifth best tournament performance) (0.1)
+B. A team’s rank equals the number of teams that rank higher than it plus 1.
+C. Each team shall be listed on the rankings under the name of the school the debaters on that team attend (including non-member schools). Hybrid teams shall list both schools. If this information is not available, the debaters shall be listed as ‘Independent.’ This may cause some debaters to appear multiple times in the rankings under both “Independent” and their school. Such debaters are encouraged to email npdl.board+reporting@gmail.com with correct school information to rectify this.
+XXI.8: Individual Rankings
+A. A debater's individual rank equals the hypothetical team rank that debater would have obtained had they attended all tournaments with the same partner.
+B. NPDL may publish the individual rank of debaters.
+
+
+XXI.9: School Rankings
+A. Only NPDL member schools are eligible to be listed on school rankings.
+B. Each member school shall be ranked based on the sum of all unweighted points of all its teams (including non-unique).
+C. The points for hybrid teams shall count at half-value for both schools.
+
+
+XXI.10: Reporting Results
+A. NPDL will calculate rankings based on the results made publicly available on Tabroom.com by the tournaments. NPDL does not commit to independently verifying whether these results are accurate.
+B. If results from a tournament are not publicly available on Tabroom.com or if the publicly available results are inaccurate or incomplete, tournaments and members of the public are encouraged to report the correct tournament results to npdl.board+reporting@gmail.com. If NPDL determines that the information provided in these reports is correct, it shall revise the rankings accordingly.
+C. NPDL shall provide a window of 30 days from the date of the end of a tournament to report results. Results received after 30 days will be ruled ineligible for inclusion in the national rankings.
+D. The Reporting Director shall ensure that rankings are updated within 31 days of the end of the tournament (see XXVII.11).
+
+
+XXI.11: Online Tournaments in 2024-25
+A. An online invitational (see 1.C) shall be auto-approved to count for points if:
+1) it was approved by NPDL for the 2023-24 season, and
+2) its 2024-25 varsity/open parliamentary debate entry fee is:
+- no higher than $57 per team (if it is a 1-day tournament), or
+- no  higher than $92 per team (if it is a multi-day tournament).
+B. Online tournaments listed in Section 4 shall be auto-approved to count for points.
+C. Online tournaments run by NYPDL shall be auto-approved to count for points.
+D. Online tournaments sanctioned by OHSSL-CA shall be auto-approved to count for points.
+E. Online tournaments may be granted points eligibility on a case-by-case basis. This shall be done by a majority vote of the Board members who cast their vote within 7 days after the tournament application was submitted, not counting abstaining votes. Voting on tournament approval shall be delayed until the next Board meeting at the request of any Board member.
+F. When determining whether to grant points eligibility (see E), Board members will consider:
+- whether the tournament has affordable entry fees;
+- whether the tournament invitation states that fee waivers are available based on need;
+- whether the tournament uses NPDL round rules;
+- whether the tournament is run by an NPDL member school;
+- alternative tournaments the same weekend; and
+- whether the tournament was run in previous years.
+G. Approval may be withdrawn if the tournament provides inaccurate information.
+H. This section does not grant points eligibility to any tournament that does not meet the general points eligibility criteria (see 1).
+I. This section shall be updated in the Board Code in July 2025.
+
+
+
+
+ARTICLE XXII: QUALIFICATION TO THE NPDL TOURNAMENT OF CHAMPIONS
+
+
+XXII.1: Autoqualification
+A. An individual who has at least 40 points (see XXI.8.A) on March 1 shall autoqualify to the TOC.
+B. Every summer, the Secretary shall update the threshold in subsection A to accord with the Legislative Code (see XI.2.B).
+C. Only tournament results reported to NPDL on or before March 1 shall count for NPDL-TOC qualification purposes.
+D. Notwithstanding XXI.10.D, the Reporting Director shall ensure that all tournaments that count toward qualification for NPDL-TOC are added to the rankings by March 2 (see XVI.3.A, XXI.10.D).
+E. A team of two individuals, both of whom autoqualify under subsection A, shall be eligible to accept an autoqualification bid to TOC.
+F. In order to accept an autoqualification bid, a team must register for NPDL-TOC on Tabroom.com by March 3. A team that autoqualifies, but does not accept the bid on or before March 3, will be placed on the waitlist, ahead of all teams that did not autoqualify, but behind any other autoqualified teams that are already on the waitlist.
+
+
+XXII.2: At-Large Qualification
+A. To be eligible for an at-large bid, both partners must have competed at one or more tournaments (see I.10) in parliamentary debate during the same season as the TOC at which they wish to compete.
+B. Regional at-large bids shall be awarded, according to tournament points, to:
+- the top 5 eligible teams from each region (except in California, or in any region with at least 7 member schools);
+- the top 7 eligible teams from each region with at least 7 member schools;
+- the top 5 eligible teams from each region in California (see I.11.B);
+- the top 2 eligible teams from each non-region state (see D).
+C. Both members of a team must be from the same region (or the same non-region state) to be considered for a regional at-large bid, and they must register on Tabroom.com on or before March 3. The TOC Director may, however, set the regional at-large deadline earlier for a particular region. Only tournament results reported to NPDL on or before that earlier deadline shall count for determining regional bids for that particular region.
+D. A non-region state is any US state that has fewer than 3 member schools, as of the at-large application deadline (see G).
+E. After autoqualification and regional at-large bids have been allocated, the TOC Director shall allocate remaining slots as wildcard at-large bids based on at-large application score (see 3).
+F. Ties for regional and wildcard at-large bids shall be broken based on which team registered on Tabroom.com earlier.
+G. The wildcard at-large application deadline is March 3.
+H. In order to be considered for a wildcard at-large bid, a team must complete the at-large application.
+I. Any team that receives an at-large bid (whether initially, or after being waitlisted) must accept the bid by registering for NPDL-TOC on Tabroom.com within 24 hours after notice, if they have not already done so. 
+J. If an admitted team drops from NPDL-TOC, the TOC Director shall admit an additional team based on their waitlist position. If a team that received a regional bid drops, the TOC Director shall admit the top ranked waitlisted team from the same region, unless there is no such waitlist, in which case the Director will admit the top ranked team from the general waitlist. The TOC Director may set a date after which no further teams would be admitted off the waitlist.
+
+
+XXII.3: Wildcard At-Large Qualification Formula
+All wildcard at-large applications shall be scored  according to the following formula. Scores are calculated individually for each partner, and then averaged.
+1) Tournament Points
+2) Underrepresented Region State
+5 points: Any region or non-region state with no autoqualified teams for the upcoming NPDL-TOC.
+3) Underrepresented School
+Point Allocations  (15 possible)
+5 points: No debater from the applicant’s school competed in the past three editions of the NPDL-TOC.
+10 points: No autoqualified team competing at the NPDL-TOC this year will have a debater from the applicant’s school.
+No more than one team from a given school (and no more than three teams total consisting of one or more homeschooled students) shall receive Underrepresented School points for their at-large application, and they shall be selected according to the following priorities: (1) a team with two members from a given Underrepresented School shall be preferred over a team with one member from that school; (2) a team with a higher at-large score shall be preferred over a team with a lower at-large score. 
+4) Underrepresented Minority in Debate 
+Point Allocations
+8 points: Underrepresented racial minority (Black, Latinx, Native American, Pacific Islander)
+2 points: Female or nonbinary
+5) Underresourced
+10 points: The applicant’s school is listed as a Title I school. (Not available if two or more teams from the applicants’ school have already qualified for the same NPDL-TOC. Title I status is determined based on the most recent publicly available data.)
+10 points: The student is eligible for free or reduced-price lunch.
+(15 points maximum in this category)
+
+
+XXII.4: Additional Requirements for NPDL-TOC Entry
+A. All students who wish to compete at NPDL-TOC must submit fully completed school and parent release forms. 
+B. Judges must be registered on Tabroom.com, or a hired judge requested.
+C. All registration, judge hire, and other mandatory fees must be paid.
+D. All deadlines under this section will be stated on the NPDL website (with a link in the Tabroom.com invitation) no later than February 1.
+E. In the event one that a team has not completed all of the steps listed in this section by the deadlines, the TOC Director will notify the team’s coach or designated adult (or the student in question if no adult contact information has been provided), and provide a new deadline that is at least 24 hours after the notification. If the problems are not corrected by the new deadline, the TOC Director may drop the affected team from the tournament. At such time as the team has fully met all entry requirements, it will be placed on the top of the waitlist for entry. If more than one team is on the waitlist because of this provision, they will be ranked in order of tournament points.
+F. A team may be dropped from the NPDL-TOC either before or after it has begun for non-payment of fines. Prior to dropping a team, however, the TOC Director shall notify the team(s) in question and their coach or chaperon, and provide a reasonable opportunity for payment. No team shall be dropped on this basis after the first preliminary round has begun, and before the last preliminary round has begun.
+G. The TOC Director may drop all entries from a school that possesses the rotating NPDL-TOC Champion trophy if that school does not return the trophy to the NPDL, or reimburse the NPDL for the full cost of a replacement trophy, at least two weeks before the start of the NPDL-TOC. The school is responsible for delivery to either the NPDL or to the host school, as determined by the TOC Director. 
+
+
+
+
+ARTICLE XXIII: TOURNAMENT LOGISTICS
+
+
+XXIII.1: NPDL-TOC Finances
+A. Entry fees shall be $150 per entry.
+B. Every school providing judges shall bring a $250 judge bond.
+C. Independent entry processing fee shall be $50/entry.
+
+
+XXIII.2: NPDL-TOC Student Forum
+A. If a meeting of members is held during NPDL-TOC, a Student Forum shall be held concurrently.
+B. All NPDL-TOC competitors must attend either the Student Forum or the meeting of members. Students prepping during the Student Forum period shall automatically forfeit their next round.
+C. The Student Forum shall be a space for students to discuss issues in parliamentary debate. Adults may be asked not to sit in on the forum at student request. The TOC Director shall designate a Student Forum Facilitator, who shall manage the Forum. The Student Forum Facilitator shall be responsible for the following:
+- acquiring a means of recording the forum;
+- facilitating forum discussions and providing initial topics for discussion;
+- creating and disseminating a survey to students after the forum;
+- analyzing survey results and communicating them to the Board.
+
+
+XXIII.3: NPDL-TOC Site Rotation
+A. The 2023-24 TOC Director shall work to secure a host site near the JFK airport (NYC Tri-State Area) for the 2024 NPDL-TOC.
+B. The 2024-25 TOC Director shall work to secure a host site near the SFO airport (SF Bay Area) for the 2025 NPDL-TOC.
+C. The 2025-26 TOC Director shall work to secure a host site near the PDX airport (Oregon) or the LAX airport (Greater LA) for the 2026 NPDL-TOC.
+
+
+
+
+ARTICLE XXIV: BOARD ELECTION PROCEDURES
+
+
+XXIV.1: Dates
+Board elections shall be held annually May 1-7 (see I.5.D, VI.1, XVI.2).
+
+
+XXIV.2: Statements of Interest
+A. By April 5, people considering running for a Board position must submit a Statement of Interest to the Inspector of Election. 
+B. The Statement of Interest must list at least one, but no more than three Board positions the person is interested in (the possible positions are President, Secretary, Treasurer, TOC Director, and Outreach Director).
+If the initial Statement of Interest does not list this, the Inspector of Election should email a reminder to the person who submitted it. That person must then reply with a corrected Statement of Interest within 24 hours or by April 5, whichever is later.
+C. A Statement of Interest does not constitute a definite commitment to run in the election.
+D. By April 6, the Inspector of Election shall create an email chain containing all people who submitted a Statement of Interest, and shall inform all of them about who is interested in which position(s).
+
+
+XXIV.3: Candidacy Declarations
+A. Candidacy declarations are due to the Inspector of Election by April 14.
+B. No person may run for a position they did not list on their Statement of Interest.
+C. Notwithstanding Section 2 and subsection B, any otherwise eligible person may run for an unclaimed position, including anyone who has not submitted a Statement of Interest for that position or at all.
+(An unclaimed position is a Board position not listed on any of the Statements of Interest. If all people who listed a position on their Statements of Interest later stated to the Inspector of Election that they are no longer interested in it, that position also becomes an unclaimed position.)
+D. By April 15, the Inspector of Election shall distribute to the representatives a finalized list of candidates (see VI.3.A).
+E. If the Inspector of Election misses the April 15 deadline (see D), candidates shall declare their candidacies to the representatives on the NPDL forum on April 16.
+XXIV.4: Candidate Statements
+A. Each candidate may make a written candidate statement, but is not required to.
+B. Candidate statements are due to the Inspector of Election by April 19.
+C. The Inspector of Election shall distribute candidate statements to the representatives by April 20.
+D. The Inspector of Election may create candidate statement guidelines.
+E. If any candidate statements are submitted after the deadline, the Inspector of Election will make a reasonable effort to publish them in a timely fashion.
+
+
+XXIV.5: Assistant Inspector of Election
+A. The Board shall ensure that there is at least one assistant Inspector of Election (see VI.2.A).
+B. An assistant Inspector of Election shall make announcements to the representatives in the event that the Inspector of Election is not available.
+
+
+XXIV.6: Roster
+A. By April 27, all changes to the representatives roster must be submitted by authorized persons to npdl.board+secretary@gmail.com in order to take effect during the elections (see XXV.4.B).
+B. By April 29, all candidates in those elections must be provided a final list of representatives eligible to vote in the election.
+
+
+XXIV.7: Secret Ballot
+(see VI.4.D)
+A. The names of all representatives who cast a vote shall be shared with all the candidates, but the information about how the representatives voted shall be confidential. By accepting their position, Inspectors of Election (including assistants) agree to never share information about individual representatives’ votes with any other person except the other inspectors for that election.
+B. Votes should be submitted to the npdl.elections@gmail.com account. Inspectors of Election (including assistants) shall maintain the integrity of the votes data until August 31 following the Board election. Between September 1 and September 30, the Inspector of Election shall delete all votes data from the npdl.elections@gmail.com account, and then return that account to the Board.
+XXIV.8: Certification
+A. The Inspector of Election and all assistant Inspectors of Election shall have full access to the votes submitted by the representatives.
+B. The final vote count shall be certified by the Inspector of Election and all assistant Inspectors of Election. If this does not occur, the Board shall appoint at least one additional assistant Inspector of Election, and shall continue doing so until a majority of all certifications agree on the final vote count.
+XXIV.9: Recount Procedure
+A. The Inspector of Election should announce the results to the candidates by May 12. Any candidate placing second in a non-Outreach election, any candidate placing fourth in an Outreach election, and any losing candidate in an uncontested election may request a recount of the votes. The recount request shall be submitted to the Board in writing by the end of the second day after the day when the results were announced to the candidates.
+B. The Board shall then nominate a person to be a Recount Inspector (an assistant Inspector of Election in charge of recounting votes). If the recount requester is not satisfied with that nomination, they may nominate a different person to be a Recount Inspector. If the Board unanimously rejects the recount requester’s nomination, the person the Board originally nominated shall be the Recount Inspector. Otherwise, the person the recount requester nominated shall be the Recount Inspector. Any Board Member who is a recount requester or ran against the recount requester in that election shall recuse themselves from the Board decisions regarding that recount.
+C. If the Recount Inspector certifies the election winner who was originally announced, the election results for that Board position shall be considered final. Otherwise, the Board shall create additional procedures for determining the election winner.
+
+
+XXIV.10: Inspectors’ Stipends
+Inspectors of Election (primary inspector and their assistant) who did not serve on the Board during the election they inspected shall, upon their request, be paid by NPDL a stipend of $100 and $60, respectively, upon the conclusion of their duties. 
+
+
+XXIV.11: Outreach Director Elections
+A. Outreach Director elections shall be conducted using the Scottish STV (see VI.4.B) rules, as implemented by opavote.com
+
+
+
+
+ARTICLE XXV: LEGISLATIVE PROCEDURES
+
+
+XXV.1: Remote Participation
+Representatives may participate in and vote in meetings of members via a teleconferencing platform chosen by the Chair.
+
+
+XXV.2: Substitutes
+(see II.5, XXVI.3)
+If an adult representative is unable to attend a meeting of members, the school may designate another coach affiliated with that school as the substitute adult representative. If a student representative is unable to attend a meeting of members, the school may designate another student from that school as the substitute student representative. Substitutes shall be considered representatives only for the duration of the meeting of members. Designation of substitutes shall be done as per XXVI.3.
+
+
+XXV.3: Proxy Eligibility
+For the purposes of determining proxy eligibility (see IV.6.F), a meeting of members held during an online tournament shall not be considered to be held at that tournament.
+
+
+XXV.4: Roster Deadlines
+(see CORP § 5611)
+A. All changes to the representatives roster except proxy and substitute designations must be submitted by authorized persons to npdl.board+secretary@gmail.com no later than 1 day prior to the meeting of members in order to take effect during that meeting of members.
+B. All changes to the representatives roster must be submitted by authorized persons to npdl.board+secretary@gmail.com no later than 4 days prior to the start of the voting period in order to take effect during that Written Ballot.
+
+
+XXV.5: League Rules Format
+(see I.12)
+A. League Rules are composed of articles. Articles are numbered using Roman numerals. Article numbers I - IX are reserved for the Bylaws. Article numbers XI - XIX are reserved for the Legislative Code. Article numbers XXI - XXIX are reserved for the Board Code.
+B. Articles are composed of sections. Sections are numbered using Arabic numerals.
+C. Sections are typically composed of subsections. Subsections are numbered using capital English letters.
+D. References to other parts of the League Rules are enclosed in parentheses and begin with the word ‘see.’ A reference may omit the number/letter of the article/section/subsection if it is located in that same article/section. References to the California Corporations Code are enclosed in parentheses and begin with ‘see CORP §’ followed by the section number.
+
+
+XXV.6: Proposal Format
+A. Each proposal shall be focused on a single topic. The Board may waive this requirement for an omnibus proposal.
+B. Each proposal shall include (1) the text added by the proposal, shown in blue, bolded, and underlined, (2) the text deleted by the proposal, shown in red and crossed out, (3) the text of the affected sections that remains the same, shown in black, (4) the sponsor’s name and school affiliation, (5) a summary of the proposal, and (6) a rationale for the proposal.
+C. If a proposal is incorrectly formatted, the Secretary shall notify the sponsor about this in writing prior to the meeting of the legislative committee/Board that would vet that proposal (see III.4.B).
+D. The Secretary may edit the proposal text without prior approval from the sponsor, so long as the edits do not alter the substance of the proposal, but are instead limited to formatting the proposal to ensure that it is in order.
+E. The Secretary may edit the proposal summary.
+
+
+XXV.7: Proposal Submission
+A. Proposals shall be submitted by their sponsors to npdl.board+secretary@gmail.com
+B. Within 5 days of receiving a proposal submission, the Secretary shall email the proposal to the representatives.
+C. Proposals and legislative committee meeting times are considered to be announced to the representatives (see III.3) once:
+- the Secretary emails them to the representatives, or
+- the Secretary or the sponsor posts them on the NPDL Forum.
+
+
+XXV.8: Sponsors
+A. The representative who submitted the proposal is its initial sponsor.
+B. If a school replaces its representative, the new representative shall become the sponsor of all pending proposals sponsored by the former representative.
+C. If a school ceases to have an adult representative, that school’s student representative shall become the sponsor of all pending proposals sponsored by the former adult representative. If a school ceases to have a student representative, that school’s adult representative shall become the sponsor of all pending proposals sponsored by the former student representative.
+D. A sponsor may designate another representative to become the new sponsor of their proposal. To do so, the sponsor must email npdl.board+secretary@gmail.com and CC the new sponsor.
+E. If a pending proposal ceases to have a sponsor, it shall be considered to be withdrawn.
+
+
+XXV.9: Motions
+A. There are two motions to amend which may be voted on at a meeting of members (see IV.4):
+- motion to modify, which modifies the text of a proposal on the agenda;
+- motion to split, which splits a proposal on the agenda into multiple proposals without substantially modifying its text.
+B. A motion to amend may be added to the agenda by:
+- the sponsor;
+- the Board, the same way it would submit a proposal (see III.2);
+- a legislative committee, the same way it would submit a proposal (see III.3).
+C. The language of a motion to amend must be closely related to the subject matter covered by the proposal. Unrelated changes should instead be introduced as separate proposals. The Chair may, unless overruled by the Board, rule that a motion to amend violates this subsection and not allow it to be added to the agenda.
+D. If it was submitted to npdl.board+president@gmail.com at least 10 days prior to the meeting of members, a motion to amend may be passed by a simple majority vote of the Legislature. Otherwise, a motion to amend may be passed by a two-thirds vote of the Legislature (see IV.7).
+
+
+
+
+ARTICLE XXVI: MEMBERSHIP REGISTRATION
+
+
+XXVI.1: Membership Form
+A. The NPDL membership registration form shall be the document in Appendix B.
+B. The Secretary may modify the text of Appendix B upon giving notice to the Board.
+C. The Secretary shall create an online membership registration form based on Appendix B.
+D. When filling out the form, the debate program supervisor will select whether the school representatives should receive official communication from NPDL by email or by regular mail (see CORP § 20).
+If the school chooses to receive communication by regular mail, the debate program supervisor must fill out a hard copy of the membership form (see Appendix B) and mail it to NPDL. If the school chooses the email option and wants to switch over to the regular-mail option later in the term, the debate program supervisor may do so at any time by mailing the hard copy of the membership form to NPDL.
+If the school chooses to receive communication from NPDL by email, the debate program supervisor should fill out the online membership form.
+
+
+XXVI.2: Timeline
+A. Membership registration for a given term shall open on June 1 of the previous term.
+B. Membership registration for a given term is due March 15 of that term.
+C. To become a voting member for a given term, the school shall list on its membership form three tournaments it attended in parli in the current or the immediately preceding term (see II.1.A.2).
+Alternatively, it may email this tournament list to npdl.board+secretary@gmail.com by March 31.
+D. If a school submits its membership form online (see 1.C), the debate program supervisor must confirm that form in writing by March 31 in order for the school to become a voting member for that term.
+E. Membership must be renewed annually. A school’s membership registration/renewal shall expire on October 31 of the following term (II.3.A).
+F. The term of a student representative shall expire no later than June 30 of the term when they were selected.
+
+
+XXVI.3: Changing Representatives
+(see II.5)
+A. Following the initial designation of representatives during membership registration/renewal, a representative may be removed and/or a new representative may be designated by an email notice sent to npdl.board+secretary@gmail.com
+B. The email notice may be sent by the debate program supervisor or a school representative.
+C. The email notice must CC the debate program supervisor, the old representative being removed (if applicable), the new representative being designated (if applicable), and the other representative of the school (if there is one).
+
+
+
+
+ARTICLE XXVII: BOARD OPERATION
+
+
+XXVII.1: Board Meetings
+A. Unless specified otherwise, Board meetings shall be held via teleconferencing 5:30 - 7:00 PM (Pacific Time).
+B. Regular Board meetings shall be held:
+- the second Tuesday of July;
+- the second Tuesday of September;
+- the first Tuesday of October;
+- the last Tuesday before the NPDL Fall Invitational;
+- the first Tuesday of November;
+- the first Tuesday after Thanksgiving (i.e. the last Tuesday before the Fall voting period);
+- the second Tuesday of January;
+- the first Tuesday of February;
+- the last Tuesday before March 3 (i.e. the deadline to finalize NPDL-TOC staff);
+- the last Tuesday before NPDL-TOC;
+- the last Tuesday of April (i.e. the last Tuesday before the Board elections);
+- the third Tuesday of May (joint meeting of outgoing Board and Board-elect).
+C. The Secretary shall maintain an attendance summary for each Board member. The summary shall include:
+- a list of regular Board meetings during which the Board member was present,
+- if the Board member was present for only part of the meeting, the summary shall note how long they were present,
+- the total number of regular meeting hours the Board member attended.
+On or before April 3, representatives shall be sent an attendance summary for each Board member, updated through the end of March.
+
+
+XXVII.2: Board Meeting Minutes
+A. The Secretary shall take minutes during each Board meeting.
+B. The minutes shall include the text of all proposals passed during the Board meeting and indicate how each Board member voted on each proposal.
+C. The Secretary shall present a draft of the minutes to the Board. The Secretary shall make a good faith effort to do this within 7 days following the Board meeting. The draft shall indicate any language the Secretary intends to redact before publishing the minutes.
+D. Within 5 days after being presented with the draft of the minutes (see C), other Board members may request changes to the text of the minutes to more accurately represent what was said during the meeting. During this review period, Board members may also request that the Secretary redact (or refrain from redacting) some language in the minutes.
+E. Any Board member may request that approval of the minutes be postponed until the next Board meeting. If no Board member makes this request before the end of the review period (see D), the minutes shall be considered to have been approved by the Board.
+F. The Secretary shall publish the minutes on the NPDL Forum (see VII.2). The Secretary shall make a good faith effort to do so within 2 days after the minutes have been approved by the Board. The Secretary shall include a summary of the minutes.
+G. Minutes language may be redacted in order to:
+- protect the privacy of any individual people discussed at the meeting;
+- allow Board members to disclose sensitive non-public information to the Board;
+- allow Board members to share their honest opinions about individual people, tournaments, camps, or other organizations; 
+- avoid undermining the Board’s bargaining position in a matter currently being negotiated with an outside entity; or
+- avoid jeopardizing the profits of an NPDL non-tournament fundraiser.
+H. If the Secretary is not present at a Board meeting and did not designate a replacement, the Chair shall appoint another Board member to take minutes at that meeting and to carry out the rest of the duties of the Secretary listed in this section.
+
+
+XXVII.3: Board Confidentiality
+A. Current and past Board members may not disclose internal information to anyone who is not a current Board member.
+B. Internal information is information about:
+- discussions during Board meetings, except those reflected in the Board-approved public minutes;
+- discussions in the Board Slack channels;
+- documents in the NPDL Google Drive, except those intended for publication;
+- any email sent to npdl.board@gmail.com, unless the sender states that the email may be shared outside of the Board;
+- login information for any NPDL account.
+C. Notwithstanding subsection A,
+- the Board may publish any internal information;
+- a Board member may disclose internal information to an NPDL volunteer on a need-to-know basis upon notifying the Board.
+
+
+XXVII.4: Board Norms
+At the beginning of each term, the Board shall adopt a Board Norms document.
+
+
+XXVII.5: NPDL Conflict of Interest Policy
+All directors/officers must sign and follow the NPDL Conflict of Interest Policy (see Appendix A).
+
+
+XXVII.6: Duties of the President
+A. The President shall chair Board meetings.
+B. The President shall prepare materials for Board meetings, including:
+- a Google Drive folder containing all proposals,
+- a Google Calendar invite,
+- a Zoom link,
+- an agenda document.
+C. The President shall oversee and coordinate the activities of the other directors.
+D. The President may represent NPDL to other organizations.
+E. The President shall maintain a calendar of tournaments eligible for NPDL points.
+F. When a tournament applies to be eligible for points, the President shall promptly inform the Board.
+
+
+XXVII.7: Duties of the Secretary
+A. The Secretary shall take minutes at meetings of members and of the Board (see VII.2) and maintain an attendance summary (see 2).
+B. The Secretary shall assist the Inspectors of Election with organizing Board elections (see XXIV).
+C. The Secretary shall maintain an updated member roster (see VII.4).
+The Secretary shall ensure that the Google Drive folder of each meeting of members/written ballot/election contains a roster of all representatives (and proxies for a meeting of members) eligible to vote in it.
+D. The Secretary shall distribute proposals and announce legislative committees to the membership (see XXV.7).
+E. The Secretary shall give the membership written notice of upcoming meetings of members (see IV.1.C) and Written Ballots.
+F. The Secretary shall ensure that a Written Ballot is distributed to the representatives.
+G. Once a new proposal is passed, the Secretary shall promptly
+- update the official Google Drive version of the League Rules,
+- adjust the numbering and references throughout the League Rules to maintain consistency (see I.13),
+- then update the public-facing version of the League Rules on the website (see VII.1).
+The Secretary shall maintain a Google Drive archive of the past versions of League Rules.
+H. In October of every even year, the Secretary shall submit an updated form SI-100 to the California Secretary of State and pay the required filing fee.
+
+
+XXVII.8: Duties of the Treasurer
+A. Reports
+(see VII.5)
+- The Treasurer shall pay all NPDL expenses in a timely manner and keep all receipts on file.
+- The Treasurer shall maintain a spreadsheet in the Board Google Drive itemizing all revenue and expenses.
+- The Treasurer shall maintain spreadsheets in the member Google Drive listing the category totals of revenues and expenses at NPDL tournaments.
+B. Bank
+- At the start of their term, the Treasurer shall ensure that they become an authorized representative on all NPDL bank accounts. The Treasurer shall then obtain access to online banking, an NPDL checkbook, and an NPDL debit card.
+- Each month, the Treasurer shall download the latest bank statement and upload it to the Board Google Drive.
+- The Treasurer shall create a ‘See activity only’ user account that can see check images, statements, and documents, but not authorize transactions, and shall give all other Board members access to this account.
+- At the end of their term, the Treasurer shall ensure that the Treasurer and the Secretary for the next term become authorized representatives on the NPDL accounts.
+C. Taxes
+- The Treasurer shall submit form 990-EZ to the IRS, form 199 to the Franchise Tax Board, and form RRF-1 to the Registry of Charitable Trusts for the immediately preceding fiscal year.
+- The Treasurer shall save all the completed forms to the Board Google Drive and present them to the Board by the first Tuesday of October (see 1.B).
+
+
+XXVII.9: Duties of the TOC Director
+The TOC Director shall organize the NPDL Tournament of Champions.
+
+
+XXVII.10: Outreach Directors
+There shall be three Outreach positions on the Board, each held by one director: the Reporting Director, the Curriculum Director, and the Public Relations (PR) Director.
+
+
+XXVII.11: Duties of the Reporting Director
+A. The Reporting Director shall ensure that reported points from any eligible tournament are promptly added to the rankings used to determine the qualification to NPDL-TOC.
+B. The Reporting Director shall ensure that there is a regularly updated NPDL database of high school parliamentary debate tournament resolutions.
+C. The Reporting Director shall ensure that there is a regularly updated NPDL database of  high school parliamentary debate tournament round recordings.
+D. The Reporting Director shall oversee website publication of news and opinion for the parliamentary debate community.
+E. The Reporting Director shall hold Zoom meetings of student correspondents approximately once a month.
+
+
+XXVII.12: Duties of the Curriculum Director
+A. The Curriculum Director shall oversee the creation and compilation of free and publicly available educational resources for parliamentary debate students and coaches.
+B. The Curriculum Director shall work with member school coaches to disseminate the NPDL educational resources.
+C. The Curriculum Director shall assemble and chair the Curriculum Committee composed of adult volunteers.
+
+
+XXVII.13: Duties of the PR Director
+A. The PR Director shall oversee NPDL social media accounts.
+B. The PR Director shall seek out fundraising opportunities for NPDL.
+
+
+XXVII.14: Chair of the Meeting of Members
+A. When scheduling a meeting of members, the Board shall also appoint the meeting Chair.
+B. The Chair shall prepare a summary of each proposal on the meeting agenda, run it by the proposal sponsor to ensure accuracy, and then read that summary word for word during the meeting.
+
+
+XXVII.15: Logistics Coordinator
+A. At the start of each term, the Board shall appoint one of its members to be the Logistics Coordinator.
+B. The Logistics Coordinator shall ensure that all Board members know how to access and use NPDL web accounts.
+C. The Logistics Coordinator shall ensure that each Board member has their own extension on the NPDL email account and that the emails sent to that extension are auto-forwarded to that Board member.
+D. The Logistics Coordinator shall ensure that all emails sent to the NPDL Board email reach the correct Board member and are then replied to.
+
+
+XXVII.16: Board-Elect
+A. The Board-elect consists of all the candidates who won regular Board elections during that term.
+B. The Board-elect exists from the time election results are announced to the candidates (see XXIV.9.A) until June 30, when the term of the previous Board expires (see VI.5).
+C. The Board-elect may meet to plan for the upcoming term. Its decisions shall not take effect, however, unless ratified by the Board.
+D. During the first Board meeting of the term, the Board shall hold an up-or-down omnibus vote on whether to ratify all the decisions it made when it was the Board-elect.
+E. Meetings of the Board-elect shall be subject to the same minutes requirements (see 2) as are meetings of the Board.
+
+
+
+
+ARTICLE XXVIII: ONLINE FORUM
+
+
+XXVIII.1: User Roles
+To be eligible for an NPDL Forum account, one must fit one or more of the roles below. Each user account shall indicate the user’s current role(s).
+- NPDL Board member
+- NPDL adult representative
+- NPDL student representative
+- Head coach of an NPDL member school
+- Assistant coach of an NPDL member school
+- Student at an NPDL member school (users may be listed under this role for a grace period of up to one year after June 1 of their last year in high school)
+- NPDL volunteer
+If a user’s role changes, the user is responsible for updating their account.
+If a previously eligible user account becomes no longer eligible, it shall be changed to view-only.
+
+
+XXVIII.2: User Account
+A. The user account must include the person’s first and last name.
+B. The user account must include the person’s school affiliation.
+
+
+XXVIII.3: Posting Guidelines
+A. Do not make posts that are sexist, racist, homophobic, or otherwise advocate for the oppression of or result in the marginalization of any individual, particularly of any member of an underprivileged social group.
+B. Do not use profanity or post obscene images or links.
+C. Do not make personal attacks on other users. This rule should not be used to prohibit criticism of specific policies or practices at parliamentary debate tournaments, events, or organizations.
+D. Do not spam. Do not advertise for-profit organizations. Limit advertisement of non-profit organizations to issues relevant to parliamentary debate.
+E. The Board may create additional guidelines.
+
+
+
+
+ARTICLE XXIX: REGIONAL LEAGUES
+
+
+XXIX.1: NCPDL
+The Board authorizes the Northern California Parliamentary Debate League (NCPDL) to act as an affiliate of NPDL. NCPDL shall be governed as outlined in the NCPDL Constitution.
+Page  of 55

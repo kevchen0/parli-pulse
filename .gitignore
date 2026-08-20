@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.next/
+.env
+.env.local
+*.tsbuildinfo
+
+# Cached Tabroom payloads: large (up to ~84MB each) and reproducible.
+data/raw/

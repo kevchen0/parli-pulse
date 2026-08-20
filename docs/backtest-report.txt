@@ -1,0 +1,90 @@
+NPDL 2025-26 BACKTEST REPORT   (generated 2026-08-20)
+
+STAGE 1 — field sizes vs sheet 'Tournaments' tab
+
+------------------------------------------------------------------------------------------------
+compared 92 tournaments, scored against published cells only
+  open field   72/80  (90%)
+  n/jv field   81/92  (88%)
+  AFS          63/80  (79%)
+  elim field   75/79  (95%)
+  prelim #     70/79  (89%)
+
+skipped 3:
+  - 37432 Rutgers (no open parli event; found none)
+  - 37788 YFL 4 (no open parli event; found none)
+  - 36597 CBSR 3 (no open parli event; found none)
+
+============================================================
+STAGE 2 BACKTEST — per-entry Article XXI points
+============================================================
+ALL                             1082/1329    81%
+
+-- by tournament category --
+CHSSA                            103/156     66%
+NYPDL                            362/412     88%
+Regular                          617/761     81%
+
+-- by result type --
+broke to elims                   542/634     85%
+prelims only                     540/695     78%
+
+-- special populations --
+hybrid teams                      30/35      86%
+flagged wrong team size            0/0         -
+adjustment disagreement            0/67       0%
+
+-- component agreement (breaking teams) --
+base points                      551/634     87%
+prelim+break adj                 634/634    100%
+
+-- top mismatching tournaments (247 rows) --
+  NPDL-TOC                         54/65   bad
+  Ryan Rutledge                    23/23   bad
+  GGSA 3                           17/17   bad
+  El Cerrito                       14/14   bad
+  CBSR 2                           11/11   bad
+  SCDL Spring                       8/8    bad
+  UCLA                              7/17   bad
+  NYPDL March OL                    7/28   bad
+  Cal - UC Berkeley                 6/21   bad
+  SCDL Fall                         6/7    bad
+  NYPDL January                     5/32   bad
+  Sid Fox                           4/7    bad
+  NYPDL November I-P                4/32   bad
+  La Costa Canyon                   4/19   bad
+  NYPDL January OL                  4/28   bad
+
+-- sample rows from the largest delta buckets --
+  delta +1 (90 rows):
+     NYPDL September OL     NYPDL    broke=Y ours= 10 sheet=  9 base=   8/  10
+     NYPDL September OL     NYPDL    broke=Y ours= 10 sheet=  9 base=   8/  10
+     NYPDL September OL     NYPDL    broke=Y ours= 10 sheet=  9 base=   8/  10
+     NYPDL September I-P    NYPDL    broke=Y ours= 10 sheet=  9 base=   7/  10
+  delta -4 (43 rows):
+     Rogue Valley           Regular  broke=n ours=  0 sheet=  4 base=   0/   4
+     Rogue Valley           Regular  broke=n ours=  0 sheet=  4 base=   0/   4
+     UCLA                   Regular  broke=n ours=  0 sheet=  4 base=   0/   4
+     UCLA                   Regular  broke=n ours=  0 sheet=  4 base=   0/   4
+  delta +6 (24 rows):
+     Notre Dame             Regular  broke=Y ours= 26 sheet= 20 base=  27/  21
+     Yale                   Regular  broke=Y ours= 27 sheet= 21 base=  28/  22
+     Stephen Stewart        Regular  broke=Y ours= 27 sheet= 21 base=  29/  23
+     Cal Parli              Regular  broke=Y ours= 28 sheet= 22 base=  28/  22
+  delta -7 (23 rows):
+     Sid Fox                Regular  broke=n ours=  0 sheet=  7 base=   0/   7
+     Clackamas Holiday Edge Regular  broke=Y ours=  4 sheet= 11 base=  12/  22
+     Clackamas Holiday Edge Regular  broke=Y ours=  4 sheet= 11 base=  12/  22
+     SCDL Fall              CHSSA    broke=n ours=  0 sheet=  7 base=   0/   7
+
+delta histogram: -12:2  -11:7  -10:6  -8:9  -7:23  -6:12  -4:43  -3:13  -2:3  -1:10  +1:90  +3:1  +5:4  +6:24
+
+sheet rows with no Tabroom match: 255
+tournaments skipped (no payload / no open event): 5
+
+============================================================
+STAGE 3 — aggregate totals (competitors we fully reproduced)
+============================================================
+individual weighted (XXI.8)      539/861     63%
+team weighted (XXI.7)            454/642     71%
+school unweighted (XXI.9)         36/136     26%

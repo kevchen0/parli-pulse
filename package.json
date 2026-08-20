@@ -1,0 +1,25 @@
+{
+  "name": "parli-pulse",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --build",
+    "backtest": "node scripts/backtest-fields.ts && node scripts/backtest-points.ts",
+    "backtest:fields": "node scripts/backtest-fields.ts",
+    "backtest:points": "node scripts/backtest-points.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3"
+  }
+}
