@@ -96,6 +96,12 @@ export interface NormalizedEvent {
    */
   publishedPrelimWins: Map<string, number>;
   /**
+   * Round-by-round prelim results recovered from the `Final Places` result
+   * set, for events that published no pairings at all. Several CHSSA league
+   * tournaments report only standings; without this they score nothing.
+   */
+  publishedRecords: Map<string, { wins: number; losses: number; rounds: number }>;
+  /**
    * Entries the `Final Places` result set marks as champion. Normally one, but
    * a closeout (XXI.5.B) produces several -- Tabroom writes "Co-Champion", and
    * some tournaments simply list two "1st" rows.
@@ -234,6 +240,39 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         }
       }
 
+      // Tab's per-entry summary string, e.g. "\nR1   W |\nR2  BYE  \nR3   L |".
+      // A bye counts as a win, matching how the round data is scored.
+      const parseBallotString = (v: string): { wins: number; losses: number; rounds: number } => {
+        let wins = 0, losses = 0, rounds = 0;
+        for (const m of v.matchAll(/R(\d+)\s+(BYE|W|L)\b/gi)) {
+          rounds++;
+          const token = m[2]!.toUpperCase();
+          if (token === 'L') losses++;
+          else wins++;
+        }
+        return { wins, losses, rounds };
+      };
+
+      const publishedRecords = new Map<string, { wins: number; losses: number; rounds: number }>();
+      for (const rs of ev.result_sets ?? []) {
+        if (rs.tag !== 'final' && rs.tag !== 'seed') continue;
+        const ballotKey = id((rs.result_keys ?? []).find((k) => k.tag === 'Ballots')?.id);
+        const winKey = id((rs.result_keys ?? []).find((k) => k.tag === 'Win' || k.tag === 'WinPm')?.id);
+        if (!ballotKey && !winKey) continue;
+        for (const res of rs.results ?? []) {
+          const entryId = id(res.entry);
+          if (!entryId || publishedRecords.has(entryId)) continue;
+          const values = res.values ?? [];
+          const ballots = values.find((v) => id(v.result_key) === ballotKey)?.value;
+          if (typeof ballots === 'string' && /R\d/.test(ballots)) {
+            const parsed = parseBallotString(ballots);
+            if (parsed.rounds > 0) { publishedRecords.set(entryId, parsed); continue; }
+          }
+          const w = Number(values.find((v) => id(v.result_key) === winKey)?.value);
+          if (Number.isFinite(w)) publishedRecords.set(entryId, { wins: w, losses: 0, rounds: 0 });
+        }
+      }
+
       const finalPlacesChampions = new Set<string>();
       for (const rs of ev.result_sets ?? []) {
         if (rs.tag !== 'final') continue;
@@ -255,6 +294,7 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         rounds,
         prelimCount: rounds.filter((r) => r.isPrelim).length,
         publishedPrelimWins,
+        publishedRecords,
         finalPlacesChampions,
       });
     }
@@ -466,6 +506,10 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
   // are panelled, counting ballots turns a 4-round tournament into a 6-0
   // record and puts the team outside the XXI.3.A table entirely.
   const debated = new Map<string, number>();
+  // Byes are credited as wins but are not evidence that results were entered;
+  // counting them here would suppress the published-record fallback for an
+  // event whose only "scored" round is a single bye.
+  let scoredBallots = 0;
   for (const r of event.rounds) {
     if (!r.isPrelim) continue;
     const perEntry = new Map<string, { won: number; total: number }>();
@@ -482,6 +526,7 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
           perEntry.set(b.entryId, t);
           continue;
         }
+        scoredBallots++;
         const t = perEntry.get(b.entryId) ?? { won: 0, total: 0 };
         t.total++;
         if (b.won) t.won++;
@@ -503,15 +548,36 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
     if (p) p.wins = wins;
   }
 
-  // Losses are the rounds a team did not win, not the losses we could find a
-  // ballot for. An unscored ballot otherwise shortens the record -- 2-1 becomes
-  // 2-0 -- and a short record is absent from the XXI.3.A table, so the team
-  // silently scores nothing. The league counts the full round schedule; teams
-  // that genuinely stopped competing are removed by the forfeit rule instead.
-  for (const [entryId, p] of out) {
-    if (!event.entries.has(entryId)) continue;
-    const played = Math.max(debated.get(entryId) ?? 0, prelimCount);
-    p.losses = Math.max(0, played - p.wins);
+  // Some events publish standings but nothing to count: either no pairings at
+  // all, or pairings whose ballots carry no win/loss. Both leave every team at
+  // 0-N, which scores nothing. Recover the record from tab's own summary --
+  // but keep going, because the elim rounds may still be scored.
+  const usePublished = prelimCount === 0 || scoredBallots === 0;
+  if (usePublished) {
+    for (const [entryId, rec] of event.publishedRecords) {
+      const p = out.get(entryId);
+      if (!p || rec.rounds === 0) continue;
+      p.wins = rec.wins;
+      p.losses = rec.losses;
+    }
+  } else {
+    // Where tab published win totals, trust them over counted ballots.
+    for (const [entryId, wins] of event.publishedPrelimWins) {
+      const p = out.get(entryId);
+      if (p) p.wins = wins;
+    }
+
+    // Losses are the rounds a team did not win, not the losses we could find a
+    // ballot for. An unscored ballot otherwise shortens the record -- 2-1
+    // becomes 2-0 -- and a short record is absent from the XXI.3.A table, so
+    // the team silently scores nothing. The league counts the full round
+    // schedule; teams that genuinely stopped competing are removed by the
+    // forfeit rule instead.
+    for (const [entryId, p] of out) {
+      if (!event.entries.has(entryId)) continue;
+      const played = Math.max(debated.get(entryId) ?? 0, prelimCount);
+      p.losses = Math.max(0, played - p.wins);
+    }
   }
 
   const { main } = partitionElimRounds(event.rounds);

@@ -38,21 +38,26 @@ against the official sheet. Points engine not yet written.
 | elim field | 75/79 (95%) |
 | prelim # | 70/79 (89%) |
 
-**Stage 2 — per-entry points** (vs `Entry` tab): **1212/1329 (91%)**
-NYPDL **100%** · Regular 91% · CHSSA 71% · broke **97%** · prelims-only 86% ·
-hybrids **100%** · prelim+break adjustment 100%
+**Stage 2 — per-entry points** (vs `Entry` tab): **1273/1329 (96%)**
 
-**Partnerships** (`backtest-teams.ts`, vs `team_calc`): **527/675 (78%) exact**,
-81% within 2 points. Restricted to teams whose every result we reproduce:
-**526/530 = 99%**, so XXI.7 weighting is correct and the remainder is per-entry
-coverage. Failure attribution: 105/148 a per-entry score disagrees, 39/148
-missing a tournament, **4/148 aggregation-only**.
+| tournament type | match |
+|---|---|
+| NYPDL | 411/412 (100%) |
+| CHSSA (incl. XXI.4.C qualifiers) | 153/156 (98%) |
+| Regular invitationals | 655/696 (94%) |
+| NPDL-TOC (XXI.4.A) | 54/65 (83%) |
+| OSAA | no rows in 2025-26 |
 
-**Aggregates**: individual 63%, team 71%, school 26% (school is worst because
-one wrong entry poisons a whole school's sum).
+breaking teams 97% · prelims-only 95% · hybrids 100% · adjustments 100%
 
-**Remaining weak spots**: CHSSA 71%, region CA3 39% / CA4 50% / OR 60%,
-255 sheet rows still unmatched by surname pair.
+**Partnerships** (vs `team_calc`): **579/675 (86%) exact**, 90% within 2 points.
+Restricted to teams whose every result we reproduce: **579/583 = 99%**.
+Failure attribution: 53/96 a per-entry score disagrees, 39/96 missing a
+tournament, **4/96 aggregation-only**.
+
+**Remaining weak spots**: NPDL-TOC 83% (its prelims are 2-judge panels; we
+undercount winning ballots for ~11 entries), 255 sheet rows unmatched by
+surname pair, 155 partnerships with no Tabroom data at all.
 
 ### Key decisions made this session
 0. **Rule-order and data-shape fixes found by backtesting** (81% -> 91%):

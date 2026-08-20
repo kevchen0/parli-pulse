@@ -18,16 +18,18 @@ skipped 3:
 ============================================================
 STAGE 2 BACKTEST — per-entry Article XXI points
 ============================================================
-ALL                             1212/1329    91%
+ALL                             1273/1329    96%
 
--- by tournament category --
-CHSSA                            111/156     71%
+-- by tournament type --
+NPDL-TOC (XXI.4.A)                54/65      83%
 NYPDL                            411/412    100%
-Regular                          690/761     91%
+CHSSA (XXI.4.B/C)                153/156     98%
+OSAA (XXI.4.C)                     0/0         -
+Regular invitationals            655/696     94%
 
 -- by result type --
 broke to elims                   612/634     97%
-prelims only                     600/695     86%
+prelims only                     661/695     95%
 
 -- special populations --
 hybrid teams                      35/35     100%
@@ -38,46 +40,45 @@ adjustment disagreement            0/18       0%
 base points                      607/634     96%
 prelim+break adj                 634/634    100%
 
--- top mismatching tournaments (117 rows) --
-  Ryan Rutledge                    23/23   bad
-  GGSA 3                           17/17   bad
+-- top mismatching tournaments (56 rows) --
   El Cerrito                       14/14   bad
   NPDL-TOC                         11/65   bad
-  CBSR 2                           11/11   bad
-  SCDL Spring                       8/8    bad
   UCLA                              7/17   bad
   Berkeley HS                       4/52   bad
   Apollo Invitational               4/19   bad
-  WBFL 2                            4/4    bad
+  Ryan Rutledge                     4/23   bad
   Harvard Season Opener             2/38   bad
   Clackamas Holiday Edge            2/12   bad
   Nueva                             2/20   bad
   CFL 1                             2/15   bad
-  WBFL 3                            2/2    bad
+  Notre Dame                        1/16   bad
+  NYPDL February I-P                1/26   bad
+  Evergreen                         1/20   bad
+  CFL 3                             1/18   bad
 
 -- sample rows from the largest delta buckets --
-  delta -4 (45 rows):
+  delta -4 (16 rows):
      UCLA                   Regular  broke=n ours=  0 sheet=  4 base=   0/   4
      UCLA                   Regular  broke=n ours=  0 sheet=  4 base=   0/   4
      UCLA                   Regular  broke=n ours=  0 sheet=  4 base=   0/   4
      UCLA                   Regular  broke=n ours=  0 sheet=  4 base=   0/   4
-  delta -7 (21 rows):
-     CFL 1                  CHSSA    broke=n ours=  0 sheet=  7 base=   0/   7
-     CFL 1                  CHSSA    broke=n ours=  0 sheet=  7 base=   0/   7
-     CFL 3                  CHSSA    broke=n ours=  0 sheet=  7 base=   0/   7
-     SCDL Spring            CHSSA    broke=n ours=  0 sheet=  7 base=   0/   7
-  delta -10 (10 rows):
+  delta +1 (15 rows):
+     El Cerrito             Regular  broke=n ours=  7 sheet=  6 base=   7/   7
+     El Cerrito             Regular  broke=n ours=  7 sheet=  6 base=   7/   7
+     El Cerrito             Regular  broke=n ours=  7 sheet=  6 base=   7/   7
+     El Cerrito             Regular  broke=n ours=  7 sheet=  6 base=   7/   7
+  delta -10 (6 rows):
      Harvard Season Opener  Regular  broke=Y ours= 15 sheet= 25 base=  19/  29
      Harvard Season Opener  Regular  broke=Y ours= 15 sheet= 25 base=  19/  29
      Clackamas Holiday Edge Regular  broke=Y ours=  1 sheet= 11 base=  12/  22
      Clackamas Holiday Edge Regular  broke=Y ours=  1 sheet= 11 base=  12/  22
-  delta -6 (10 rows):
-     El Cerrito             Regular  broke=n ours=  0 sheet=  6 base=   0/   7
-     El Cerrito             Regular  broke=n ours=  0 sheet=  6 base=   0/   7
-     El Cerrito             Regular  broke=n ours=  0 sheet=  6 base=   0/   7
-     El Cerrito             Regular  broke=n ours=  0 sheet=  6 base=   0/   7
+  delta -1 (6 rows):
+     Berkeley HS            Regular  broke=Y ours=  9 sheet= 10 base=  10/  10
+     Berkeley HS            Regular  broke=Y ours=  9 sheet= 10 base=  10/  10
+     Berkeley HS            Regular  broke=Y ours=  9 sheet= 10 base=  10/  10
+     Berkeley HS            Regular  broke=Y ours=  9 sheet= 10 base=  10/  10
 
-delta histogram: -12:2  -11:7  -10:10  -8:9  -7:21  -6:10  -4:45  -3:1  -2:2  -1:6  +1:1  +6:3
+delta histogram: -10:6  -7:3  -5:2  -4:16  -3:1  -2:2  -1:6  +1:15  +3:2  +6:3
 
 sheet rows with no Tabroom match: 255
 tournaments skipped (no payload / no open event): 5
@@ -85,9 +86,9 @@ tournaments skipped (no payload / no open event): 5
 ============================================================
 STAGE 3 — aggregate totals (competitors we fully reproduced)
 ============================================================
-individual weighted (XXI.8)      679/861     79%
-team weighted (XXI.7)            542/642     84%
-school unweighted (XXI.9)         53/136     39%
+individual weighted (XXI.8)      777/861     90%
+team weighted (XXI.7)            594/642     93%
+school unweighted (XXI.9)         68/136     50%
 
 ========================================================================
 PARTNERSHIP BACKTEST — season points per team (XXI.7) vs team_calc
@@ -95,53 +96,55 @@ PARTNERSHIP BACKTEST — season points per team (XXI.7) vs team_calc
 official partnerships: 830   compared: 675   no Tabroom data: 155
 
 -- overall agreement on weighted season total --
-  exact                             527/675    78%
-  within 0.5                        532/675    79%
-  within 2.0                        545/675    81%
+  exact                             579/675    86%
+  within 0.5                        585/675    87%
+  within 2.0                        608/675    90%
 
 -- teams whose every result we reproduce (isolates aggregation) --
-  exact                             526/530    99%
-  within 0.5                        526/530    99%
+  exact                             579/583    99%
+  within 0.5                        579/583    99%
 
 -- by tournaments attended (official top-5 count) --
-  1 tournament                      369/423    87%
-  2 tournaments                      70/111    63%
-  3 tournaments                      24/46     52%
-  4 tournaments                      25/34     74%
-  5 tournaments                      39/61     64%
+  1 tournament                      397/423    94%
+  2 tournaments                      85/111    77%
+  3 tournaments                      30/46     65%
+  4 tournaments                      27/34     79%
+  5 tournaments                      40/61     66%
 
 -- by competitive tier (official rank) --
   top 25                             13/22     59%
-  26-100                             47/70     67%
-  101-300                           114/164    70%
-  301+                              353/419    84%
+  26-100                             50/70     71%
+  101-300                           127/164    77%
+  301+                              389/419    93%
 
 -- by region --
-  CA1                               236/288    82%
-  CA2                                 7/10     70%
-  CA3                                13/33     39%
-  CA4                                18/36     50%
+  CA1                               251/288    87%
+  CA2                                 9/10     90%
+  CA3                                22/33     67%
+  CA4                                25/36     69%
   CT                                 19/19    100%
   NJ                                 18/21     86%
   NY                                124/141    88%
   North Carolina                      5/6      83%
-  OR                                 44/73     60%
+  OR                                 61/73     84%
 
 -- by composition --
   hybrid partnerships                 0/0        -
-  single-school                     527/675    78%
-  ever broke to elims               272/342    80%
-  prelims only, all season          255/333    77%
+  single-school                     579/675    86%
+  ever broke to elims               281/342    82%
+  prelims only, all season          298/333    89%
 
--- by tournament mix --
-  any Regular                       321/421    76%
+-- by tournament mix (teams attending at least one) --
+  any NPDL-TOC                       37/61     61%
   any NYPDL                         223/248    90%
-  any CHSSA                          69/116    59%
+  any CHSSA                         104/116    90%
+  any OSAA                            0/0        -
+  any Regular                       343/421    81%
 
 -- rank agreement (recomputed ordering vs official) --
-  exact rank                         25/675     4%
-  within 5 places                   143/675    21%
-  within 20 places                  322/675    48%
+  exact rank                         31/675     5%
+  within 5 places                   175/675    26%
+  within 20 places                  419/675    62%
 
 ========================================================================
 TOP 30 PARTNERSHIPS BY OFFICIAL POINTS
@@ -179,6 +182,6 @@ TOP 30 PARTNERSHIPS BY OFFICIAL POINTS
  34 Evergreen         Abhiman & Pallakke       43.8   44.2    -0.4*  9/5  1 bad
 
 -- why teams miss --
-  missing tournaments for the team     39/148
-  a per-entry score disagrees         105/148
-  all entries agree, total does not     4/148
+  missing tournaments for the team     39/96
+  a per-entry score disagrees          53/96
+  all entries agree, total does not     4/96

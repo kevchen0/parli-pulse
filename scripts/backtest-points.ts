@@ -171,9 +171,18 @@ console.log('STAGE 2 BACKTEST — per-entry Article XXI points');
 console.log('='.repeat(60));
 console.log(line('ALL', cases));
 
-console.log('\n-- by tournament category --');
+// The TOC scores under its own schedule (XXI.4.A), so it is broken out of
+// "Regular" rather than diluted into it.
+const isToc = (c: Case): boolean => /NPDL-TOC/i.test(c.tournament);
+console.log('\n-- by tournament type --');
+console.log(line('NPDL-TOC (XXI.4.A)', cases.filter(isToc)));
+console.log(line('NYPDL', cases.filter((c) => c.category === 'NYPDL')));
+console.log(line('CHSSA (XXI.4.B/C)', cases.filter((c) => c.category === 'CHSSA')));
+console.log(line('OSAA (XXI.4.C)', cases.filter((c) => c.category === 'OSAA')));
+console.log(line('Regular invitationals', cases.filter((c) => c.category === 'Regular' && !isToc(c))));
 for (const cat of [...new Set(cases.map((c) => c.category))].sort()) {
-  console.log(line(cat, cases.filter((c) => c.category === cat)));
+  if (['NYPDL', 'CHSSA', 'OSAA', 'Regular'].includes(cat)) continue;
+  console.log(line(`other: ${cat}`, cases.filter((c) => c.category === cat)));
 }
 
 console.log('\n-- by result type --');

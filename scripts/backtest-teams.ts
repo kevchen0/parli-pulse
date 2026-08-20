@@ -138,8 +138,9 @@ slice('single-school', compared.filter((r) => !r.entries.some((e) => e.hybrid)))
 slice('ever broke to elims', compared.filter((r) => r.entries.some((e) => e.broke)));
 slice('prelims only, all season', compared.filter((r) => !r.entries.some((e) => e.broke)));
 
-console.log('\n-- by tournament mix --');
-for (const cat of ['Regular', 'NYPDL', 'CHSSA']) {
+console.log('\n-- by tournament mix (teams attending at least one) --');
+slice('any NPDL-TOC', compared.filter((r) => r.entries.some((e) => /NPDL-TOC/i.test(e.tournament))));
+for (const cat of ['NYPDL', 'CHSSA', 'OSAA', 'Regular']) {
   slice(`any ${cat}`, compared.filter((r) => r.entries.some((e) => e.category === cat)));
 }
 
