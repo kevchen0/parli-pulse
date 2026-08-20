@@ -16,6 +16,12 @@ import {
   normalizeTournament,
 } from '../../packages/ingest/src/normalize.ts';
 import {
+  matchTeams,
+  peopleFromEntryLabel,
+  type EntryCandidate,
+  type MatchTier,
+} from '../../packages/ingest/src/matching.ts';
+import {
   parseEntryTab,
   parseTournamentsTab,
   parseWorkbook,
@@ -41,6 +47,9 @@ export interface EntryCase {
   school: string;
   team: string;
   pair: string;
+  entryId: string;
+  matchTier: MatchTier;
+  matchAmbiguous: boolean;
   ours: number;
   theirs: number;
   matched: boolean;
@@ -56,6 +65,8 @@ export interface SeasonResult {
   cases: EntryCase[];
   /** Sheet rows we could not tie to a Tabroom entry. */
   unmatched: { tournament: string; team: string }[];
+  /** Rows whose best candidates tied; deliberately left unscored. */
+  ambiguous: { tournament: string; team: string }[];
   /** Sheet tournaments with no usable Tabroom payload. */
   skippedTournaments: string[];
   workbook: Map<string, SheetRow[]>;
@@ -75,6 +86,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
 
   const cases: EntryCase[] = [];
   const unmatched: { tournament: string; team: string }[] = [];
+  const ambiguous: { tournament: string; team: string }[] = [];
   const skippedTournaments: string[] = [];
 
   for (const off of officialTournaments) {
@@ -105,33 +117,55 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
       wins: number; losses: number; elimLevel: ElimLevel | null;
       size: boolean; prelimBallotsWon: number; elimWins: number;
     }
-    const ours = new Map<string, Mine>();
+    const byEntry = new Map<string, Mine>();
+    const candidates: EntryCandidate[] = [];
+
     for (const ev of opens) {
       const perf = computeEntryPerformances(ev);
       for (const [entryId, entry] of ev.entries) {
-        const names = entry.studentIds.map((s) => students.get(s)?.last ?? '').filter(Boolean);
-        if (names.length !== 2) continue;
+        const people = entry.studentIds
+          .map((sid) => students.get(sid))
+          .filter((x): x is { first: string; last: string } => !!x && !!x.last);
+        // Entries known only from ballots have no student records; fall back to
+        // the names carried on the entry label itself.
+        const resolved = people.length ? people : peopleFromEntryLabel(entry.name, entry.code);
+        if (resolved.length === 0) continue;
         const p = perf.get(entryId)!;
+        // Elim *wins* are round wins, not ballots: a 3-0 panel is one win.
         const elimRoundWins = ev.rounds.filter((r) => r.isElim).filter((r) =>
           r.sections.some((sec) => {
             const mineB = sec.ballots.filter((b) => b.entryId === entryId);
             return mineB.length > 0 && mineB.filter((b) => b.won === true).length * 2 > mineB.length;
           }),
         ).length;
-        ours.set(pairKey(names[0]!, names[1]!), {
+        byEntry.set(entryId, {
           wins: p.wins, losses: p.losses, elimLevel: p.elimLevel,
           size: entry.eligibleTeamSize,
           prelimBallotsWon: p.prelimBallotsWon,
           elimWins: elimRoundWins,
         });
+        candidates.push({ entryId, schoolName: entry.schoolName, people: resolved });
       }
     }
 
-    for (const row of sheetRows) {
-      const key = pairKey(row.partner1, row.partner2);
+    const teams = sheetRows.map((r) => ({
+      partner1: r.partner1,
+      partner2: r.partner2,
+      school: r.school1,
+    }));
+    const result = matchTeams(teams, candidates);
+
+    for (const [i, m] of result.matches) {
+      const row = sheetRows[i]!;
+      const mine = byEntry.get(m.entryId);
+      if (!mine) continue;
       const team = teamKey(row.school1, row.partner1, row.partner2);
-      const mine = ours.get(key);
-      if (!mine) { unmatched.push({ tournament: off.name, team }); continue; }
+      // An unbreakable tie is not a match. Scoring it would attribute one
+      // partnership's result to another, which is worse than a gap.
+      if (m.ambiguous) {
+        ambiguous.push({ tournament: off.name, team });
+        continue;
+      }
 
       const isQualifier = (off.category === 'CHSSA' || off.category === 'OSAA')
         ? ({ qual: 8, alt: 4 } as Record<string, number>)[row.result.toLowerCase()]
@@ -158,7 +192,10 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         tournId: off.tournId!,
         school: row.school1,
         team,
-        pair: key,
+        pair: pairKey(row.partner1, row.partner2),
+        entryId: m.entryId,
+        matchTier: m.tier,
+        matchAmbiguous: m.ambiguous,
         ours: sb.points,
         theirs: row.calcPoints ?? 0,
         matched: sb.points === (row.calcPoints ?? 0),
@@ -170,7 +207,11 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         theirAdj: row.breakPrelimAdjustment,
       });
     }
+    for (const i of result.unmatched) {
+      const row = sheetRows[i]!;
+      unmatched.push({ tournament: off.name, team: teamKey(row.school1, row.partner1, row.partner2) });
+    }
   }
 
-  return { cases, unmatched, skippedTournaments, workbook, officialTournaments, officialEntries };
+  return { cases, unmatched, ambiguous, skippedTournaments, workbook, officialTournaments, officialEntries };
 }

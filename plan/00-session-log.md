@@ -38,30 +38,41 @@ against the official sheet. Points engine not yet written.
 | elim field | 75/79 (95%) |
 | prelim # | 70/79 (89%) |
 
-**Stage 2 — per-entry points** (vs `Entry` tab): **1279/1329 (96%)**
+**Stage 2 — per-entry points** (vs `Entry` tab): **1484/1535 (97%)**
 
 | tournament type | match |
 |---|---|
-| NYPDL | 411/412 (100%) |
-| CHSSA (incl. XXI.4.C qualifiers) | 153/156 (98%) |
-| Regular invitationals | 655/696 (94%) |
-| NPDL-TOC (XXI.4.A) | 60/65 (92%) |
+| NYPDL | 459/460 (100%) |
+| CHSSA (incl. XXI.4.C qualifiers) | 298/302 (99%) |
+| Regular invitationals | 666/707 (94%) |
+| NPDL-TOC (XXI.4.A) | 61/66 (92%) |
 | OSAA | no rows in 2025-26 |
 
-breaking teams 97% · prelims-only 96% · hybrids 100% ·
-base points 96% · prelim+break adjustment 100%
+breaking teams 97% · prelims-only 96% · hybrids 100% · adjustments 100%
 
-**Partnerships** (vs `team_calc`): **584/675 (87%) exact**, 90% within 2 points.
-Restricted to teams whose every result we reproduce: **584/589 = 99%**.
-Failure attribution: 47/91 a per-entry score disagrees, 39/91 missing a
-tournament, 5/91 aggregation-only. Missing coverage is now roughly as large a
-cause as scoring bugs.
+By match tier: exact-initials 97%, exact-surnames 97%, maverick 100%,
+fuzzy-surname 100%.
 
-**Remaining weak spots**: 255 sheet rows unmatched by surname pair and 155
-partnerships with no Tabroom data at all — coverage, not arithmetic, is the
-next lever.
+**Partnerships** (vs `team_calc`): **701/775 (90%) exact**, 94% within 2 points.
+Restricted to teams whose every result we reproduce: **701/706 = 99%**.
+Failure attribution: 48/74 a per-entry score disagrees, 21/74 missing a
+tournament, 5/74 aggregation-only.
+
+**Aggregates**: individual 93%, school 65%.
+
+**Coverage**: 47 unmatched sheet rows (was 255), 2 ambiguous, 55 partnerships
+with no Tabroom data (was 155). What remains is mostly Ridge Debates, which
+published almost nothing, and three tournaments with no payload at all.
 
 ### Key decisions made this session
+-1. **Entity matching rebuilt** (`packages/ingest/src/matching.ts`).
+   Surname-pair keys silently collided -- CFL 3 contains two different
+   `He & Zhang` partnerships, and one was overwriting the other. Matching is
+   now tiered and one-to-one, disambiguates on first initials (the sheet writes
+   `Ma. Qiu` / `Me. Qiu` for siblings), allows a Damerau near-miss only when
+   the school agrees, and **reports ambiguity rather than guessing**. Entries
+   known only from ballots recover names from the entry label. Unmatched rows
+   255 -> 47.
 0. **Rule-order and data-shape fixes found by backtesting** (81% -> 91%):
    - **The XXI.3.B points floor lifts the *base*, then adjustments apply on
      top** — it is not a floor on the final total. NYPDL 88% -> 98%. Settles
@@ -108,12 +119,9 @@ breaks. Corrected and re-verified against the `Entry` tab: **Berkeley 31**
 - Entity matching by normalized surname pair (255 sheet rows still unmatched).
 
 ### Next
-- **Entity matching** is now the biggest lever: 255 unmatched sheet rows and
-  155 partnerships with no Tabroom data, versus only 47 rows failing on
-  arithmetic. Surname-pair matching is the bottleneck; Tabroom student ids
-  should replace it.
-- Load normalized data into Postgres (needs the database).
-- Sheet mirror UI (Phase 1).
+- Load normalized data into Postgres (needs Neon).
+- Sheet mirror UI (Phase 1, needs Neon + Vercel).
+- Smaller: `Regular invitationals` at 94% is now the weakest large category.
 
 ### Schema notes
 `packages/db/src/schema.ts` holds the Drizzle schema; `npm run db:generate`

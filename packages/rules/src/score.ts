@@ -71,8 +71,12 @@ export function scoreEntry(
     broke: perf.elimLevel !== null,
   };
 
-  // XXI.1.G -- only two-person teams are eligible for points.
-  if (!perf.eligibleTeamSize) return { ...empty, excluded: 'teamSize' };
+  // XXI.1.G -- only two-person teams are eligible for points. The points are
+  // still computed and reported; the exclusion is surfaced via `excluded` and
+  // applied when totals are rolled up. This mirrors the league's own working,
+  // which scores every row and then drops the flagged ones from the standings,
+  // and it keeps the per-row figure comparable against theirs.
+  const excluded: ScoreBreakdown['excluded'] = perf.eligibleTeamSize ? null : 'teamSize';
 
   const walkover = perf.walkoverAdjustment ?? 0;
 
@@ -81,6 +85,7 @@ export function scoreEntry(
     const base = prelimPoints(perf.wins, perf.losses);
     return {
       ...empty,
+      excluded,
       basePoints: base,
       walkoverAdjustment: walkover,
       points: Math.max(0, base + walkover),
@@ -91,7 +96,7 @@ export function scoreEntry(
   const base = elimPoints(ctx.afs, perf.elimLevel);
   if (base === null) {
     // Unreachable bracket for this field size: a data problem, not a zero.
-    return { ...empty, basePoints: null };
+    return { ...empty, excluded, basePoints: null };
   }
 
   let floorApplied: ScoreBreakdown['floorApplied'] = 'none';
@@ -130,7 +135,7 @@ export function scoreEntry(
     breakPenalty,
     walkoverAdjustment: walkover,
     floorApplied,
-    excluded: null,
+    excluded,
     broke: true,
   };
 }

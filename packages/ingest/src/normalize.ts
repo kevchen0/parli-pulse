@@ -51,6 +51,9 @@ export interface NormalizedEntry {
 export interface NormalizedBallot {
   ballotId: string | null;
   entryId: string | null;
+  /** Denormalized on the ballot; the only name source for detached entries. */
+  entryCode: string | null;
+  entryName: string | null;
   side: number | null;
   judgeId: string | null;
   judgePersonId: string | null;
@@ -130,6 +133,8 @@ function normalizeSection(raw: NonNullable<TabroomEvent['rounds']>[number]['sect
       return {
         ballotId: id(b.id),
         entryId: id(b.entry),
+        entryCode: b.entry_code ?? null,
+        entryName: b.entry_name ?? null,
         side: num(b.side),
         judgeId: id(b.judge),
         judgePersonId: id(b.judge_person),
@@ -208,10 +213,11 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         for (const s of r.sections) {
           for (const entryId of s.entryIds) {
             if (!entries.has(entryId)) {
+              const b = s.ballots.find((x) => x.entryId === entryId);
               entries.set(entryId, {
                 entryId,
-                code: null,
-                name: null,
+                code: b?.entryCode ?? null,
+                name: b?.entryName ?? null,
                 schoolId: null,
                 schoolName: null,
                 studentIds: [],

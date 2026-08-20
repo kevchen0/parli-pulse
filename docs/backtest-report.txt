@@ -18,39 +18,46 @@ skipped 3:
 ============================================================
 STAGE 2 BACKTEST — per-entry Article XXI points
 ============================================================
-ALL                               1279/1329    96%
+ALL                               1484/1535    97%
 
 -- by tournament type --
-NPDL-TOC (XXI.4.A)                  60/65      92%
-NYPDL                              411/412    100%
-CHSSA (XXI.4.B/C)                  153/156     98%
+NPDL-TOC (XXI.4.A)                  61/66      92%
+NYPDL                              459/460    100%
+CHSSA (XXI.4.B/C)                  298/302     99%
 OSAA (XXI.4.C)                       0/0         -
-Regular invitationals              655/696     94%
+Regular invitationals              666/707     94%
 
 -- by result type --
-broke to elims                     613/634     97%
-prelims only                       666/695     96%
+broke to elims                     680/701     97%
+prelims only                       804/834     96%
 
 -- special populations --
-hybrid teams                        35/35     100%
+hybrid teams                        33/33     100%
+
+-- by how the row was matched to Tabroom --
+exact-initials                      88/91      97%
+exact-surnames                    1338/1386    97%
+partial-maverick                    41/41     100%
+fuzzy-surname                       17/17     100%
+flagged ambiguous                    0/0         -
 
 -- component agreement (breaking teams) --
-base points                        607/634     96%
-prelim+break adjustment            634/634    100%
+base points                        674/701     96%
+prelim+break adjustment            701/701    100%
 
--- top mismatching tournaments (50 rows) --
+-- top mismatching tournaments (51 rows) --
   El Cerrito                       14/14   bad
   UCLA                              7/17   bad
-  NPDL-TOC                          5/65   bad
-  Berkeley HS                       4/52   bad
+  NPDL-TOC                          5/66   bad
+  Berkeley HS                       4/53   bad
   Apollo Invitational               4/19   bad
   Ryan Rutledge                     4/23   bad
-  Harvard Season Opener             2/38   bad
-  Clackamas Holiday Edge            2/12   bad
+  Harvard Season Opener             2/39   bad
+  Clackamas Holiday Edge            2/13   bad
   Nueva                             2/20   bad
   CFL 1                             2/15   bad
   Notre Dame                        1/16   bad
-  NYPDL February I-P                1/26   bad
+  NYPDL February I-P                1/27   bad
 
 -- sample rows from the largest delta buckets --
   delta +1 (15 rows):
@@ -70,78 +77,79 @@ prelim+break adjustment            634/634    100%
      Berkeley HS            Regular  broke=Y ours=  9 sheet= 10 base=  10/  10
      Berkeley HS            Regular  broke=Y ours=  9 sheet= 10 base=  10/  10
 
-delta histogram: -10:6  -7:3  -5:2  -4:9  -3:1  -2:2  -1:6  +1:15  +3:2  +4:1  +6:3
+delta histogram: -10:6  -7:4  -5:2  -4:9  -3:1  -2:2  -1:6  +1:15  +3:2  +4:1  +6:3
 
-sheet rows with no Tabroom match: 255
+sheet rows with no Tabroom match: 47
+rows matched but flagged ambiguous:   2
 tournaments skipped (no payload / no open event): 5
 
 ============================================================
 STAGE 3 — aggregate totals (competitors we fully reproduced)
 ============================================================
-individual weighted (XXI.8)        784/861     91%
-school unweighted (XXI.9)           68/136     50%
+individual weighted (XXI.8)       1004/1083    93%
+school unweighted (XXI.9)          104/160     65%
 
 ========================================================================
 PARTNERSHIP BACKTEST — season points per team (XXI.7) vs team_calc
 ========================================================================
-official partnerships: 830   compared: 675   no Tabroom data: 155
+official partnerships: 830   compared: 775   no Tabroom data: 55
 
 -- overall agreement on weighted season total --
-  exact                             584/675    87%
-  within 0.5                        590/675    87%
-  within 2.0                        610/675    90%
+  exact                             701/775    90%
+  within 0.5                        706/775    91%
+  within 2.0                        726/775    94%
 
 -- teams whose every result we reproduce (isolates aggregation) --
-  exact                             584/589    99%
-  within 0.5                        585/589    99%
+  exact                             701/706    99%
+  within 0.5                        702/706    99%
 
 -- by tournaments attended (official top-5 count) --
-  1 tournament                      397/423    94%
-  2 tournaments                      86/111    77%
-  3 tournaments                      31/46     67%
+  1 tournament                      474/500    95%
+  2 tournaments                     111/126    88%
+  3 tournaments                      42/53     79%
   4 tournaments                      28/34     82%
-  5 tournaments                      42/61     69%
+  5 tournaments                      46/62     74%
 
 -- by competitive tier (official rank) --
-  top 25                             14/22     64%
-  26-100                             53/70     76%
-  101-300                           128/164    78%
-  301+                              389/419    93%
+  top 25                             15/22     68%
+  26-100                             58/72     81%
+  101-300                           167/190    88%
+  301+                              461/491    94%
 
 -- by region --
-  CA1                               253/288    88%
-  CA2                                 9/10     90%
-  CA3                                22/33     67%
-  CA4                                26/36     72%
-  CT                                 19/19    100%
-  NJ                                 18/21     86%
-  NY                                124/141    88%
+  CA1                               259/294    88%
+  CA2                                34/34    100%
+  CA3                                54/57     95%
+  CA4                                70/74     95%
+  CT                                 20/20    100%
+  NJ                                 20/23     87%
+  NY                                129/144    90%
   North Carolina                      5/6      83%
-  OR                                 62/73     85%
+  OR                                 64/75     85%
 
 -- by composition --
   hybrid partnerships                 0/0        -
-  single-school                     584/675    87%
-  ever broke to elims               285/342    83%
-  prelims only, all season          299/333    90%
+  single-school                     701/775    90%
+  ever broke to elims               331/375    88%
+  prelims only, all season          370/400    93%
 
 -- by tournament mix (teams attending at least one) --
-  any NPDL-TOC                       42/61     69%
-  any NYPDL                         225/248    91%
-  any CHSSA                         105/116    91%
+  any NPDL-TOC                       46/62     74%
+  any NYPDL                         233/254    92%
+  any CHSSA                         211/221    95%
   any OSAA                            0/0        -
-  any Regular                       348/421    83%
+  any Regular                       367/427    86%
 
 -- rank agreement (recomputed ordering vs official) --
-  exact rank                         41/675     6%
-  within 5 places                   177/675    26%
-  within 20 places                  423/675    63%
+  exact rank                         30/775     4%
+  within 5 places                   322/775    42%
+  within 20 places                  464/775    60%
 
 ========================================================================
 TOP 30 PARTNERSHIPS BY OFFICIAL POINTS
 ========================================================================
   # school            partnership              ours  sheet      Δ  n   entries
-  1 Stuyvesant        Georgatos & Miller       83.0   83.0    +0.0  13/5  0 bad
+  1 Stuyvesant        Georgatos & Miller       83.0   83.0    +0.0  14/5  0 bad
   3 Menlo-Atherton    T. Greenleaf & Singel    75.4   80.8    -5.4*  6/5  1 bad
   4 Nueva             Savla & Wee              69.0   73.3    -4.3*  8/5  1 bad
   5 Berkeley          Esterson & Goldblum      72.3   72.3    +0.0  11/5  0 bad
@@ -150,12 +158,12 @@ TOP 30 PARTNERSHIPS BY OFFICIAL POINTS
   8 Nueva             Fang & Resser            67.9   68.6    -0.7*  6/5  0 bad
   9 Menlo-Atherton    Kassayan & Shivakumar    65.5   67.8    -2.3*  7/5  2 bad
  10 Ridge             Qin & Shah               61.9   65.0    -3.1*  5/5  0 bad
- 11 Dalton            Gordon & Langdon         44.1   62.7   -18.6*  2/3  0 bad
+ 11 Dalton            Gordon & Langdon         62.7   62.7    +0.0   3/3  0 bad
  12 Washington        Kaul & Patil             62.1   62.1    +0.0   9/5  0 bad
  13 Stuyvesant        Kowalski & Schwartz      61.3   61.3    +0.0   8/5  0 bad
  14 King              Blanco & Jakubowski      59.0   59.0    +0.0   4/4  0 bad
  15 Independent       Ordukhanyan & Ratchman   54.6   54.6    +0.0   6/5  0 bad
- 16 Claremont         Brodie & Ni              54.2   54.2    +0.0   6/5  0 bad
+ 16 Claremont         Brodie & Ni              54.2   54.2    +0.0   7/5  0 bad
  17 Ridge             Chen & Mitra             52.3   53.6    -1.3*  4/5  0 bad
  18 Nueva             Jha & Leong              53.2   53.2    +0.0   5/5  0 bad
  19 Brooklyn Tech     Bar-tura & Segura        52.9   52.9    +0.0   9/5  0 bad
@@ -165,7 +173,7 @@ TOP 30 PARTNERSHIPS BY OFFICIAL POINTS
  25 Irvington         Mantha & Patel           48.7   48.7    +0.0   7/5  0 bad
  26 Campolindo        Babb & Cho               51.1   47.8    +3.3*  4/4  1 bad
  28 Independent       Chinn & Humenik          46.5   46.5    +0.0   4/4  0 bad
- 29 Mira Mesa         Ly & O'Neill             36.3   46.0    -9.7*  2/5  0 bad
+ 29 Mira Mesa         Ly & O'Neill             46.0   46.0    +0.0   5/5  0 bad
  30 Campolindo        Mukundan & Schoemehl     45.7   45.7    +0.0   3/3  0 bad
  30 Mountain View     Chen & Nalumasu          41.7   45.7    -4.0*  6/5  1 bad
  32 Archbishop Mitty  Mishra & Smith           45.5   45.5    +0.0   3/3  0 bad
@@ -173,6 +181,6 @@ TOP 30 PARTNERSHIPS BY OFFICIAL POINTS
  34 Evergreen         Abhiman & Pallakke       44.2   44.2    +0.0   9/5  0 bad
 
 -- why teams miss --
-  missing tournaments for the team     39/91
-  a per-entry score disagrees          47/91
-  all entries agree, total does not     5/91
+  missing tournaments for the team     21/74
+  a per-entry score disagrees          48/74
+  all entries agree, total does not     5/74

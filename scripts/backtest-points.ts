@@ -6,7 +6,7 @@
 import { weightedTotal } from '../packages/rules/src/index.ts';
 import { computeSeason, norm, pairKey, type EntryCase } from './lib/season.ts';
 
-const { cases, unmatched, skippedTournaments, officialEntries } = computeSeason();
+const { cases, unmatched, ambiguous, skippedTournaments, officialEntries } = computeSeason();
 
 const pct = (k: number, n: number): string => (n ? `${((100 * k) / n).toFixed(0)}%` : '  -');
 const line = (label: string, rows: { matched: boolean }[]): string => {
@@ -39,6 +39,12 @@ console.log(line('prelims only', cases.filter((c) => !c.broke)));
 
 console.log('\n-- special populations --');
 console.log(line('hybrid teams', cases.filter((c) => c.hybrid)));
+
+console.log('\n-- by how the row was matched to Tabroom --');
+for (const tier of ['exact-initials', 'exact-surnames', 'partial-maverick', 'fuzzy-surname'] as const) {
+  console.log(line(tier, cases.filter((c) => c.matchTier === tier)));
+}
+console.log(line('flagged ambiguous', cases.filter((c) => c.matchAmbiguous)));
 
 console.log('\n-- component agreement (breaking teams) --');
 const br = cases.filter((c) => c.broke);
@@ -73,6 +79,7 @@ for (const [d, rs] of [...buckets.entries()].sort((a, b) => b[1].length - a[1].l
 }
 console.log('\ndelta histogram:', [...buckets.entries()].sort((a, b) => a[0] - b[0]).map(([d, r]) => `${d > 0 ? '+' : ''}${d}:${r.length}`).join('  '));
 console.log(`\nsheet rows with no Tabroom match: ${unmatched.length}`);
+console.log(`rows matched but flagged ambiguous:   ${ambiguous.length}`);
 console.log(`tournaments skipped (no payload / no open event): ${skippedTournaments.length}`);
 
 // ---------------------------------------------------------------------------
