@@ -108,15 +108,6 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
     const ours = new Map<string, Mine>();
     for (const ev of opens) {
       const perf = computeEntryPerformances(ev);
-      const ballotsWon = new Map<string, number>();
-      for (const r of ev.rounds) {
-        if (!r.isPrelim) continue;
-        for (const sec of r.sections) {
-          for (const b of sec.ballots) {
-            if (b.entryId && b.won === true) ballotsWon.set(b.entryId, (ballotsWon.get(b.entryId) ?? 0) + 1);
-          }
-        }
-      }
       for (const [entryId, entry] of ev.entries) {
         const names = entry.studentIds.map((s) => students.get(s)?.last ?? '').filter(Boolean);
         if (names.length !== 2) continue;
@@ -130,7 +121,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         ours.set(pairKey(names[0]!, names[1]!), {
           wins: p.wins, losses: p.losses, elimLevel: p.elimLevel,
           size: entry.eligibleTeamSize,
-          prelimBallotsWon: ballotsWon.get(entryId) ?? 0,
+          prelimBallotsWon: p.prelimBallotsWon,
           elimWins: elimRoundWins,
         });
       }

@@ -481,6 +481,13 @@ export interface EntryPerformance {
   wonFinal: boolean;
   /** Elim sections where this team faced a same-school opponent with no result. */
   sameSchoolWalkovers: number;
+  /**
+   * Prelim ballots won, for XXI.4.A's ballot-counted schedule. Not the same as
+   * `wins`: panelled prelims award several ballots per round.
+   */
+  prelimBallotsWon: number;
+  /** Prelim ballots available to the team, won or lost. */
+  prelimBallotsTotal: number;
 }
 
 /**
@@ -495,7 +502,10 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
   const get = (entryId: string): EntryPerformance => {
     let p = out.get(entryId);
     if (!p) {
-      p = { entryId, wins: 0, losses: 0, elimLevel: null, wonFinal: false, sameSchoolWalkovers: 0 };
+      p = {
+        entryId, wins: 0, losses: 0, elimLevel: null, wonFinal: false,
+        sameSchoolWalkovers: 0, prelimBallotsWon: 0, prelimBallotsTotal: 0,
+      };
       out.set(entryId, p);
     }
     return p;
@@ -577,6 +587,37 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
       if (!event.entries.has(entryId)) continue;
       const played = Math.max(debated.get(entryId) ?? 0, prelimCount);
       p.losses = Math.max(0, played - p.wins);
+    }
+  }
+
+  // Ballot counts for XXI.4.A. A round whose result was never entered is
+  // credited as a win at full panel size: at the 2025-26 TOC both teams in
+  // each such room were credited, and adding a full round to our counts
+  // reproduces every affected record exactly.
+  const prelims = event.rounds.filter((r) => r.isPrelim);
+  const panelSizes: number[] = [];
+  for (const r of prelims) {
+    for (const sec of r.sections) {
+      if (sec.entryIds.length < 2) continue;
+      const scored = sec.ballots.filter((b) => b.won !== null).length;
+      if (scored > 0) panelSizes.push(scored / sec.entryIds.length);
+    }
+  }
+  const panelSize = panelSizes.length
+    ? [...panelSizes].sort((a, b) => panelSizes.filter((v) => v === a).length - panelSizes.filter((v) => v === b).length).pop()!
+    : 1;
+
+  for (const [entryId, p] of out) {
+    for (const r of prelims) {
+      const mine = r.sections.flatMap((sec) => sec.ballots).filter((b) => b.entryId === entryId);
+      const scored = mine.filter((b) => b.won !== null);
+      if (scored.length > 0) {
+        p.prelimBallotsTotal += scored.length;
+        p.prelimBallotsWon += scored.filter((b) => b.won === true).length;
+      } else {
+        p.prelimBallotsTotal += panelSize;
+        p.prelimBallotsWon += panelSize;
+      }
     }
   }
 
