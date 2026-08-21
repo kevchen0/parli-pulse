@@ -45,6 +45,8 @@ export interface EntryCase {
   category: string;
   tournId: string;
   school: string;
+  /** Second school on a hybrid entry; XXI.9.C splits its points between them. */
+  hybridSchool: string | null;
   team: string;
   pair: string;
   entryId: string;
@@ -191,6 +193,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         category: off.category || '(none)',
         tournId: off.tournId!,
         school: row.school1,
+        hybridSchool: row.school2 || null,
         team,
         pair: pairKey(row.partner1, row.partner2),
         entryId: m.entryId,

@@ -119,10 +119,28 @@ breaks. Corrected and re-verified against the `Entry` tab: **Berkeley 31**
 - Entity matching by normalized surname pair (255 sheet rows still unmatched).
 
 ### Next
-- Rankings UI over the loaded data (Phase 1).
+- Tournament and profile pages; search/filter on the ranking tables.
+- Glicko-2 (Phase 5) and speaker normalization (Phase 4).
 - Speaker normalization (Phase 4): scale config per event — **YFL 1 uses 0-100**,
   NYPDL 23-30, everything else 25-30.
 - Smaller: `Regular invitationals` at 94% is the weakest large category.
+
+### Identity resolution (two problems, both solved)
+1. **Tabroom student ids are stable per chapter, not per person.** A debater
+   who also enters under a club or independent registration gets a second id,
+   splitting their season. Stuyvesant's top team competed as both "Stuyvesant"
+   and "Rodda's Disciples", and their 83 points were splitting in two.
+   Merged by name, but only where partners corroborate: two same-named ids at
+   one tournament with *different* partners are different people (there really
+   are two Jessica Lius), while the same partner twice is one person entered
+   twice. 150 records merged; Georgatos & Miller now read 83.0, matching the
+   sheet exactly.
+2. **Clubs and academies need an affiliation index**
+   (`packages/ingest/src/school-aliases.ts`) — "Lucent Debate Academy" is
+   Campolindo, "Rodda's Disciples" is Stuyvesant. Seeded by
+   `scripts/discover-aliases.ts`, which compares Tabroom's school against the
+   league-credited one, **excluding hybrids** (they look identical to aliases
+   but are not). 26 confident entries; the file is meant to be hand-edited.
 
 ### Infrastructure (live)
 Neon Postgres provisioned, 23 tables migrated, Vercel deploying from
@@ -130,6 +148,13 @@ Neon Postgres provisioned, 23 tables migrated, Vercel deploying from
 deletes and reinserts rather than merging, so a reload always reflects the
 current engine. `SEASON=2024-25 npm run load` is how a backfill would run once
 those payloads are cached — the schema and loader are season-keyed throughout.
+
+Rankings pages live at `/rankings` (teams, debaters, schools), rendered from
+Postgres. `npm run load` then `npm run rollup` refreshes them.
+
+**Local builds need `apps/web/.env`** — Next reads env from the app directory,
+not the repo root. It is a symlink to the root `.env`; Vercel uses its own
+dashboard variables instead.
 
 Loaded for 2025-26: 96 tournaments, 150 events, 4,872 entries, 3,127 debaters,
 2,967 judges, 26,146 ballots, 32,267 speaker scores, 1,535 scored results,

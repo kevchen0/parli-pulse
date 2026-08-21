@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { CURRENT_SEASON, hasDatabase } from '@/lib/season';
 
 export default function Home() {
@@ -19,13 +20,24 @@ export default function Home() {
           : 'Database not connected yet. Rankings appear once ingestion runs.'}
       </p>
 
-      <h2>What goes here</h2>
+      <h2>Rankings</h2>
       <div className="grid">
         <section className="card">
-          <h3>Rankings</h3>
-          <p>Team, individual, school, and TOC-qualification tables, with each team&rsquo;s
-            best-five point breakdown.</p>
+          <h3><Link href="/rankings">Teams</Link></h3>
+          <p>Partnership standings under the Article XXI diminishing-returns formula.</p>
         </section>
+        <section className="card">
+          <h3><Link href="/rankings/debaters">Debaters</Link></h3>
+          <p>Individual points pooled across every partner, with TOC qualification.</p>
+        </section>
+        <section className="card">
+          <h3><Link href="/rankings/schools">Schools</Link></h3>
+          <p>Member-school totals, with hybrid partnerships counting half to each.</p>
+        </section>
+      </div>
+
+      <h2>Still to come</h2>
+      <div className="grid">
         <section className="card">
           <h3>Rating</h3>
           <p>A Glicko-2 rating over every ballot, shown with its confidence interval and

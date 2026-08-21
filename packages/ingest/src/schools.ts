@@ -7,6 +7,7 @@
  * "Mountain View High School". Everything is resolved through here so that a
  * school's points are not split across three near-identical rows.
  */
+import { SCHOOL_ALIASES } from './school-aliases.ts';
 import { indexHeaders, type SheetRow } from './sheet.ts';
 
 export interface CanonicalSchool {
@@ -73,6 +74,15 @@ export function buildSchoolIndex(rows: SheetRow[]): SchoolIndex {
       isMember: true,
     };
     register(school, ...(shortName ? [shortName] : []));
+  }
+
+  // Alternate registrations resolve to the school the league credits. Applied
+  // after the roster so a club never shadows a real school of the same name.
+  for (const [alias, canonicalName] of Object.entries(SCHOOL_ALIASES)) {
+    const target = lookup.get(schoolKey(canonicalName));
+    if (!target) continue;
+    const k = schoolKey(alias);
+    if (k) lookup.set(k, target);
   }
 
   return {

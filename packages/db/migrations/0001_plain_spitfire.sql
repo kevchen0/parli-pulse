@@ -1,0 +1,1 @@
+ALTER TABLE "debaters" ADD COLUMN "canonical_id" text;

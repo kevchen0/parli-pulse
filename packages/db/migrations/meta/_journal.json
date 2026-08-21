@@ -8,6 +8,13 @@
       "when": 1787264590877,
       "tag": "0000_robust_dazzler",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787285810835,
+      "tag": "0001_plain_spitfire",
+      "breakpoints": true
     }
   ]
 }

@@ -99,8 +99,18 @@ export const schoolAliases = pgTable('school_aliases', {
 });
 
 export const debaters = pgTable('debaters', {
-  /** Tabroom student id. Stable across tournaments, unlike a surname. */
+  /**
+   * Tabroom student id. Stable within a chapter but NOT across chapters: a
+   * debater who also competes under an independent or club registration gets a
+   * second id. See `canonicalId`.
+   */
   id: text('id').primaryKey(),
+  /**
+   * The id this record has been merged into, or null if it is itself
+   * canonical. Rankings group by this so one person's results are not split
+   * across their school and independent registrations.
+   */
+  canonicalId: text('canonical_id'),
   firstName: text('first_name'),
   lastName: text('last_name'),
   schoolId: text('school_id').references(() => schools.id),

@@ -155,11 +155,23 @@ async function main(): Promise<void> {
       for (const [entryId, entry] of ev.entries) {
         if (seenEntries.has(entryId)) continue;
         seenEntries.add(entryId);
-        const school = schoolIndex.resolve(entry.schoolName);
+        const matched = caseByEntry.get(entryId);
+        // The league credits a result to the debater's actual school, not to
+        // whatever club or independent registration it was entered under --
+        // Stuyvesant's top team also competed as "Rodda's Disciples". The
+        // sheet's own school column is that mapping, so prefer it where a row
+        // matched, and fall back to the Tabroom name otherwise.
+        const school = schoolIndex.resolve(matched?.school ?? entry.schoolName)
+          ?? schoolIndex.resolve(entry.schoolName);
+        // Hybrid membership comes from the league's own row: Tabroom files a
+        // hybrid under one school, so the second is not recoverable from it.
+        const hybridSchool = matched?.hybridSchool
+          ? schoolIndex.resolve(matched.hybridSchool)
+          : null;
         const p = perf.get(entryId)!;
         rows.entries.push({
           id: entryId, eventId: ev.eventId, code: entry.code,
-          schoolId: school?.id ?? null, hybridSchoolId: null,
+          schoolId: school?.id ?? null, hybridSchoolId: hybridSchool?.id ?? null,
           teamSize: entry.studentIds.length, dropped: entry.dropped,
           prelimWins: p.wins, prelimLosses: p.losses,
           prelimBallotsWon: p.prelimBallotsWon, prelimBallotsTotal: p.prelimBallotsTotal,
@@ -176,7 +188,7 @@ async function main(): Promise<void> {
           rows.entryDebaters.push({ entryId, debaterId: sid, schoolId: school?.id ?? null });
         }
 
-        const c = caseByEntry.get(entryId);
+        const c = matched;
         if (c) {
           rows.entryResults.push({
             entryId, points: c.ours, basePoints: c.ourBase,
