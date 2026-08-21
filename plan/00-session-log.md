@@ -119,9 +119,21 @@ breaks. Corrected and re-verified against the `Entry` tab: **Berkeley 31**
 - Entity matching by normalized surname pair (255 sheet rows still unmatched).
 
 ### Next
-- Load normalized data into Postgres (needs Neon).
-- Sheet mirror UI (Phase 1, needs Neon + Vercel).
-- Smaller: `Regular invitationals` at 94% is now the weakest large category.
+- Rankings UI over the loaded data (Phase 1).
+- Speaker normalization (Phase 4): scale config per event — **YFL 1 uses 0-100**,
+  NYPDL 23-30, everything else 25-30.
+- Smaller: `Regular invitationals` at 94% is the weakest large category.
+
+### Infrastructure (live)
+Neon Postgres provisioned, 23 tables migrated, Vercel deploying from
+`apps/web`. `npm run load` rebuilds a season from the cached payloads; it
+deletes and reinserts rather than merging, so a reload always reflects the
+current engine. `SEASON=2024-25 npm run load` is how a backfill would run once
+those payloads are cached — the schema and loader are season-keyed throughout.
+
+Loaded for 2025-26: 96 tournaments, 150 events, 4,872 entries, 3,127 debaters,
+2,967 judges, 26,146 ballots, 32,267 speaker scores, 1,535 scored results,
+51 open disagreements.
 
 ### Schema notes
 `packages/db/src/schema.ts` holds the Drizzle schema; `npm run db:generate`

@@ -14,6 +14,8 @@ export interface TabroomScore {
   tag?: string;
   value?: string | number;
   id?: TabroomId;
+  /** Student id, present on per-debater scores ('point', 'rank'). */
+  speaker?: TabroomId;
 }
 
 export interface TabroomBallot {

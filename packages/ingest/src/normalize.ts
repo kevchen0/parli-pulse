@@ -59,7 +59,8 @@ export interface NormalizedBallot {
   judgePersonId: string | null;
   /** null when the ballot carries no win/loss score at all. */
   won: boolean | null;
-  speakerPoints: number[];
+  /** Speaker points with the debater they were awarded to. */
+  speakerPoints: { debaterId: string | null; value: number }[];
 }
 
 export interface NormalizedSection {
@@ -141,8 +142,8 @@ function normalizeSection(raw: NonNullable<TabroomEvent['rounds']>[number]['sect
         won: wlValue === null ? null : wlValue >= 1,
         speakerPoints: scores
           .filter((x) => x.tag === 'point')
-          .map((x) => num(x.value))
-          .filter((n): n is number => n !== null),
+          .map((x) => ({ debaterId: id(x.speaker), value: num(x.value) }))
+          .filter((x): x is { debaterId: string | null; value: number } => x.value !== null),
       };
     });
     const entryIds = [...new Set(ballots.map((b) => b.entryId).filter((x): x is string => !!x))];
@@ -342,10 +343,17 @@ export interface EventFieldStats {
  * Splits an event's elim rounds into the main bracket and any consolation
  * bracket running alongside it.
  *
- * NYPDL tournaments run both inside a single Tabroom event: the top seeds
- * enter the main bracket while the next tier enters a parallel "Novice
- * Bracket", and their rounds interleave in the round list. Only the main
- * bracket counts as the open elim field.
+ * NYPDL runs both inside a single Tabroom event. Its format is one shared
+ * preliminary pool with no separate novice prelims; every team at 4-1 or
+ * better breaks to the open elims, and the teams below that line break into a
+ * separate novice bracket of fixed size. Their rounds interleave in the round
+ * list. Only the open bracket is the elim field for XXI.2.
+ *
+ * Verified across the 2025-26 NYPDL slate: in 15 of 17 tournaments the open
+ * bracket contains exactly the 5-0 and 4-1 teams, and the parallel bracket
+ * exactly the 3-2s and 2-3s. Two tournaments differ -- November California
+ * broke 3-2s into the open bracket as well -- so the break line is read from
+ * the data rather than assumed to sit at 4-1.
  *
  * The two brackets never share a team, so we start at the last elim round and
  * walk backwards, keeping any round that shares a team with what we've already

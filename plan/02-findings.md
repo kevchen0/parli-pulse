@@ -211,6 +211,34 @@ from the sheet.
 
 ---
 
+## 4d. NYPDL runs one shared pool with two break brackets
+
+NYPDL holds a single preliminary pool -- no separate novice prelims. Teams at
+4-1 or better break to the open elims; everyone below that line breaks into a
+separate novice bracket of fixed size. Both brackets live inside one Tabroom
+event with their rounds interleaved.
+
+Verified across the 2025-26 slate. In 15 of 17 tournaments the open bracket
+holds exactly the 5-0 and 4-1 teams and the parallel bracket exactly the 3-2s
+and 2-3s:
+
+| tournament | pool | open bracket | novice bracket |
+|---|---|---|---|
+| September OL | 54 | 5-0 x2, 4-1 x9 | 3-2 x2 |
+| October OL | 89 | 5-0 x3, 4-1 x12 | 2-3 x8 |
+| January | 87 | 5-0 x2, 4-1 x11 | 3-2 x8 |
+| November California | 38 | 5-0 x1, 4-1 x7, **3-2 x8** | — |
+
+November California broke 3-2s into the open bracket as well, so the engine
+reads the break line from the data rather than assuming 4-1.
+
+Two consequences for Article XXI. The whole shared pool is the open field --
+the league records N/JV as 0 for NYPDL, which matches. And the novice bracket
+must be excluded from the elim field, or break percentage lands in the wrong
+XXI.2.D penalty band; this is what `partitionElimRounds` is for.
+
+---
+
 ## 5. Speaker points
 
 Measured all 20,030 parli speaker scores. **A low minimum is usually a misnomer,
@@ -229,7 +257,11 @@ Default to 25-30 and override per league from a config table.
 
 - No 0-10 scale appears anywhere in 2025-26 data. Handle defensively.
 - 15 scores of exactly 0.0 (0.07%) — forfeits, not scores. Filter as sentinels.
-- ~50 scores (0.25%) in the 1-22 range — likely data-entry errors. Review queue.
+- ~50 scores (0.25%) outside 20-31, now traced to three events rather than
+  scattered noise: **YFL 1 runs a 0-100 scale** (20 scores, 68-100), while Cal
+  and DVC Vikings have a handful of genuinely low values (1-19) that look like
+  data-entry errors. The 0-100 case confirms the scale must come from a config
+  table per event, not from the convention.
 - Some tournaments use tenths, others integers only.
 
 ---
