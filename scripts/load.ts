@@ -16,6 +16,8 @@ import * as t from '../packages/db/src/schema.ts';
 import {
   buildSchoolIndex,
   buildStudentIndex,
+  peopleFromEntryLabel,
+  schoolKey,
   computeEntryPerformances,
   computeFieldStats,
   normalizeTournament,
@@ -169,23 +171,44 @@ async function main(): Promise<void> {
           ? schoolIndex.resolve(matched.hybridSchool)
           : null;
         const p = perf.get(entryId)!;
+        // Tournaments that publish no student records leave entries with no
+        // debaters at all. Their points scored correctly but then vanished
+        // from every rollup, because standings group by debater. Recover the
+        // names from the entry label and give them stable synthetic ids, keyed
+        // on school and name so the same person recurs across tournaments.
+        const linked: { id: string; first: string | null; last: string | null }[] =
+          entry.studentIds.length > 0
+            ? entry.studentIds.map((sid) => ({
+                id: sid,
+                first: students.get(sid)?.first ?? null,
+                last: students.get(sid)?.last ?? null,
+              }))
+            : peopleFromEntryLabel(entry.name, entry.code).map((p) => ({
+                id: `lbl_${schoolKey(school?.name ?? 'unknown')}_${schoolKey(p.last)}${p.first ? `_${schoolKey(p.first)}` : ''}`,
+                first: p.first || null,
+                last: p.last,
+              }));
+
         rows.entries.push({
           id: entryId, eventId: ev.eventId, code: entry.code,
           schoolId: school?.id ?? null, hybridSchoolId: hybridSchool?.id ?? null,
-          teamSize: entry.studentIds.length, dropped: entry.dropped,
+          // Count the debaters we actually resolved, not the student records.
+          // Entries known only from ballots have no student records at all, and
+          // reading that as a zero-person team wrongly failed XXI.1.G and
+          // dropped genuine results out of every standing.
+          teamSize: linked.length, dropped: entry.dropped,
           prelimWins: p.wins, prelimLosses: p.losses,
           prelimBallotsWon: p.prelimBallotsWon, prelimBallotsTotal: p.prelimBallotsTotal,
           elimLevel: p.elimLevel, wonFinal: p.wonFinal,
         });
-        for (const sid of entry.studentIds) {
-          const s = students.get(sid);
-          if (!debaters.has(sid)) {
-            debaters.set(sid, {
-              id: sid, firstName: s?.first ?? null, lastName: s?.last ?? null,
+        for (const person of linked) {
+          if (!debaters.has(person.id)) {
+            debaters.set(person.id, {
+              id: person.id, firstName: person.first, lastName: person.last,
               schoolId: school?.id ?? null, suppressed: false,
             });
           }
-          rows.entryDebaters.push({ entryId, debaterId: sid, schoolId: school?.id ?? null });
+          rows.entryDebaters.push({ entryId, debaterId: person.id, schoolId: school?.id ?? null });
         }
 
         const c = matched;
@@ -194,7 +217,7 @@ async function main(): Promise<void> {
             entryId, points: c.ours, basePoints: c.ourBase,
             prelimCountAdjustment: 0, breakPenalty: c.ourAdj, walkoverAdjustment: 0,
             floorApplied: null,
-            excludedReason: entry.studentIds.length === 2 ? null : 'teamSize',
+            excludedReason: linked.length === 2 ? null : 'teamSize',
             countsTowardToc: true,
           });
           if (!c.matched) {

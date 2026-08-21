@@ -118,6 +118,23 @@ breaks. Corrected and re-verified against the `Entry` tab: **Berkeley 31**
   type, special population, and rule component.
 - Entity matching by normalized surname pair (255 sheet rows still unmatched).
 
+### Standings accuracy (top 100, vs `team_calc` / `School`)
+teams **76% exact**, 81% within 2%; schools **43% exact**, 55% within 2%.
+Run `npm run compare` and `npm run diagnose`.
+
+Two bugs found by diagnosing this, both in the load path rather than the
+engine, and both invisible to the per-entry backtest:
+1. Entries known only from ballots got no debater rows at all, so their points
+   scored correctly and then vanished from every rollup (9.6% of scored
+   results, concentrated in the CHSSA slate).
+2. Those same entries have no student records, and the XXI.1.G two-person test
+   read that as a zero-person team, excluding genuine results.
+
+**Beware:** comparison tooling must use `scripts/lib/standings.ts`, not a
+surname key. Surnames alone collapse "Egleson & S. Goyal" into
+"Egleson & N. Goyal" -- two real Menlo teams 73 points apart -- and invent
+data problems that do not exist.
+
 ### Next
 - Tournament and profile pages; search/filter on the ranking tables.
 - Glicko-2 (Phase 5) and speaker normalization (Phase 4).

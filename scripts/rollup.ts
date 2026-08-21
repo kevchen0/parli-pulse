@@ -96,8 +96,35 @@ async function resolveIdentities(
 
   let merged = 0;
   const updates: { id: string; canonicalId: string }[] = [];
+
+  // Label-recovered records carry a surname and often no first name, so the
+  // name-group pass above cannot see them. Bridge them to a real record when
+  // exactly one debater at the same school shares the surname -- scoped to the
+  // school, and requiring uniqueness, so a common surname is never guessed at.
+  const realBySchoolSurname = new Map<string, typeof people>();
+  for (const p of people) {
+    if (p.id.startsWith('lbl_') || !p.last || !p.schoolId) continue;
+    const k = `${p.schoolId}|${p.last.trim().toLowerCase()}`;
+    const l = realBySchoolSurname.get(k) ?? [];
+    l.push(p);
+    realBySchoolSurname.set(k, l);
+  }
+  const bridged = new Set<string>();
+  for (const p of people) {
+    if (!p.id.startsWith('lbl_') || !p.last || !p.schoolId) continue;
+    const candidates = realBySchoolSurname.get(`${p.schoolId}|${p.last.trim().toLowerCase()}`);
+    if (!candidates || candidates.length !== 1) continue;
+    const target = candidates[0]!;
+    // If the label carried a first name, it must not contradict.
+    if (p.first && target.first &&
+        !target.first.trim().toLowerCase().startsWith(p.first.trim().toLowerCase().slice(0, 1))) continue;
+    updates.push({ id: p.id, canonicalId: target.id });
+    bridged.add(p.id);
+    merged++;
+  }
   for (const [, group] of groups) {
     if (group.length < 2) continue;
+    if (group.some((g) => bridged.has(g.id))) continue;
 
     let conflict = false;
     for (let i = 0; i < group.length && !conflict; i++) {

@@ -17,7 +17,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "load": "node --env-file=.env scripts/load.ts",
-    "rollup": "node --env-file=.env scripts/rollup.ts"
+    "rollup": "node --env-file=.env scripts/rollup.ts",
+    "compare": "node --env-file=.env scripts/compare-top.ts",
+    "diagnose": "node --env-file=.env scripts/diagnose.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
