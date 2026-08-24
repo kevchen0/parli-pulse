@@ -8,7 +8,7 @@
  * on reconciling Tabroom's school-name variants.
  */
 import { existsSync, readFileSync } from 'node:fs';
-import { scoreEntry, scoreToc, type ElimLevel } from '../../packages/rules/src/index.ts';
+import { prelimPoints, scoreEntry, scoreToc, type ElimLevel } from '../../packages/rules/src/index.ts';
 import {
   buildStudentIndex,
   computeEntryPerformances,
@@ -22,6 +22,7 @@ import {
   type MatchTier,
 } from '../../packages/ingest/src/matching.ts';
 import { openEventFilter } from '../../packages/ingest/src/event-selection.ts';
+import { MANUAL_RESULTS } from '../../packages/ingest/src/manual-results.ts';
 import {
   parseEntryTab,
   parseTournamentsTab,
@@ -53,6 +54,13 @@ export interface EntryCase {
   entryId: string;
   matchTier: MatchTier;
   matchAmbiguous: boolean;
+  /**
+   * Where our figure came from. 'tabroom' is computed from round data;
+   * 'manual' is hand-entered because no Tabroom data exists; 'sheet-record'
+   * is scored from the league's own recorded result at a prelim-only
+   * tournament, which needs no bracket.
+   */
+  provenance: 'tabroom' | 'manual' | 'sheet-record';
   ours: number;
   theirs: number;
   matched: boolean;
@@ -96,7 +104,32 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
     const sheetRows = officialEntries.filter((e) => e.tournament === off.name);
     if (!sheetRows.length) continue;
     const path = off.tournId ? `data/raw/tabroom/${off.tournId}.json` : '';
-    if (!path || !existsSync(path)) { skippedTournaments.push(off.name); continue; }
+    if (!path || !existsSync(path)) {
+      // No Tabroom data at all. Tournaments that run on another platform are
+      // still scoreable from the hand-entered table; anything else is a gap.
+      skippedTournaments.push(off.name);
+      for (const row of sheetRows) {
+        const manual = MANUAL_RESULTS.find(
+          (m) => m.tournament === off.name &&
+            pairKey(m.partner1, m.partner2) === pairKey(row.partner1, row.partner2),
+        );
+        const team = teamKey(row.school1, row.partner1, row.partner2);
+        if (!manual) { unmatched.push({ tournament: off.name, team }); continue; }
+        cases.push({
+          tournament: off.name, category: off.category || '(none)', tournId: '',
+          school: row.school1, hybridSchool: row.school2 || null, team,
+          pair: pairKey(row.partner1, row.partner2),
+          entryId: `manual_${off.name}_${pairKey(row.partner1, row.partner2)}`.replace(/\s+/g, '_'),
+          matchTier: 'exact-surnames', matchAmbiguous: false, provenance: 'manual',
+          ours: manual.points, theirs: row.calcPoints ?? 0,
+          matched: manual.points === (row.calcPoints ?? 0),
+          broke: false, hybrid: row.hybrid,
+          ourBase: manual.points, theirBase: row.basePoints,
+          ourAdj: 0, theirAdj: row.breakPrelimAdjustment,
+        });
+      }
+      continue;
+    }
 
     const raw = JSON.parse(readFileSync(path, 'utf8'));
     const t = normalizeTournament(raw);
@@ -200,6 +233,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         entryId: m.entryId,
         matchTier: m.tier,
         matchAmbiguous: m.ambiguous,
+        provenance: 'tabroom',
         ours: sb.points,
         theirs: row.calcPoints ?? 0,
         matched: sb.points === (row.calcPoints ?? 0),
@@ -213,7 +247,55 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
     }
     for (const i of result.unmatched) {
       const row = sheetRows[i]!;
-      unmatched.push({ tournament: off.name, team: teamKey(row.school1, row.partner1, row.partner2) });
+      const team = teamKey(row.school1, row.partner1, row.partner2);
+
+      // Hand-entered results for tournaments Tabroom does not carry.
+      const manual = MANUAL_RESULTS.find(
+        (m) => m.tournament === off.name && pairKey(m.partner1, m.partner2) === pairKey(row.partner1, row.partner2),
+      );
+      // Prelim-only formats need no bracket: the record alone determines the
+      // points, so a row the matcher could not place is still scoreable from
+      // the league's own recorded result. Marked as such, because it is a
+      // weaker check than recomputing from rounds.
+      const record = parseRecord(row.result);
+      const prelimOnly = (off.category === 'CHSSA' || off.category === 'OSAA');
+      const qualifier = prelimOnly
+        ? ({ qual: 8, alt: 4 } as Record<string, number>)[row.result.toLowerCase()]
+        : undefined;
+      const fallback = manual
+        ? { points: manual.points, provenance: 'manual' as const }
+        : qualifier !== undefined
+          ? { points: qualifier, provenance: 'sheet-record' as const }
+          : prelimOnly && record
+            ? { points: prelimPoints(record.wins, record.losses), provenance: 'sheet-record' as const }
+            : null;
+
+      if (!fallback) {
+        unmatched.push({ tournament: off.name, team });
+        continue;
+      }
+      cases.push({
+        tournament: off.name,
+        category: off.category || '(none)',
+        tournId: off.tournId ?? '',
+        school: row.school1,
+        hybridSchool: row.school2 || null,
+        team,
+        pair: pairKey(row.partner1, row.partner2),
+        entryId: `${fallback.provenance}_${off.name}_${pairKey(row.partner1, row.partner2)}`.replace(/\s+/g, '_'),
+        matchTier: 'exact-surnames',
+        matchAmbiguous: false,
+        provenance: fallback.provenance,
+        ours: fallback.points,
+        theirs: row.calcPoints ?? 0,
+        matched: fallback.points === (row.calcPoints ?? 0),
+        broke: false,
+        hybrid: row.hybrid,
+        ourBase: fallback.points,
+        theirBase: row.basePoints,
+        ourAdj: 0,
+        theirAdj: row.breakPrelimAdjustment,
+      });
     }
   }
 

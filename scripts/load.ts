@@ -276,6 +276,63 @@ async function main(): Promise<void> {
       }
     }
 
+    // Results with no Tabroom entry behind them -- hand-entered from another
+    // platform, or scored from the league's own record at a prelim-only
+    // tournament -- still need rows, or they score correctly and then never
+    // reach a standing.
+    const synthetic = season.cases.filter((c) => !seenEntries.has(c.entryId));
+    if (synthetic.length) {
+      const madeTournaments = new Set(rows.tournaments.map((t) => t.id as string));
+      for (const c of synthetic) {
+        const tournId = c.tournId || `manual_${c.tournament}`.replace(/\s+/g, '_');
+        if (!madeTournaments.has(tournId)) {
+          madeTournaments.add(tournId);
+          rows.tournaments.push({
+            id: tournId, seasonId: SEASON, tabroomId: c.tournId || null,
+            name: c.tournament, officialName: c.tournament,
+            startsOn: null, endsOn: null, location: null,
+            category: c.category === '(none)' ? null : c.category,
+            approval: null, payloadHash: null, fetchedAt: new Date(),
+          });
+        }
+        const eventId = `${tournId}_manual`;
+        if (!rows.events.some((e) => e.id === eventId)) {
+          rows.events.push({
+            id: eventId, tournamentId: tournId, name: 'Open Parli (entered by hand)',
+            abbr: null, division: 'open', isParli: true, prelimCount: 0,
+            speakerScaleMin: null, speakerScaleMax: null,
+          });
+        }
+        const school = schoolIndex.resolve(c.school);
+        const hybrid = c.hybridSchool ? schoolIndex.resolve(c.hybridSchool) : null;
+        const surnames = c.pair.split('|');
+        seenEntries.add(c.entryId);
+        rows.entries.push({
+          id: c.entryId, eventId, code: `${c.school} ${surnames.join(' & ')}`,
+          schoolId: school?.id ?? null, hybridSchoolId: hybrid?.id ?? null,
+          teamSize: surnames.length, dropped: false,
+          prelimWins: 0, prelimLosses: 0, prelimBallotsWon: 0, prelimBallotsTotal: 0,
+          elimLevel: null, wonFinal: false,
+        });
+        for (const surname of surnames) {
+          const id = `lbl_${schoolKey(school?.name ?? c.school)}_${schoolKey(surname)}`;
+          if (!debaters.has(id)) {
+            debaters.set(id, {
+              id, firstName: null, lastName: surname, schoolId: school?.id ?? null, suppressed: false,
+            });
+          }
+          rows.entryDebaters.push({ entryId: c.entryId, debaterId: id, schoolId: school?.id ?? null });
+        }
+        rows.entryResults.push({
+          entryId: c.entryId, points: c.ours, basePoints: c.ourBase,
+          prelimCountAdjustment: 0, breakPenalty: 0, walkoverAdjustment: 0,
+          floorApplied: null, excludedReason: surnames.length === 2 ? null : 'teamSize',
+          countsTowardToc: true,
+        });
+      }
+      console.log(`  synthesized ${synthetic.length} results with no Tabroom entry`);
+    }
+
     // Judge names come from ballots, which carry them denormalized.
     for (const off of officialTournaments) {
       if (!off.tournId || !cached.has(off.tournId)) continue;
