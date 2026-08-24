@@ -651,13 +651,47 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
         if (walkover) p.sameSchoolWalkovers++;
         // Rounds are visited deepest-first, so the first assignment wins.
         if (p.elimLevel === null) {
-          const won = s.ballots.some((b) => b.entryId === entryId && b.won === true);
+          // A round is won on a majority of its ballots. Testing whether any
+          // ballot was won makes a 1-2 panel decision look like a victory,
+          // which promoted beaten finalists to champion -- a full level, and
+          // six points in every band.
+          const mine = s.ballots.filter((b) => b.entryId === entryId && b.won !== null);
+          const won = mine.filter((b) => b.won === true).length * 2 > mine.length;
           p.elimLevel = level === 'first' && !won ? 'second' : level;
           if (level === 'first' && won) p.wonFinal = true;
         }
       }
     }
   }
+  // Tournaments routinely stop publishing before the bracket ends: Nueva
+  // posted quarterfinals and a final but no semifinal, and Harvard stopped at
+  // semifinals. A team that won its deepest published round did reach the next
+  // level, so promote it when that level has no round at all. Guarded on the
+  // level being genuinely absent, so a team that simply lost a published round
+  // is never promoted.
+  const publishedLevels = new Set(
+    main.map((r) => elimLevelFromSectionCount(r.sections.length)).filter((l): l is ElimLevel => l !== null),
+  );
+  const deeper: Record<ElimLevel, ElimLevel | null> = {
+    tripleOcto: 'doubleOcto', doubleOcto: 'octo', octo: 'quarter',
+    quarter: 'semi', semi: 'first', second: null, first: null,
+  };
+  for (const [entryId, p] of out) {
+    if (p.elimLevel === null || p.wonFinal) continue;
+    const round = ordered.find((r) => r.sections.some((s) => s.entryIds.includes(entryId)));
+    if (!round) continue;
+    const wonIt = round.sections.some((s) =>
+      s.entryIds.includes(entryId) &&
+      s.ballots.filter((b) => b.entryId === entryId && b.won === true).length * 2 >
+        s.ballots.filter((b) => b.entryId === entryId && b.won !== null).length);
+    if (!wonIt) continue;
+    const next = deeper[p.elimLevel];
+    if (next && !publishedLevels.has(next)) {
+      p.elimLevel = next;
+      if (next === 'first') p.wonFinal = true;
+    }
+  }
+
   // Resolve the championship round. Two failure modes matter and pull in
   // opposite directions: a closeout gives every finalist champion points, and
   // a final whose result was never entered gives none of them champion points.

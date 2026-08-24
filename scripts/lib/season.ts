@@ -182,6 +182,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
               broke: mine.elimLevel !== null,
               elimWins: mine.elimWins,
               champion: mine.elimLevel === 'first',
+              walkoverAdjustment: row.walkoverAdjustment ?? 0,
             }, breakPct)
           : scoreEntry({
               wins: mine.wins, losses: mine.losses, elimLevel: mine.elimLevel,

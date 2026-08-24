@@ -198,6 +198,8 @@ export interface TocPerformance {
   broke: boolean;
   elimWins: number;
   champion: boolean;
+  /** XXI.5.C adjustments apply here too; the TOC has same-school closeouts. */
+  walkoverAdjustment?: number;
 }
 
 /**
@@ -216,13 +218,14 @@ export function scoreToc(perf: TocPerformance, breakPct: number): ScoreBreakdown
   // the 2025-26 TOC show odd totals (5, 7) that a 2-points-per-ballot schedule
   // cannot produce on its own.
   const penalty = breakPercentagePenalty(breakPct);
+  const walkover = perf.walkoverAdjustment ?? 0;
   return {
-    points: Math.max(0, base + penalty),
+    points: Math.max(0, base + penalty + walkover),
     basePoints: base,
     prelimCountAdjustment: 0,
     breakPenalty: penalty,
-    walkoverAdjustment: 0,
-    floorApplied: base + penalty < 0 ? 'zero' : 'none',
+    walkoverAdjustment: walkover,
+    floorApplied: base + penalty + walkover < 0 ? 'zero' : 'none',
     excluded: null,
     broke: perf.broke,
   };
