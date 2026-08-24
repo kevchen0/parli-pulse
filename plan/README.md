@@ -17,6 +17,8 @@ judge-normalized speaker points that exist nowhere today.
 | [06-roadmap.md](06-roadmap.md) | Phases, sequencing, status |
 | [07-open-questions.md](07-open-questions.md) | What's still unresolved, grouped by when it blocks |
 | [08-risks-policy.md](08-risks-policy.md) | Risks, privacy, and editorial policy |
+| [09-data-quality.md](09-data-quality.md) | **Known gaps, manual entries, seasonal checklist** |
+| [10-mistakes.md](10-mistakes.md) | **Errors made and the patterns behind them. Read before changing scoring** |
 
 ## Ground rules
 
@@ -30,6 +32,10 @@ judge-normalized speaker points that exist nowhere today.
    and disagreements go to a triage queue rather than onto the page.
 3. **Assume nothing about Tabroom.** The bulk endpoint is undocumented. Cache
    every payload so the site can always be rebuilt offline.
+4. **Read [10-mistakes.md](10-mistakes.md) before touching scoring or
+   identity.** Several bugs there were reintroduced once already, in tooling
+   written after the original fix. The patterns recur; the specific bugs are
+   less important than the rules at the end of each one.
 
 ## Status
 
