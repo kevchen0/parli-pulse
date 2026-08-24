@@ -138,13 +138,26 @@ async function main(): Promise<void> {
       (perDebater.get(id) ?? perDebater.set(id, []).get(id)!).push(r.z);
     }
 
+    const pool = poolStats.get('open') ?? [...poolStats.values()][0]!;
     const totals = [...perDebater.entries()]
       .map(([debaterId, zs]) => {
-        const meanZ = zs.reduce((a, b) => a + b, 0) / zs.length;
-        const pool = poolStats.get('open') ?? [...poolStats.values()][0]!;
+        const n = zs.length;
+        const meanZ = zs.reduce((a, b) => a + b, 0) / n;
+        // Sample standard deviation of this debater's own ballots, and from it
+        // the standard error of their mean. Two debaters can share a season
+        // average while one earned it consistently and the other from a wide
+        // scatter over few rounds; the interval is what separates them.
+        const variance = n > 1
+          ? zs.reduce((a, b) => a + (b - meanZ) ** 2, 0) / (n - 1)
+          : 0;
+        const sdZ = Math.sqrt(variance);
+        const stderr = n > 1 ? sdZ / Math.sqrt(n) : sdZ;
         return {
-          debaterId, ballots: zs.length, meanZ,
+          debaterId, ballots: n, meanZ, sdZ,
           meanDisplay: pool.centre + meanZ * pool.spread,
+          // 95% interval, expressed in display points so it can be read
+          // straight off the adjusted score.
+          marginDisplay: 1.96 * stderr * pool.spread,
         };
       })
       .sort((a, b) => b.meanZ - a.meanZ);
@@ -160,7 +173,10 @@ async function main(): Promise<void> {
     const values = ranked.map((r) => ({
       id: `spk_${SEASON}_${r.debaterId}`, seasonId: SEASON, debaterId: r.debaterId,
       ballots: r.ballots, meanZ: Number(r.meanZ.toFixed(4)),
-      meanDisplay: Number(r.meanDisplay.toFixed(3)), rank: r.rank,
+      meanDisplay: Number(r.meanDisplay.toFixed(3)),
+      sdZ: Number(r.sdZ.toFixed(4)),
+      marginDisplay: Number(r.marginDisplay.toFixed(3)),
+      rank: r.rank,
     }));
     for (let i = 0; i < values.length; i += 500) {
       await db.insert(t.debaterSpeakerTotals).values(values.slice(i, i + 500) as never).onConflictDoNothing();

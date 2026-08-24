@@ -10,7 +10,7 @@
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { createDb } from '../packages/db/src/client.ts';
 import * as t from '../packages/db/src/schema.ts';
 import {
@@ -22,6 +22,7 @@ import {
   computeFieldStats,
   normalizeTournament,
   partitionElimRounds,
+  indexHeaders,
   parseTournamentsTab,
   parseWorkbook,
   type NormalizedEvent,
@@ -61,7 +62,15 @@ async function main(): Promise<void> {
 
     const wb = parseWorkbook(new Uint8Array(readFileSync(SHEET)));
     const officialTournaments = parseTournamentsTab(wb.get('Tournaments')!);
-    const schoolIndex = buildSchoolIndex(wb.get('SchoolList')!);
+    // The league's own School tab is its member list; SchoolList is merely
+    // every school seen. XXI.9.A ranks members only.
+    const schoolTab = wb.get('School')!;
+    const schoolHeader = indexHeaders(schoolTab);
+    const memberNames = schoolTab
+      .slice(schoolHeader.headerIndex + 1)
+      .map((r) => (r[schoolHeader.col('School')] ?? '').trim())
+      .filter(Boolean);
+    const schoolIndex = buildSchoolIndex(wb.get('SchoolList')!, memberNames);
 
     // Scoring and sheet matching share the engine used by the backtests, so
     // what lands in the database is exactly what the reports measure.
@@ -361,10 +370,22 @@ async function main(): Promise<void> {
     }
 
     console.log('\ninserting:');
-    await insertAll(db, t.schools, [...schoolIndex.byId.values()].map((s) => ({
+    // Schools are not season-scoped and so are never cleared; they must be
+    // updated in place or a corrected membership flag silently does nothing.
+    const schoolRows = [...schoolIndex.byId.values()].map((s) => ({
       id: s.id, name: s.name, shortName: s.shortName, region: s.region,
       tabroomChapterId: null, isMember: s.isMember,
-    })), 'schools');
+    }));
+    for (let i = 0; i < schoolRows.length; i += 500) {
+      await db.insert(t.schools).values(schoolRows.slice(i, i + 500)).onConflictDoUpdate({
+        target: t.schools.id,
+        set: {
+          name: sql`excluded.name`, shortName: sql`excluded.short_name`,
+          region: sql`excluded.region`, isMember: sql`excluded.is_member`,
+        },
+      });
+    }
+    console.log(`  ${'schools'.padEnd(26)} ${schoolRows.length}`);
     await insertAll(db, t.tournaments, rows.tournaments, 'tournaments');
     await insertAll(db, t.events, rows.events, 'events');
     await insertAll(db, t.debaters, [...debaters.values()], 'debaters');

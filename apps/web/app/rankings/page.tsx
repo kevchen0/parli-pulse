@@ -12,7 +12,7 @@ export default async function TeamsPage() {
   return (
     <>
       <p className="meta">
-        <span><b>{summary.teams}</b> partnerships</span>
+        <span><b>{teams.length}</b> partnerships ranked</span>
         <span><b>{summary.tournaments}</b> tournaments</span>
         <span><b>{summary.ballots.toLocaleString()}</b> ballots</span>
       </p>

@@ -19,13 +19,17 @@ export default async function SpeakersPage() {
       </p>
 
       <p className="meta">
-        <span><b>{summary.ranked}</b> of {summary.total} debaters listed</span>
+        <span><b>{speakers.length}</b> ranked, of {summary.total} who competed</span>
         <span><b>{summary.scores.toLocaleString()}</b> ballots normalized</span>
         <span>minimum 20 ballots to be ranked</span>
       </p>
 
       <p className="note">
-        Open divisions only. This is our own measure — Article XXI gives speaker points no
+        <b>vs judge</b> is how far above or below that judge&rsquo;s own average the debater
+        scored, in standard deviations — so +0.50 means half a deviation better than the
+        typical ballot from the judges they drew. <b>Adjusted</b> is the same figure put back
+        on the 25-30 scale, and <b>±</b> is the 95% interval around it, which narrows as a
+        debater accumulates ballots. Open divisions only. This is our own measure — Article XXI gives speaker points no
         ranking weight, and the league publishes no speaker standings. It covers more debaters
         than the team table does: the league records only results that earned points, so a
         debater with strong speaks and a losing record appears here and not there.
@@ -37,7 +41,7 @@ export default async function SpeakersPage() {
             <tr>
               <th>#</th><th>School</th><th>Debater</th>
               <th className="num">Ballots</th><th className="num">vs judge</th>
-              <th className="num">Adjusted</th>
+              <th className="num">Adjusted</th><th className="num">±95%</th>
             </tr>
           </thead>
           <tbody>
@@ -54,6 +58,9 @@ export default async function SpeakersPage() {
                   {Number(s.meanZ) > 0 ? '+' : ''}{Number(s.meanZ).toFixed(2)}
                 </td>
                 <td className="pts num">{Number(s.meanDisplay).toFixed(2)}</td>
+                <td className="num region">
+                  {s.marginDisplay === null ? '—' : `±${Number(s.marginDisplay).toFixed(2)}`}
+                </td>
               </tr>
             ))}
           </tbody>

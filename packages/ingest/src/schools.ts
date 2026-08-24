@@ -42,16 +42,21 @@ export interface SchoolIndex {
 }
 
 /**
- * Builds the index from the `SchoolList` tab. Names that do not appear there
- * are still resolvable -- they are added on first sight and marked as
- * non-member, since XXI.9.A restricts school rankings to member schools.
+ * Builds the index from the `SchoolList` tab, which names every school seen in
+ * the season -- 379 of them -- and from the `School` tab, which is the league's
+ * own ranking and therefore the list of the 56 schools it treats as members.
+ *
+ * The distinction matters: XXI.9.A restricts school rankings to member schools,
+ * so appearing in `SchoolList` is not membership. Pass `memberNames` to mark
+ * them; without it nothing is a member, which is the safe default.
  */
-export function buildSchoolIndex(rows: SheetRow[]): SchoolIndex {
+export function buildSchoolIndex(rows: SheetRow[], memberNames: readonly string[] = []): SchoolIndex {
   const { headerIndex, col } = indexHeaders(rows);
   const c = { name: col('Name'), short: col('Short Name'), region: col('Region') };
 
   const byId = new Map<string, CanonicalSchool>();
   const lookup = new Map<string, CanonicalSchool>();
+  const members = new Set(memberNames.map((n) => schoolKey(n)));
 
   const register = (school: CanonicalSchool, ...aliases: string[]): void => {
     byId.set(school.id, school);
@@ -71,7 +76,7 @@ export function buildSchoolIndex(rows: SheetRow[]): SchoolIndex {
       name,
       shortName,
       region: (r[c.region] ?? '').trim() || null,
-      isMember: true,
+      isMember: members.has(schoolKey(name)) || (shortName ? members.has(schoolKey(shortName)) : false),
     };
     register(school, ...(shortName ? [shortName] : []));
   }

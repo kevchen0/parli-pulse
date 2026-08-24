@@ -361,6 +361,13 @@ export const debaterSpeakerTotals = pgTable('debater_speaker_totals', {
   meanZ: real('mean_z').notNull(),
   /** The same figure expressed on the familiar 25-30 scale. */
   meanDisplay: real('mean_display').notNull(),
+  /**
+   * Spread of the debater's own ballots. With `ballots`, this gives the
+   * standard error of the mean -- how much of the figure above is signal.
+   */
+  sdZ: real('sd_z'),
+  /** Half-width of the 95% interval on `meanDisplay`, in display points. */
+  marginDisplay: real('margin_display'),
   /** Null until the debater clears the minimum-ballot threshold. */
   rank: integer('rank'),
 }, (t) => [uniqueIndex('debater_speaker_season_idx').on(t.seasonId, t.debaterId)]);

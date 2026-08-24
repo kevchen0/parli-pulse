@@ -66,7 +66,15 @@ NYPDL's 23-30 scale makes their raw means look low. That is the whole point of
 the exercise.
 
 Threshold chosen from the data: the spread of season means is 0.75 sd among
-debaters with ten ballots or fewer, 0.52 by twenty, 0.41 by thirty.
+debaters with ten ballots or fewer, 0.52 by twenty, 0.41 by thirty. Each row
+also carries a 95% interval, so a 20-ballot debater reads +-0.34 against a
+70-ballot debater's +-0.21 rather than looking equally certain.
+
+**Membership**: XXI.9.A ranks member schools only. `SchoolList` names all 379
+schools seen in the season, not members -- the league's own `School` tab is the
+member list, 56 of them. School rankings now cover 47 rather than 156. Note
+`schools` rows are not season-scoped and so must be **upserted**, not inserted
+with `onConflictDoNothing`, or a corrected flag silently does nothing.
 
 ### Next
 - **Phase 5, Glicko-2.** Needs no input.
