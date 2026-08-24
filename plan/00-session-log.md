@@ -6,6 +6,41 @@ cold. Newest first. Keep entries short; put durable conclusions in
 
 ---
 
+## 2026-08-21 — Phases 0-3 complete, site live
+
+**State:** rankings and diagnostic pages deployed, reading from Neon.
+Per-entry **98%**, partnerships **87% exact** (top 100: **92%**, 95% within 2%).
+
+### Commands
+| | |
+|---|---|
+| `npm run load` | rebuild a season from cached payloads (`SEASON=` to pick) |
+| `npm run rollup` | recompute standings and identity merging |
+| `npm run diagnostics` | rebuild the reconciliation the site shows |
+| `npm run backtest` | fields, per-entry, partnerships |
+| `npm run compare` / `diagnose` | top-N accuracy and cause attribution |
+
+Order matters: `load` → `rollup` → `diagnostics`.
+
+### Where the remaining error lives
+Catalogued in [09-data-quality.md](09-data-quality.md). Of the ~110
+partnerships that differ or have no standing, most are structural:
+
+- **~30** results at tournaments that published little or nothing to Tabroom
+  (Ridge Debates, Randolph Fall Classic, CBSR 3, Ryan Rutledge). Manual entry
+  is the only route.
+- **14** at El Cerrito, where the league applied a −1 adjustment that 27 of 28
+  comparable tournaments did not. Probably their error.
+- **~8** where the league splits one partnership across two registrations and
+  we merge them — a modelling difference, not a bug.
+- **6** at UCLA, where Tabroom shows six prelims and the league counted five.
+- **~5** human `manual_adj` overrides in the sheet.
+- **3** league typos creating phantom teams.
+
+### Next
+- **Phase 4, speaker points.** Everything needed is loaded; needs no input.
+- Manual-entry path for the tournaments above, which is the only way past ~88%.
+
 ## 2026-08-20 — Phase 0 + field-size backtest
 
 **State:** Phase 0 essentially complete. Stage-1 (field size) backtest running

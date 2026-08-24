@@ -97,11 +97,22 @@ penalty; **27 of them applied 0** to their entries. El Cerrito alone applied
 −1. Our 11 follows XXI.3.A; their 10 looks like a slip. *(A 0% break does not
 itself trigger a penalty — that hypothesis was tested and rejected.)*
 
-**Still unexplained.** Two results nobody has accounted for:
+**Prelim count disagreements.** UCLA published **six** preliminary rounds to
+Tabroom (rounds 1-6, twelve sections each); the league recorded five. Teams we
+read as 3-3 the league records as 3-2, which is the difference between nothing
+and four points, and it affects six results. Whether a round was dropped, or a
+hidden elim (XXI.6.A) was counted as a prelim, needs the Reporting Director.
+
+**Tournaments publishing no rounds at all.** Ryan Rutledge has zero rounds in
+its payload. Records come from tab's own summary, so prelim results are right,
+but **elim placement is unrecoverable** — teams the league records as reaching
+finals or semifinals score only their prelim points here. Four results. Same
+class as Ridge Debates, and only manual entry fixes it.
+
+**Still unexplained.** One result:
 
 | Tournament | Official | Ours | Note |
 |---|---|---|---|
-| Ryan Rutledge, finalist | 12 | 7 | tournament-level adj of −10 does not decompose from the rules |
 | TCFL Spring, 3-1 | 7 | 0 | we read no record for this team |
 
 ## 6b. Partnerships with no standing of ours (44)

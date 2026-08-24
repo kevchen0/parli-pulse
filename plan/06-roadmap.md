@@ -7,7 +7,7 @@ Sept 5-6 (August tournaments are excluded by XXI.1.H).
 
 ---
 
-### Phase 0 — Foundation — *in progress*
+### Phase 0 — Foundation — **done**
 Repo, workspace, Drizzle schema, CI. Article XXI constants encoded as typed data.
 
 - [x] Monorepo scaffold, TypeScript config, Vitest
@@ -16,12 +16,27 @@ Repo, workspace, Drizzle schema, CI. Article XXI constants encoded as typed data
       invariant that the table's stepped border follows bracket size)
 - [x] Tabroom payload types
 - [x] Drizzle schema + generated initial migration (`npm run db:generate`)
-- [ ] Neon + Vercel provisioning — **blocked on your accounts**
+- [x] Neon Postgres provisioned, 23 tables migrated, Vercel deploying
 
-Phase 2 arrived early: the Tabroom normalizer, sheet reader, Article XXI
-engine, and a three-stage backtest all landed while validating Phase 0. What
-remains of Phase 2 is loading the normalized data into Postgres, which needs
-the database.
+### Phase 1 — Rankings site — **done**
+Team, debater and school standings at `/rankings`, rendered from Postgres.
+Plus a fourth tab, `/rankings/diagnostic`, reconciling every partnership
+against the league's published standings result by result.
+
+### Phase 2 — Tabroom ingestion — **done**
+Circuit-179 discovery, cached `download_data` client, normalization, entity
+resolution, and the loader. 96 tournaments, 4,872 entries, 26,146 ballots,
+32,267 speaker scores.
+
+### Phase 3 — Article XXI engine + backtest — **done**
+Per-entry agreement **98%** (1529/1564): NPDL-TOC and NYPDL both 100%, CHSSA
+99%, regular invitationals 96%. Partnership season totals **87% exact**
+across all 835; the league's top 100 **92% exact, 95% within 2%**.
+
+Every remaining gap is catalogued in [09-data-quality.md](09-data-quality.md).
+Most are not ours to fix: tournaments that published nothing, human overrides
+in the league's own sheet, typos creating phantom teams, and one modelling
+difference where the league splits a partnership across two registrations.
 
 ### Phase 1 — Sheet mirror
 Ingest every tab. Ship team / individual / school / TOC-qual rankings with
@@ -44,9 +59,13 @@ Full engine per [03-rules-engine.md](03-rules-engine.md). Two-stage validation:
 **Gate:** every mismatch classified — not necessarily 100% match, since
 `manual_adj` bakes in human judgment by construction.
 
-### Phase 4 — Speaker points
+### Phase 4 — Speaker points — **next**
 Sentinel filtering, per-judge z-scores with shrinkage, display rescaling.
 Speaker leaderboards and per-tournament speaker tabs.
+
+Ready to start: 32,267 scores are loaded, 95% already attributed to a specific
+debater, and the scale config is known (25-30 default, NYPDL 23-30, YFL 1
+0-100). Needs no input from you.
 
 ### Phase 5 — Glicko-2
 Implement, tune on 2025-26, validate on held-out late-season rounds. Rating
