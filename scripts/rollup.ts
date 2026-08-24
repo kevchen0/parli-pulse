@@ -254,7 +254,7 @@ async function main(): Promise<void> {
     }
 
     // --- Teams (XXI.7): a partnership is a pair of debaters, not an entry. ---
-    const teamPoints = new Map<string, { points: number[]; schoolId: string | null; ids: string[] }>();
+    const teamPoints = new Map<string, { points: number[]; schools: (string | null)[]; ids: string[] }>();
     const debaterPoints = new Map<string, number[]>();
     const schoolPoints = new Map<string, number>();
 
@@ -262,8 +262,12 @@ async function main(): Promise<void> {
       const ds = [...new Set(debatersByEntry.get(r.entryId) ?? [])].sort();
       if (ds.length === 2) {
         const key = ds.join('|');
-        const e = teamPoints.get(key) ?? { points: [], schoolId: r.schoolId, ids: ds };
+        const e = teamPoints.get(key) ?? { points: [], schools: [], ids: ds };
         e.points.push(r.points);
+        // A partnership can compete under more than one registration; the
+        // league credits the school it belongs to, so take the one it entered
+        // under most rather than whichever result happened to load first.
+        e.schools.push(r.schoolId);
         teamPoints.set(key, e);
       }
       // XXI.8: a debater's own results, pooled across every partner.
@@ -286,13 +290,61 @@ async function main(): Promise<void> {
     await db.delete(t.debaterSeasonTotals).where(eq(t.debaterSeasonTotals.seasonId, SEASON));
     await db.delete(t.schoolSeasonTotals).where(eq(t.schoolSeasonTotals.seasonId, SEASON));
 
+    const dominantSchool = (schools: (string | null)[]): string | null => {
+      const counts = new Map<string, number>();
+      for (const s of schools) if (s) counts.set(s, (counts.get(s) ?? 0) + 1);
+      let best: string | null = null;
+      let bestScore = -1;
+      for (const [id, n] of counts) {
+        const score = n * 2 + (memberSchools.has(id) ? 1 : 0);
+        if (score > bestScore) { best = id; bestScore = score; }
+      }
+      return best;
+    };
+
+    // One partnership can still hold two rows when a label-recovered record
+    // could not be tied to its student record. Same school and same surnames,
+    // with no contradicting first name, is the same team.
+    const nameOf = new Map(
+      (await db.select({ id: t.debaters.id, first: t.debaters.firstName, last: t.debaters.lastName })
+        .from(t.debaters)).map((d) => [d.id, d]),
+    );
+    const norm = (v: string | null): string =>
+      (v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '');
+    const collapsed = new Map<string, { points: number[]; schools: (string | null)[]; ids: string[] }>();
+    for (const [, v] of teamPoints) {
+      const school = dominantSchool(v.schools) ?? '';
+      const people = v.ids.map((id) => nameOf.get(id));
+      const surnames = people.map((p) => norm(p?.last ?? '')).sort().join('|');
+      const firsts = people.map((p) => norm(p?.first ?? '')).sort().join('|');
+      let key = `${school}::${surnames}`;
+      const existing = collapsed.get(key);
+      if (existing) {
+        const otherFirsts = existing.ids.map((id) => norm(nameOf.get(id)?.first ?? '')).sort().join('|');
+        // Both naming first names that differ means two real partnerships.
+        const bothNamed = firsts.replace(/\|/g, '') && otherFirsts.replace(/\|/g, '');
+        if (bothNamed && firsts !== otherFirsts) key = `${key}::${firsts}`;
+      }
+      const target = collapsed.get(key);
+      if (target) {
+        target.points.push(...v.points);
+        target.schools.push(...v.schools);
+        // Prefer the identity carrying real names.
+        if (target.ids.some((id) => !nameOf.get(id)?.first) && people.every((p) => p?.first)) {
+          target.ids = v.ids;
+        }
+      } else {
+        collapsed.set(key, { points: [...v.points], schools: [...v.schools], ids: v.ids });
+      }
+    }
+
     const teamRows = assignRanks(
-      [...teamPoints.entries()].map(([key, v]) => ({
+      [...collapsed.entries()].map(([key, v]) => ({
         key, points: weightedTotal(v.points), counted: Math.min(v.points.length, 5),
-        schoolId: v.schoolId, ids: v.ids,
+        schoolId: dominantSchool(v.schools), ids: v.ids,
       })),
     ).map((r) => ({
-      id: `team_${SEASON}_${r.key}`, seasonId: SEASON, schoolId: r.schoolId,
+      id: `team_${SEASON}_${r.ids.join('|')}`, seasonId: SEASON, schoolId: r.schoolId,
       debater1Id: r.ids[0]!, debater2Id: r.ids[1]!,
       points: r.points, rank: r.rank, tournamentsCounted: r.counted,
     }));

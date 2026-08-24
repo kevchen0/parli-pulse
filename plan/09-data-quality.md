@@ -104,6 +104,39 @@ itself trigger a penalty — that hypothesis was tested and rejected.)*
 | Ryan Rutledge, finalist | 12 | 7 | tournament-level adj of −10 does not decompose from the rules |
 | TCFL Spring, 3-1 | 7 | 0 | we read no record for this team |
 
+## 6b. Partnerships with no standing of ours (44)
+
+Categorised, because they are not one problem:
+
+| Cause | n | Fixable |
+|---|---|---|
+| We scored none of their results | 24 | No — these are the Ridge Debates / Randolph Fall Classic / CBSR 3 gaps in sections 1-2 |
+| The league lists one partnership under two schools | ~8 | No — see below |
+| League typo creating a phantom second team | 3 | No |
+| School ambiguity and hybrids | ~9 | Partly |
+
+**The league keys a team by school *and* debaters, so one partnership competing
+under two registrations becomes two rows with the points split between them:**
+
+| | |
+|---|---|
+| Stuyvesant Schrank & Schwartz | 9.0 |
+| Independent Schrank & Schwartz | 7.6 |
+| NEST Moore & Powell | 4.0 |
+| Independent Moore & Powell | 7.6 |
+
+We merge those into one partnership, which is arguably the more useful model —
+it is the same two people — but it means our single row cannot reconcile
+against either of theirs. Changing this would mean adopting a model we think is
+worse; it is recorded rather than "fixed".
+
+**Typos in the sheet create phantom teams.** Brooklyn Tech appears as both
+`Tsujimoto & Yarmy` (12.6) and `Tsujimonto & Yarmy` (4.0) — one team, two rows,
+one of them misspelled. Also `Menlo Egleson & Goyan` (Goyal) and
+`Palo Alto Chen & Yang` (Yan). Our matcher deliberately will not resolve these,
+because one-to-one matching has already given the real spelling to the real
+team.
+
 ## 7. Provenance
 
 Every scored result carries where its figure came from, because they are not

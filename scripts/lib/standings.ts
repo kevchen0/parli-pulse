@@ -57,25 +57,44 @@ export interface Pairing {
  * partnerships from the same program.
  */
 export function pairStandings(official: OfficialTeam[], ours: OurTeam[]): Pairing[] {
+  // A hybrid is written "Princeton/Stuyvesant", and our team sits under
+  // whichever of the two the league credits. Key on both halves so the match
+  // does not depend on guessing which one that is.
+  const halves = (school: string): string[] => {
+    const parts = school.split('/').map((p) => schoolKey(p)).filter(Boolean);
+    return parts.length ? [...new Set(parts)] : [schoolKey(school)];
+  };
+
   const oursBySchool = new Map<string, OurTeam[]>();
   for (const o of ours) {
-    const k = schoolKey(o.school ?? '');
-    const l = oursBySchool.get(k) ?? [];
-    l.push(o);
-    oursBySchool.set(k, l);
+    for (const k of halves(o.school ?? '')) {
+      const l = oursBySchool.get(k) ?? [];
+      l.push(o);
+      oursBySchool.set(k, l);
+    }
   }
 
   const out: Pairing[] = [];
   const bySchool = new Map<string, OfficialTeam[]>();
   for (const t of official) {
-    const k = schoolKey(t.school);
+    // Group under the first half; the candidate pool below unions both.
+    const k = halves(t.school)[0]!;
     const l = bySchool.get(k) ?? [];
     l.push(t);
     bySchool.set(k, l);
   }
 
+  const claimed = new Set<string>();
   for (const [k, teams] of bySchool) {
-    const candidates: EntryCandidate[] = (oursBySchool.get(k) ?? []).map((o) => ({
+    const pool = new Map<string, OurTeam>();
+    for (const t of teams) {
+      for (const h of halves(t.school)) {
+        for (const o of oursBySchool.get(h) ?? []) pool.set(o.teamId, o);
+      }
+    }
+    for (const o of oursBySchool.get(k) ?? []) pool.set(o.teamId, o);
+    const available = [...pool.values()].filter((o) => !claimed.has(o.teamId));
+    const candidates: EntryCandidate[] = available.map((o) => ({
       entryId: o.teamId,
       schoolName: o.school,
       people: [
@@ -83,14 +102,18 @@ export function pairStandings(official: OfficialTeam[], ours: OurTeam[]): Pairin
         { first: o.first2 ?? '', last: o.last2 },
       ],
     }));
-    const byId = new Map((oursBySchool.get(k) ?? []).map((o) => [o.teamId, o]));
+    const byId = new Map(available.map((o) => [o.teamId, o]));
     const result = matchTeams(
       teams.map((t) => ({ partner1: t.partner1, partner2: t.partner2, school: t.school })),
       candidates,
     );
     teams.forEach((t, i) => {
       const m = result.matches.get(i);
-      const mine = m && !m.ambiguous ? byId.get(m.entryId) ?? null : null;
+      // An ambiguous match usually means our own duplicate rows, not two real
+      // teams; take the best-scoring candidate rather than discarding it, since
+      // a wrong attribution here only affects the comparison, not the site.
+      const mine = m ? byId.get(m.entryId) ?? null : null;
+      if (mine) claimed.add(mine.teamId);
       out.push({ official: t, ours: mine, delta: mine ? mine.points - t.points : null });
     });
   }
