@@ -132,9 +132,14 @@ async function main(): Promise<void> {
         // league tournament actually owns can carry its results.
         if (!ev.isParli && !selectOpen(ev)) continue;
         const stats = computeFieldStats(ev);
+        // An event claimed by an override is the open division of its league
+        // tournament by definition -- "Round Robin" says nothing about either
+        // the format or the level, so the name-based classifier cannot see it.
+        const claimedByOverride = selectOpen(ev) && !ev.isParli;
         rows.events.push({
           id: ev.eventId, tournamentId: off.tournId, name: ev.name, abbr: ev.abbr,
-          division: divisionOf(ev.division), isParli: ev.isParli, prelimCount: ev.prelimCount,
+          division: claimedByOverride ? 'open' : divisionOf(ev.division),
+          isParli: ev.isParli || claimedByOverride, prelimCount: ev.prelimCount,
           // NYPDL declares 23-30; everything else uses the 25-30 convention.
           speakerScaleMin: off.category === 'NYPDL' ? 23 : 25, speakerScaleMax: 30,
         });

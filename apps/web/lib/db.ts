@@ -133,7 +133,9 @@ export async function getSpeakerSummary(): Promise<SpeakerSummary> {
             where season_id = ${CURRENT_SEASON} and rank is not null) as ranked,
            (select count(*)::int from ${t.debaterSpeakerTotals}
             where season_id = ${CURRENT_SEASON}) as total,
-           (select count(*)::int from ${t.speakerScores} where not excluded) as scores,
+           -- Only scores that were actually normalized; the table also holds
+           -- novice and JV ballots, which this measure does not rate.
+           (select count(*)::int from ${t.speakerScores} where z is not null) as scores,
            (select count(*)::int from ${t.speakerScores} where excluded) as excluded
   `);
   const row = r.rows[0] as Record<string, unknown>;

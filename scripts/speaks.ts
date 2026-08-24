@@ -5,6 +5,13 @@
  * Raw speaker points measure the judge as much as the debater: panels differ
  * by two points or more, so a debater's total depends heavily on who they
  * drew. See packages/speaks for the method and why it uses robust statistics.
+ *
+ * Open divisions only, matching Article XXI.1.A. Novice, JV and middle school
+ * are a different competition scored on a different curve, and mixing them
+ * both distorts a judge's baseline and fills the leaderboard with debaters who
+ * never entered the division being ranked. A tournament running a single
+ * undifferentiated "Parli" division counts as open, which is what the division
+ * classifier already does.
  */
 import { eq, sql } from 'drizzle-orm';
 import { createDb } from '../packages/db/src/client.ts';
@@ -39,6 +46,13 @@ interface Row {
 async function main(): Promise<void> {
   const { db, close } = createDb();
   try {
+    // Clear anything a previous run left behind, so scores outside the open
+    // divisions do not keep stale normalized values.
+    await db.execute(sql`
+      update ${t.speakerScores} set z = null, display = null,
+             excluded = false, exclusion_reason = null
+    `);
+
     const rows = (await db.execute(sql`
       select s.id, s.raw, s.judge_id as "judgeId", s.debater_id as "debaterId",
              coalesce(t.official_name, t.name) as tournament, v.division
@@ -47,9 +61,9 @@ async function main(): Promise<void> {
       join ${t.rounds} r on r.id = b.round_id
       join ${t.events} v on v.id = r.event_id
       join ${t.tournaments} t on t.id = v.tournament_id
-      where t.season_id = ${SEASON}
+      where t.season_id = ${SEASON} and v.division = 'open'
     `)).rows as unknown as Row[];
-    console.log(`speaker scores: ${rows.length}`);
+    console.log(`speaker scores in open divisions: ${rows.length}`);
 
     // Normalize onto the canonical scale and drop what is not a score.
     interface Usable extends Row { canonical: number }
@@ -63,8 +77,8 @@ async function main(): Promise<void> {
     }
     console.log(`  usable ${usable.length}, excluded ${excluded.length}`);
 
-    // Novice and open rounds are scored differently by the same judges, so
-    // each division is its own pool and each judge is measured within it.
+    // Grouped by division for safety, though the query restricts to open: the
+    // pool a judge is measured against must be the competition being ranked.
     const pools = new Map<string, number[]>();
     const judges = new Map<string, number[]>();
     for (const r of usable) {

@@ -38,8 +38,18 @@ partnerships that differ or have no standing, most are structural:
 - **3** league typos creating phantom teams.
 
 ### Phase 4 — speaker points (done)
-`/rankings/speakers`, built by `npm run speaks`. 31,796 scores normalized
-against the judge who gave them; 439 debaters clear the 20-ballot threshold.
+`/rankings/speakers`, built by `npm run speaks`. **Open divisions only**, per
+XXI.1.A — novice and JV are a different competition on a different curve, and
+mixing them distorts a judge's baseline as well as filling the board with
+debaters who never entered the division being ranked. A tournament running one
+undifferentiated "Parli" division counts as open, which the classifier already
+did. 27,013 scores normalized; 387 debaters clear the 20-ballot threshold.
+
+**Why more debaters than the team table has**: 1,831 have open speaker scores
+against 1,183 in team standings, because **the league records only results that
+earned points** — its `Entry` tab has no zero-point rows at all, lowest is 3.
+A debater with good speaks and a losing record appears on one and not the
+other. That is correct, and the page says so.
 
 Method in `packages/speaks`: scores map onto a canonical 25-30 scale from a
 **config table** (never inferred from the observed minimum), then each judge's
@@ -48,9 +58,7 @@ score cannot shift everyone else that judge ranked. Both centre and spread are
 shrunk toward the division pool by sample size, since a judge with three
 ballots can show almost no spread by chance.
 
-Pools are per division: open n=26,893 centre 27.86, novice n=3,120 centre
-27.50. Judges score novice rounds differently, so mixing them would distort
-both.
+Pool: open n=27,013, centre 27.86, spread 1.11.
 
 **The correction is large.** The biggest movers are all NYPDL-region schools —
 Dalton, Horace Mann, Bard Queens, Princeton — rising 350-450 places, because

@@ -25,8 +25,10 @@ export default async function SpeakersPage() {
       </p>
 
       <p className="note">
-        This is our own measure. Article XXI gives speaker points no ranking weight, and the
-        league publishes no speaker standings.
+        Open divisions only. This is our own measure — Article XXI gives speaker points no
+        ranking weight, and the league publishes no speaker standings. It covers more debaters
+        than the team table does: the league records only results that earned points, so a
+        debater with strong speaks and a losing record appears here and not there.
       </p>
 
       <div className="tablewrap">
