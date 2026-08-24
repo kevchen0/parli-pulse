@@ -12,7 +12,7 @@ export default async function DebatersPage() {
   return (
     <>
       <p className="meta">
-        <span><b>{debaters.length}</b> debaters ranked</span>
+        <span><b>{debaters.length}</b> debaters with Article XXI points</span>
         <span>
           <b>{qualified}</b> at or above the {TOC_AUTOQUAL_POINTS}-point TOC
           autoqualification line

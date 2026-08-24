@@ -42,6 +42,17 @@ Applies to 2024-25 onward only. Earlier seasons stay archival — see
    number reads familiarly. Store raw, z, and display separately; never
    overwrite raw.
 
+**One z per ballot, not one per debater.** Each ballot is measured against the
+judge who gave it; a debater's season figure is the mean of those. The top
+figures rest on 19 to 71 distinct judges apiece, so they average across many
+standards rather than comparing anyone to a single judge.
+
+Each debater also carries the spread of their own ballots and a 95% confidence
+interval on the mean -- `1.96 * sd / sqrt(n)`, converted from z units into
+display points. Two debaters can share an average while one earned it
+consistently over seventy ballots and the other from a wide scatter over
+twenty.
+
 Aggregate per debater (already per-debater) and per team.
 
 ### Punitive scores are handled, never surfaced

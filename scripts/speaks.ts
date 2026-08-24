@@ -131,6 +131,9 @@ async function main(): Promise<void> {
       (await db.select({ id: t.debaters.id, canonicalId: t.debaters.canonicalId }).from(t.debaters))
         .map((d) => [d.id, d.canonicalId ?? d.id]),
     );
+    // One z per ballot, each against the judge who gave that ballot. A
+    // debater's season figure is the mean of those, so it averages across
+    // every judge they faced rather than comparing them to any single one.
     const perDebater = new Map<string, number[]>();
     for (const r of scored) {
       if (!r.debaterId) continue;
@@ -155,8 +158,9 @@ async function main(): Promise<void> {
         return {
           debaterId, ballots: n, meanZ, sdZ,
           meanDisplay: pool.centre + meanZ * pool.spread,
-          // 95% interval, expressed in display points so it can be read
-          // straight off the adjusted score.
+          // Half-width of the 95% confidence interval on the mean:
+          // 1.96 * (sd / sqrt(n)), converted from z units into display points
+          // by the pool's spread, so it reads straight off the adjusted score.
           marginDisplay: 1.96 * stderr * pool.spread,
         };
       })

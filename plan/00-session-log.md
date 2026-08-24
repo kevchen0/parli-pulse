@@ -70,6 +70,11 @@ debaters with ten ballots or fewer, 0.52 by twenty, 0.41 by thirty. Each row
 also carries a 95% interval, so a 20-ballot debater reads +-0.34 against a
 70-ballot debater's +-0.21 rather than looking equally certain.
 
+**Two debater populations, both correct**: 1,185 have Article XXI points;
+1,831 have open-division speaker ballots (935 in both). The league records
+only point-earning results, so a losing record with good speaks appears on one
+board and not the other. The pages label which is which.
+
 **Membership**: XXI.9.A ranks member schools only. `SchoolList` names all 379
 schools seen in the season, not members -- the league's own `School` tab is the
 member list, 56 of them. School rankings now cover 47 rather than 156. Note
