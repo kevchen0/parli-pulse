@@ -135,7 +135,20 @@ surname key. Surnames alone collapse "Egleson & S. Goyal" into
 "Egleson & N. Goyal" -- two real Menlo teams 73 points apart -- and invent
 data problems that do not exist.
 
+### Diagnostic page
+`/rankings/diagnostic` reconciles all 835 partnerships against the league's
+standings, result by result. **86.2% exact.** Built by
+`npm run diagnostics` into `standing_diagnostics`; the per-tournament
+breakdown is read from the database, not recomputed, so it always sums to the
+total the site displays.
+
+It exposed a class of problem the aggregate rates hid: partnerships where we
+attribute a result the league does not (Horace Mann Manges & Worthington
+carries an NPDL-TOC result and is missing its NYPDL one). That is identity
+over-merging, and it is the next thing to chase.
+
 ### Next
+- Over-merged identities surfaced by the diagnostic page.
 - Tournament and profile pages; search/filter on the ranking tables.
 - Glicko-2 (Phase 5) and speaker normalization (Phase 4).
 - Speaker normalization (Phase 4): scale config per event — **YFL 1 uses 0-100**,

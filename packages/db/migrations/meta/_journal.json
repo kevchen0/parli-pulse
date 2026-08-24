@@ -15,6 +15,13 @@
       "when": 1787285810835,
       "tag": "0001_plain_spitfire",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787593952672,
+      "tag": "0002_tiresome_avengers",
+      "breakpoints": true
     }
   ]
 }

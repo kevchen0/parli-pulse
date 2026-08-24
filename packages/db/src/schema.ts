@@ -344,6 +344,36 @@ export const schoolSeasonTotals = pgTable('school_season_totals', {
 }, (t) => [uniqueIndex('school_season_idx').on(t.seasonId, t.schoolId)]);
 
 /**
+ * Per-partnership reconciliation against the league's published standings.
+ *
+ * Stored rather than computed on demand because it is the site's honesty
+ * surface: it shows exactly where our figures differ from the league's and
+ * which tournament caused it. `results` carries the whole season for the
+ * partnership, so a reader can see that a total is wrong by one result rather
+ * than wrong everywhere.
+ */
+export const standingDiagnostics = pgTable('standing_diagnostics', {
+  id: text('id').primaryKey(),
+  seasonId: text('season_id').notNull().references(() => seasons.id),
+  schoolName: text('school_name').notNull(),
+  region: text('region'),
+  debater1: text('debater1').notNull(),
+  debater2: text('debater2').notNull(),
+  officialRank: integer('official_rank'),
+  officialPoints: real('official_points').notNull(),
+  ourPoints: real('our_points'),
+  /** ourPoints - officialPoints; null when we have no standing at all. */
+  delta: real('delta'),
+  /** Results that differ, and whether each is inside the counting best five. */
+  mismatchedResults: integer('mismatched_results').notNull().default(0),
+  /** Full season: [{tournament, official, ours, delta, counted, provenance}]. */
+  results: jsonb('results'),
+}, (t) => [
+  index('standing_diagnostics_season_idx').on(t.seasonId),
+  index('standing_diagnostics_delta_idx').on(t.delta),
+]);
+
+/**
  * Glicko-2 ratings, snapshotted per rating period so history can be charted.
  * Deliberately separate from Article XXI points: this is our own metric and
  * must never be presented as league rankings.

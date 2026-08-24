@@ -93,6 +93,90 @@ export async function getSchools(): Promise<SchoolRow[]> {
   return rows.rows as unknown as SchoolRow[];
 }
 
+export interface DiagnosticResult {
+  tournament: string;
+  official: number | null;
+  ours: number | null;
+  delta: number | null;
+  /** Inside the best five that actually determine the season total. */
+  counted: boolean;
+  provenance: string;
+}
+
+export interface DiagnosticRow {
+  schoolName: string;
+  region: string | null;
+  debater1: string;
+  debater2: string;
+  officialRank: number | null;
+  officialPoints: number;
+  ourPoints: number | null;
+  delta: number | null;
+  mismatchedResults: number;
+  results: DiagnosticResult[];
+}
+
+export interface DiagnosticSummary {
+  total: number;
+  exact: number;
+  differ: number;
+  missing: number;
+}
+
+/** Partnerships whose totals disagree, worst first. */
+export async function getDiagnostics(limit = 200): Promise<DiagnosticRow[]> {
+  const { db } = handle();
+  const rows = await db.execute(sql`
+    select school_name as "schoolName", region, debater1, debater2,
+           official_rank as "officialRank", official_points as "officialPoints",
+           our_points as "ourPoints", delta,
+           mismatched_results as "mismatchedResults", results
+    from ${t.standingDiagnostics}
+    where season_id = ${CURRENT_SEASON}
+      and (our_points is null or abs(delta) >= 0.051)
+    order by our_points is null desc, abs(delta) desc nulls first
+    limit ${limit}
+  `);
+  return rows.rows as unknown as DiagnosticRow[];
+}
+
+export async function getDiagnosticSummary(): Promise<DiagnosticSummary> {
+  const { db } = handle();
+  const r = await db.execute(sql`
+    select count(*)::int as total,
+           count(*) filter (where delta is not null and abs(delta) < 0.051)::int as exact,
+           count(*) filter (where delta is not null and abs(delta) >= 0.051)::int as differ,
+           count(*) filter (where our_points is null)::int as missing
+    from ${t.standingDiagnostics} where season_id = ${CURRENT_SEASON}
+  `);
+  const row = r.rows[0] as Record<string, unknown>;
+  return {
+    total: Number(row.total ?? 0), exact: Number(row.exact ?? 0),
+    differ: Number(row.differ ?? 0), missing: Number(row.missing ?? 0),
+  };
+}
+
+export interface TournamentDiagnostic {
+  tournament: string;
+  differing: number;
+  points: number;
+}
+
+/** Tournaments ranked by how many differing results they contribute. */
+export async function getTournamentDiagnostics(): Promise<TournamentDiagnostic[]> {
+  const { db } = handle();
+  const rows = await db.execute(sql`
+    select r->>'tournament' as tournament,
+           count(*)::int as differing,
+           sum(abs(coalesce((r->>'delta')::real, (r->>'official')::real, 0)))::real as points
+    from ${t.standingDiagnostics} d, jsonb_array_elements(d.results) r
+    where d.season_id = ${CURRENT_SEASON}
+      and (r->>'ours' is null or (r->>'delta')::real <> 0)
+    group by 1 order by 2 desc limit 20
+  `);
+  return rows.rows as unknown as TournamentDiagnostic[];
+}
+
 export interface Summary {
   tournaments: number;
   teams: number;

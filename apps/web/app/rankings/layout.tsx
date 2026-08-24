@@ -5,6 +5,7 @@ const tabs = [
   { href: '/rankings', label: 'Teams' },
   { href: '/rankings/debaters', label: 'Debaters' },
   { href: '/rankings/schools', label: 'Schools' },
+  { href: '/rankings/diagnostic', label: 'Diagnostic' },
 ] as const;
 
 export default function RankingsLayout({ children }: { children: React.ReactNode }) {
