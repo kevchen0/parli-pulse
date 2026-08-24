@@ -344,6 +344,28 @@ export const schoolSeasonTotals = pgTable('school_season_totals', {
 }, (t) => [uniqueIndex('school_season_idx').on(t.seasonId, t.schoolId)]);
 
 /**
+ * Season speaker standings per debater, from judge-normalized scores.
+ *
+ * Separate from Article XXI entirely: speaker points carry no ranking weight
+ * in the rules, and this is our own measure. Stored with the sample size it
+ * came from, because a mean over four ballots and one over forty are not the
+ * same claim.
+ */
+export const debaterSpeakerTotals = pgTable('debater_speaker_totals', {
+  id: text('id').primaryKey(),
+  seasonId: text('season_id').notNull().references(() => seasons.id),
+  debaterId: text('debater_id').notNull().references(() => debaters.id),
+  /** Usable ballots, after forfeits and out-of-range values are removed. */
+  ballots: integer('ballots').notNull(),
+  /** Mean standard deviations from the judge's own baseline. */
+  meanZ: real('mean_z').notNull(),
+  /** The same figure expressed on the familiar 25-30 scale. */
+  meanDisplay: real('mean_display').notNull(),
+  /** Null until the debater clears the minimum-ballot threshold. */
+  rank: integer('rank'),
+}, (t) => [uniqueIndex('debater_speaker_season_idx').on(t.seasonId, t.debaterId)]);
+
+/**
  * Per-partnership reconciliation against the league's published standings.
  *
  * Stored rather than computed on demand because it is the site's honesty

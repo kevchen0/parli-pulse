@@ -20,7 +20,8 @@
     "rollup": "node --env-file=.env scripts/rollup.ts",
     "compare": "node --env-file=.env scripts/compare-top.ts",
     "diagnose": "node --env-file=.env scripts/diagnose.ts",
-    "diagnostics": "node --env-file=.env scripts/build-diagnostics.ts"
+    "diagnostics": "node --env-file=.env scripts/build-diagnostics.ts",
+    "speaks": "node --env-file=.env scripts/speaks.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

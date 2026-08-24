@@ -37,9 +37,33 @@ partnerships that differ or have no standing, most are structural:
 - **~5** human `manual_adj` overrides in the sheet.
 - **3** league typos creating phantom teams.
 
+### Phase 4 — speaker points (done)
+`/rankings/speakers`, built by `npm run speaks`. 31,796 scores normalized
+against the judge who gave them; 439 debaters clear the 20-ballot threshold.
+
+Method in `packages/speaks`: scores map onto a canonical 25-30 scale from a
+**config table** (never inferred from the observed minimum), then each judge's
+baseline is a median and an interquartile spread — robust, so one punitive
+score cannot shift everyone else that judge ranked. Both centre and spread are
+shrunk toward the division pool by sample size, since a judge with three
+ballots can show almost no spread by chance.
+
+Pools are per division: open n=26,893 centre 27.86, novice n=3,120 centre
+27.50. Judges score novice rounds differently, so mixing them would distort
+both.
+
+**The correction is large.** The biggest movers are all NYPDL-region schools —
+Dalton, Horace Mann, Bard Queens, Princeton — rising 350-450 places, because
+NYPDL's 23-30 scale makes their raw means look low. That is the whole point of
+the exercise.
+
+Threshold chosen from the data: the spread of season means is 0.75 sd among
+debaters with ten ballots or fewer, 0.52 by twenty, 0.41 by thirty.
+
 ### Next
-- **Phase 4, speaker points.** Everything needed is loaded; needs no input.
-- Manual-entry path for the tournaments above, which is the only way past ~88%.
+- **Phase 5, Glicko-2.** Needs no input.
+- Manual-entry path for the tournaments in 09-data-quality, the only way past
+  ~88% on standings.
 
 ## 2026-08-20 — Phase 0 + field-size backtest
 

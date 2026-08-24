@@ -93,6 +93,56 @@ export async function getSchools(): Promise<SchoolRow[]> {
   return rows.rows as unknown as SchoolRow[];
 }
 
+export interface SpeakerRow {
+  rank: number | null;
+  name: string;
+  school: string | null;
+  region: string | null;
+  ballots: number;
+  meanZ: number;
+  meanDisplay: number;
+}
+
+export async function getSpeakers(limit = 300): Promise<SpeakerRow[]> {
+  const { db } = handle();
+  const rows = await db.execute(sql`
+    select st.rank, st.ballots, st.mean_z as "meanZ", st.mean_display as "meanDisplay",
+           coalesce(d.first_name || ' ', '') || d.last_name as name,
+           coalesce(s.short_name, s.name) as school, s.region
+    from ${t.debaterSpeakerTotals} st
+    join ${t.debaters} d on d.id = st.debater_id
+    left join ${t.schools} s on s.id = d.school_id
+    where st.season_id = ${CURRENT_SEASON} and st.rank is not null
+    order by st.rank asc
+    limit ${limit}
+  `);
+  return rows.rows as unknown as SpeakerRow[];
+}
+
+export interface SpeakerSummary {
+  ranked: number;
+  total: number;
+  scores: number;
+  excluded: number;
+}
+
+export async function getSpeakerSummary(): Promise<SpeakerSummary> {
+  const { db } = handle();
+  const r = await db.execute(sql`
+    select (select count(*)::int from ${t.debaterSpeakerTotals}
+            where season_id = ${CURRENT_SEASON} and rank is not null) as ranked,
+           (select count(*)::int from ${t.debaterSpeakerTotals}
+            where season_id = ${CURRENT_SEASON}) as total,
+           (select count(*)::int from ${t.speakerScores} where not excluded) as scores,
+           (select count(*)::int from ${t.speakerScores} where excluded) as excluded
+  `);
+  const row = r.rows[0] as Record<string, unknown>;
+  return {
+    ranked: Number(row.ranked ?? 0), total: Number(row.total ?? 0),
+    scores: Number(row.scores ?? 0), excluded: Number(row.excluded ?? 0),
+  };
+}
+
 export interface DiagnosticResult {
   tournament: string;
   official: number | null;
