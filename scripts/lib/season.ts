@@ -21,6 +21,7 @@ import {
   type EntryCandidate,
   type MatchTier,
 } from '../../packages/ingest/src/matching.ts';
+import { openEventFilter } from '../../packages/ingest/src/event-selection.ts';
 import {
   parseEntryTab,
   parseTournamentsTab,
@@ -100,9 +101,8 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
     const raw = JSON.parse(readFileSync(path, 'utf8'));
     const t = normalizeTournament(raw);
     const students = buildStudentIndex(raw);
-    const opens = t.events.filter(
-      (e) => e.isParli && e.division === 'open' && !computeFieldStats(e).phantom,
-    );
+    const selectOpen = openEventFilter(off.name);
+    const opens = t.events.filter((e) => selectOpen(e) && !computeFieldStats(e).phantom);
     if (!opens.length) { skippedTournaments.push(off.name); continue; }
 
     // Use the sheet's published field figures so a points mismatch is never
@@ -144,7 +144,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
           wins: p.wins, losses: p.losses, elimLevel: p.elimLevel,
           size: entry.eligibleTeamSize,
           prelimBallotsWon: p.prelimBallotsWon,
-          elimWins: elimRoundWins,
+          elimWins: p.elimWins,
         });
         candidates.push({ entryId, schoolName: entry.schoolName, people: resolved });
       }

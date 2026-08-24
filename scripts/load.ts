@@ -26,6 +26,7 @@ import {
   parseWorkbook,
   type NormalizedEvent,
 } from '../packages/ingest/src/index.ts';
+import { openEventFilter } from '../packages/ingest/src/event-selection.ts';
 import { computeSeason } from './lib/season.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
@@ -125,8 +126,11 @@ async function main(): Promise<void> {
         breakPenalty: off.breakPenalty,
       });
 
+      const selectOpen = openEventFilter(off.name);
       for (const ev of norm.events) {
-        if (!ev.isParli) continue;
+        // Load every parli division for field sizes, but only the events this
+        // league tournament actually owns can carry its results.
+        if (!ev.isParli && !selectOpen(ev)) continue;
         const stats = computeFieldStats(ev);
         rows.events.push({
           id: ev.eventId, tournamentId: off.tournId, name: ev.name, abbr: ev.abbr,

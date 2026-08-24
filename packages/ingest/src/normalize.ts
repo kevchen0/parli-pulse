@@ -100,6 +100,13 @@ export interface NormalizedEvent {
    */
   publishedPrelimWins: Map<string, number>;
   /**
+   * Prelim *ballots* won, from the seed set's `BalPm` key. Distinct from wins:
+   * XXI.4.A pays per ballot, and a panelled round awards several. Tab computes
+   * this itself and knows the outcome of rounds whose ballots were never
+   * entered, which no amount of counting can recover.
+   */
+  publishedPrelimBallots: Map<string, number>;
+  /**
    * Round-by-round prelim results recovered from the `Final Places` result
    * set, for events that published no pairings at all. Several CHSSA league
    * tournaments report only standings; without this they score nothing.
@@ -231,19 +238,25 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         }
       }
 
-      // `Prelim Seeds` carries tab's own win totals; prefer them over ballots.
+      // `Prelim Seeds` carries tab's own totals; prefer them over counting.
       const publishedPrelimWins = new Map<string, number>();
+      const publishedPrelimBallots = new Map<string, number>();
       for (const rs of ev.result_sets ?? []) {
         if (rs.tag !== 'seed') continue;
-        const winKey = (rs.result_keys ?? []).find((k) => k.tag === 'WinPm');
-        if (!winKey) continue;
-        const keyId = id(winKey.id);
-        for (const res of rs.results ?? []) {
-          const entryId = id(res.entry);
-          const v = (res.values ?? []).find((x) => id(x.result_key) === keyId);
-          if (!entryId || v?.value === undefined) continue;
-          const n = Number(v.value);
-          if (Number.isFinite(n)) publishedPrelimWins.set(entryId, n);
+        for (const [tag, target] of [
+          ['WinPm', publishedPrelimWins],
+          ['BalPm', publishedPrelimBallots],
+        ] as const) {
+          const key = (rs.result_keys ?? []).find((k) => k.tag === tag);
+          if (!key) continue;
+          const keyId = id(key.id);
+          for (const res of rs.results ?? []) {
+            const entryId = id(res.entry);
+            const v = (res.values ?? []).find((x) => id(x.result_key) === keyId);
+            if (!entryId || v?.value === undefined) continue;
+            const n = Number(v.value);
+            if (Number.isFinite(n)) target.set(entryId, n);
+          }
         }
       }
 
@@ -301,6 +314,7 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         rounds,
         prelimCount: rounds.filter((r) => r.isPrelim).length,
         publishedPrelimWins,
+        publishedPrelimBallots,
         publishedRecords,
         finalPlacesChampions,
       });
@@ -502,6 +516,13 @@ export interface EntryPerformance {
   prelimBallotsWon: number;
   /** Prelim ballots available to the team, won or lost. */
   prelimBallotsTotal: number;
+  /**
+   * Elim rounds won, derived from how far up the bracket the team went rather
+   * than by counting published rounds. XXI.4.A pays per elim win, and the
+   * final round is frequently missing from Tabroom, which would otherwise
+   * short a champion by a whole win.
+   */
+  elimWins: number;
 }
 
 /**
@@ -519,6 +540,7 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
       p = {
         entryId, wins: 0, losses: 0, elimLevel: null, wonFinal: false,
         sameSchoolWalkovers: 0, prelimBallotsWon: 0, prelimBallotsTotal: 0,
+        elimWins: 0,
       };
       out.set(entryId, p);
     }
@@ -604,10 +626,16 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
     }
   }
 
-  // Ballot counts for XXI.4.A. A round whose result was never entered is
-  // credited as a win at full panel size: at the 2025-26 TOC both teams in
-  // each such room were credited, and adding a full round to our counts
-  // reproduces every affected record exactly.
+  // Ballot counts for XXI.4.A.
+  //
+  // Where tab publishes them, they are authoritative and used directly. An
+  // unentered round had a real winner that the ballots do not record, and
+  // guessing in either direction is wrong: at the 2025-26 TOC, Campolindo and
+  // Evergreen Valley shared such a room and the league credited the round to
+  // one of them, not to both. Only tab knows which.
+  //
+  // The fallback below credits an unentered round at full panel size, which
+  // over-credits the loser; it applies only where no published figure exists.
   const prelims = event.rounds.filter((r) => r.isPrelim);
   const panelSizes: number[] = [];
   for (const r of prelims) {
@@ -622,6 +650,12 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
     : 1;
 
   for (const [entryId, p] of out) {
+    const published = event.publishedPrelimBallots.get(entryId);
+    if (published !== undefined) {
+      p.prelimBallotsWon = published;
+      p.prelimBallotsTotal = prelims.length * panelSize;
+      continue;
+    }
     for (const r of prelims) {
       const mine = r.sections.flatMap((sec) => sec.ballots).filter((b) => b.entryId === entryId);
       const scored = mine.filter((b) => b.won !== null);
@@ -725,6 +759,29 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
         p.wonFinal = isCloseout;
       }
     }
+  }
+
+  // Elim wins from the bracket ladder: a team that entered at octofinals and
+  // won the tournament won four rounds, whether or not all four were posted.
+  const LADDER: ElimLevel[] = ['tripleOcto', 'doubleOcto', 'octo', 'quarter', 'semi', 'first'];
+  const rung = (l: ElimLevel): number => (l === 'second' ? LADDER.indexOf('first') : LADDER.indexOf(l));
+  const entryRung = new Map<string, number>();
+  for (const r of main) {
+    const level = elimLevelFromSectionCount(r.sections.length);
+    if (!level) continue;
+    for (const s of r.sections) {
+      for (const e of s.entryIds) {
+        const v = rung(level);
+        if (!entryRung.has(e) || v < entryRung.get(e)!) entryRung.set(e, v);
+      }
+    }
+  }
+  for (const [entryId, p] of out) {
+    if (p.elimLevel === null) continue;
+    const from = entryRung.get(entryId);
+    if (from === undefined) continue;
+    const to = rung(p.elimLevel);
+    p.elimWins = Math.max(0, to - from + (p.wonFinal ? 1 : 0));
   }
 
   return out;
