@@ -52,6 +52,9 @@ export interface EntryCase {
   team: string;
   pair: string;
   entryId: string;
+  /** Surnames as the league writes them; the normalized `pair` loses spacing. */
+  partner1: string;
+  partner2: string;
   matchTier: MatchTier;
   matchAmbiguous: boolean;
   /**
@@ -119,6 +122,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
           tournament: off.name, category: off.category || '(none)', tournId: '',
           school: row.school1, hybridSchool: row.school2 || null, team,
           pair: pairKey(row.partner1, row.partner2),
+          partner1: row.partner1, partner2: row.partner2,
           entryId: `manual_${off.name}_${pairKey(row.partner1, row.partner2)}`.replace(/\s+/g, '_'),
           matchTier: 'exact-surnames', matchAmbiguous: false, provenance: 'manual',
           ours: manual.points, theirs: row.calcPoints ?? 0,
@@ -230,6 +234,8 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         hybridSchool: row.school2 || null,
         team,
         pair: pairKey(row.partner1, row.partner2),
+        partner1: row.partner1,
+        partner2: row.partner2,
         entryId: m.entryId,
         matchTier: m.tier,
         matchAmbiguous: m.ambiguous,
@@ -282,6 +288,8 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         hybridSchool: row.school2 || null,
         team,
         pair: pairKey(row.partner1, row.partner2),
+        partner1: row.partner1,
+        partner2: row.partner2,
         entryId: `${fallback.provenance}_${off.name}_${pairKey(row.partner1, row.partner2)}`.replace(/\s+/g, '_'),
         matchTier: 'exact-surnames',
         matchAmbiguous: false,

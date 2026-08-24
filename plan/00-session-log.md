@@ -142,13 +142,20 @@ standings, result by result. **86.2% exact.** Built by
 breakdown is read from the database, not recomputed, so it always sums to the
 total the site displays.
 
-It exposed a class of problem the aggregate rates hid: partnerships where we
-attribute a result the league does not (Horace Mann Manges & Worthington
-carries an NPDL-TOC result and is missing its NYPDL one). That is identity
-over-merging, and it is the next thing to chase.
+It exposed the opposite of what I first assumed. The problem was **under**-merging:
+one partnership existing as several team rows because their registrations
+produced debater records that never unified. Diamond Bar's Liu & Zhu appeared
+at 37.5, 17.3 and 9.0; they now read 47.5, matching the league exactly.
+
+Identity now unions over two keys — full name across schools, and
+school-plus-surname for label-recovered records with no first name — guarded
+by two distinctness signals: different first names (allowing abbreviations,
+since Tabroom writes "M" for "Melina") and different partners at one
+tournament.
 
 ### Next
-- Over-merged identities surfaced by the diagnostic page.
+- 44 partnerships still have no standing; a long tail, mostly school-key
+  mismatches where the canonical name carries a qualifier.
 - Tournament and profile pages; search/filter on the ranking tables.
 - Glicko-2 (Phase 5) and speaker normalization (Phase 4).
 - Speaker normalization (Phase 4): scale config per event — **YFL 1 uses 0-100**,

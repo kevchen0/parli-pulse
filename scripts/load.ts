@@ -305,7 +305,10 @@ async function main(): Promise<void> {
         }
         const school = schoolIndex.resolve(c.school);
         const hybrid = c.hybridSchool ? schoolIndex.resolve(c.hybridSchool) : null;
-        const surnames = c.pair.split('|');
+        // The league's own spelling, not the normalized key: "Cassel Engen"
+        // must not become "casselengen", or it will never tie back to the
+        // student record that carries the space.
+        const surnames = [c.partner1, c.partner2].filter(Boolean);
         seenEntries.add(c.entryId);
         rows.entries.push({
           id: c.entryId, eventId, code: `${c.school} ${surnames.join(' & ')}`,

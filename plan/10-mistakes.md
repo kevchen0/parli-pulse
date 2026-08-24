@@ -45,9 +45,23 @@ count rounds when the rule pays per ballot — read tab's own `BalPm` instead.
    team, who also competed as "Rodda's Disciples", showed 78.4 against an
    official 83.*
 
+22. **Identity merging under-merged, splitting partnerships across several
+    team rows.** Diamond Bar's Liu & Zhu existed three times — 37.5, 17.3 and
+    9.0 — because their three registrations produced debater records that never
+    unified. Merging keyed on full name, so label-recovered records carrying no
+    first name could not group at all. Two keys are needed: full name across
+    schools, and school-plus-surname for records with no first name, unioned.
+23. **Treated a first-name abbreviation as a different person.** Tabroom writes
+    "M" where the league writes "Melina", which split a partnership in half.
+24. **Synthesized debaters from the normalized match key**, so "Cassel Engen"
+    became "casselengen" and never tied back to the student record carrying the
+    space. Synthetic records must use the league's own spelling.
+
 **Rule:** all comparison and aggregation goes through
 `scripts/lib/standings.ts` or `packages/ingest/src/matching.ts`. Never write a
-new key.
+new key. Identity needs *both* over- and under-merge guards: distinct first
+names and different partners at one tournament prove two people; an
+abbreviation and a missing first name prove nothing.
 
 ## Pattern C: field sizes decide points before any table is consulted
 

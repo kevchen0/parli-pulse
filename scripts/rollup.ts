@@ -24,16 +24,21 @@ function assignRanks<T extends { points: number }>(rows: T[]): (T & { rank: numb
 /**
  * Merges duplicate debater records.
  *
- * Tabroom student ids are stable within a chapter but not across them: a
- * debater who also enters under an independent or club registration gets a
- * second id, which otherwise splits one person's season in two. Stuyvesant's
- * top team competed as both "Stuyvesant" and "Rodda's Disciples".
+ * A person can hold several Tabroom student ids -- ids are stable within a
+ * chapter, not across them, so entering under a club or independent
+ * registration creates another. Records recovered from entry labels add more,
+ * usually with no first name at all. Left alone, one partnership becomes three
+ * separate team rows: Diamond Bar's Liu & Zhu appeared at 37.5, 17.3 and 9.0.
  *
- * Same name is not sufficient on its own -- there really are two Jessica Lius.
- * The discriminator is partners: if two same-named ids appear at the same
- * tournament with *different* partners they are different people, whereas the
- * same partner twice is one person entered twice. Groups with any conflicting
- * evidence are left unmerged.
+ * Records are grouped by school and surname, then split apart again by two
+ * signals that prove distinctness:
+ *
+ *  - **Different first names.** Two records at one school both naming a first
+ *    name that differs are different people, so each keeps its own group and
+ *    any first-name-less record between them is left alone rather than guessed.
+ *  - **Different partners at one tournament.** There really are two Jessica
+ *    Lius; they debated the same weekend with different partners. The same
+ *    partner twice is instead one person entered twice.
  */
 async function resolveIdentities(
   db: ReturnType<typeof createDb>['db'],
@@ -46,17 +51,18 @@ async function resolveIdentities(
     })
     .from(t.debaters);
 
-  const key = (f: string | null, l: string | null): string | null =>
-    f && l ? `${f.trim().toLowerCase()} ${l.trim().toLowerCase()}` : null;
+  const letters = (s: string | null): string =>
+    (s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '');
 
-  const groups = new Map<string, typeof people>();
-  for (const p of people) {
-    const k = key(p.first, p.last);
-    if (!k) continue;
-    const g = groups.get(k) ?? [];
-    g.push(p);
-    groups.set(k, g);
-  }
+  // A label-recovered two-word surname may arrive split into first and last
+  // ("Cassel" + "Engen") or run together ("casselengen"), so the surname key
+  // includes both spellings.
+  const surnameKeys = (p: (typeof people)[number]): string[] => {
+    const last = letters(p.last);
+    if (!last) return [];
+    const joined = letters(p.first) + last;
+    return joined !== last ? [last, joined] : [last];
+  };
 
   const rows = await db
     .select({
@@ -69,22 +75,21 @@ async function resolveIdentities(
     .innerJoin(t.events, eq(t.events.id, t.entries.eventId));
 
   const partnersByEntry = new Map<string, string[]>();
-  const all = await db
+  for (const a of await db
     .select({ entryId: t.entryDebaters.entryId, debaterId: t.entryDebaters.debaterId })
-    .from(t.entryDebaters);
-  for (const a of all) {
+    .from(t.entryDebaters)) {
     const l = partnersByEntry.get(a.entryId) ?? [];
     l.push(a.debaterId);
     partnersByEntry.set(a.entryId, l);
   }
-  const nameOf = new Map(people.map((p) => [p.id, key(p.first, p.last) ?? p.id]));
+  const surnameOf = new Map(people.map((p) => [p.id, letters(p.last) || p.id]));
 
-  // debaterId -> tournament -> set of partner name-keys
+  // debaterId -> tournament -> partner surnames seen there
   const seen = new Map<string, Map<string, Set<string>>>();
   for (const r of rows) {
     const partners = (partnersByEntry.get(r.entryId) ?? [])
       .filter((d) => d !== r.debaterId)
-      .map((d) => nameOf.get(d) ?? d)
+      .map((d) => surnameOf.get(d) ?? d)
       .sort()
       .join('+');
     const byT = seen.get(r.debaterId) ?? new Map<string, Set<string>>();
@@ -93,75 +98,111 @@ async function resolveIdentities(
     byT.set(r.tournamentId, set);
     seen.set(r.debaterId, byT);
   }
+  const appearances = (id: string): number => seen.get(id)?.size ?? 0;
 
-  let merged = 0;
-  const updates: { id: string; canonicalId: string }[] = [];
+  // Two different keys catch two different duplications, so both are used and
+  // the results unioned:
+  //  - full name, across schools, for a debater who also enters under a club
+  //    or independent registration;
+  //  - school plus surname, for label-recovered records that carry no first
+  //    name and so cannot be grouped by full name at all.
+  const groups = new Map<string, typeof people>();
+  const push = (key: string, p: (typeof people)[number]): void => {
+    const g = groups.get(key) ?? [];
+    if (!g.some((x) => x.id === p.id)) g.push(p);
+    groups.set(key, g);
+  };
+  for (const p of people) {
+    const first = letters(p.first);
+    const last = letters(p.last);
+    if (first && last) push(`name|${first}${last}`, p);
+    if (p.schoolId) for (const k of surnameKeys(p)) push(`school|${p.schoolId}|${k}`, p);
+  }
 
-  // Label-recovered records carry a surname and often no first name, so the
-  // name-group pass above cannot see them. Bridge them to a real record when
-  // exactly one debater at the same school shares the surname -- scoped to the
-  // school, and requiring uniqueness, so a common surname is never guessed at.
-  const realBySchoolSurname = new Map<string, typeof people>();
-  for (const p of people) {
-    if (p.id.startsWith('lbl_') || !p.last || !p.schoolId) continue;
-    const k = `${p.schoolId}|${p.last.trim().toLowerCase()}`;
-    const l = realBySchoolSurname.get(k) ?? [];
-    l.push(p);
-    realBySchoolSurname.set(k, l);
-  }
-  const bridged = new Set<string>();
-  for (const p of people) {
-    if (!p.id.startsWith('lbl_') || !p.last || !p.schoolId) continue;
-    const candidates = realBySchoolSurname.get(`${p.schoolId}|${p.last.trim().toLowerCase()}`);
-    if (!candidates || candidates.length !== 1) continue;
-    const target = candidates[0]!;
-    // If the label carried a first name, it must not contradict.
-    if (p.first && target.first &&
-        !target.first.trim().toLowerCase().startsWith(p.first.trim().toLowerCase().slice(0, 1))) continue;
-    updates.push({ id: p.id, canonicalId: target.id });
-    bridged.add(p.id);
-    merged++;
-  }
+  const conflicts = (a: (typeof people)[number], b: (typeof people)[number]): boolean => {
+    // Two records naming different first names are different people -- unless
+    // one is an abbreviation of the other. Tabroom carries "M" where the
+    // league writes "Melina", and treating those as two people splits a
+    // partnership in half.
+    const fa = letters(a.first);
+    const fb = letters(b.first);
+    if (fa && fb && fa !== fb && !fa.startsWith(fb) && !fb.startsWith(fa)) return true;
+    const sa = seen.get(a.id);
+    const sb = seen.get(b.id);
+    if (!sa || !sb) return false;
+    for (const [tournament, pa] of sa) {
+      const pb = sb.get(tournament);
+      // Same tournament, different partners: two people, not one entered twice.
+      if (pb && new Set([...pa, ...pb]).size > 1) return true;
+    }
+    return false;
+  };
+
+  // Union-find over the compatible pairs, so a record linked by either key ends
+  // up in one component.
+  const parent = new Map<string, string>();
+  const find = (x: string): string => {
+    let r = x;
+    while (parent.get(r) && parent.get(r) !== r) r = parent.get(r)!;
+    parent.set(x, r);
+    return r;
+  };
+  const union = (a: string, b: string): void => {
+    const ra = find(a);
+    const rb = find(b);
+    if (ra !== rb) parent.set(ra, rb);
+  };
+  for (const p of people) parent.set(p.id, p.id);
+
   for (const [, group] of groups) {
     if (group.length < 2) continue;
-    if (group.some((g) => bridged.has(g.id))) continue;
-
-    let conflict = false;
-    for (let i = 0; i < group.length && !conflict; i++) {
-      for (let j = i + 1; j < group.length && !conflict; j++) {
-        const a = seen.get(group[i]!.id);
-        const b = seen.get(group[j]!.id);
-        if (!a || !b) continue;
-        for (const [tourn, pa] of a) {
-          const pb = b.get(tourn);
-          if (!pb) continue;
-          // Same tournament: different partners means two different people.
-          const union = new Set([...pa, ...pb]);
-          if (union.size > 1) { conflict = true; break; }
-        }
+    for (let i = 0; i < group.length; i++) {
+      for (let j = i + 1; j < group.length; j++) {
+        const a = group[i]!;
+        const b = group[j]!;
+        if (find(a.id) === find(b.id)) continue;
+        if (conflicts(a, b)) continue;
+        union(a.id, b.id);
       }
     }
-    if (conflict) continue;
+  }
 
-    // Prefer an identity attached to a member school, then the busiest one.
-    const ranked = [...group].sort((a, b) => {
+  const byId = new Map(people.map((p) => [p.id, p]));
+  const components = new Map<string, string[]>();
+  for (const p of people) {
+    const root = find(p.id);
+    (components.get(root) ?? components.set(root, []).get(root)!).push(p.id);
+  }
+
+  const merged = new Map<string, string>();
+  for (const [, ids] of components) {
+    if (ids.length < 2) continue;
+    const ranked = ids.map((id) => byId.get(id)!).sort((a, b) => {
       const am = memberSchools.has(a.schoolId ?? '') ? 1 : 0;
       const bm = memberSchools.has(b.schoolId ?? '') ? 1 : 0;
       if (am !== bm) return bm - am;
-      return (seen.get(b.id)?.size ?? 0) - (seen.get(a.id)?.size ?? 0);
+      // Prefer a real student record over one recovered from a label.
+      const al = a.id.startsWith('lbl_') ? 0 : 1;
+      const bl = b.id.startsWith('lbl_') ? 0 : 1;
+      if (al !== bl) return bl - al;
+      return appearances(b.id) - appearances(a.id);
     });
     const canonical = ranked[0]!;
-    for (const p of group) {
-      if (p.id === canonical.id) continue;
-      updates.push({ id: p.id, canonicalId: canonical.id });
-      merged++;
-    }
+    for (const id of ids) if (id !== canonical.id) merged.set(id, canonical.id);
   }
 
-  for (const u of updates) {
-    await db.update(t.debaters).set({ canonicalId: u.canonicalId }).where(eq(t.debaters.id, u.id));
+  // Collapse chains so every record points at a final canonical id.
+  const resolve = (id: string, depth = 0): string => {
+    const next = merged.get(id);
+    return next && depth < 10 ? resolve(next, depth + 1) : id;
+  };
+  for (const [id] of merged) merged.set(id, resolve(id));
+
+  for (const [id, canonicalId] of merged) {
+    if (id === canonicalId) continue;
+    await db.update(t.debaters).set({ canonicalId }).where(eq(t.debaters.id, id));
   }
-  return merged;
+  return merged.size;
 }
 
 async function main(): Promise<void> {
