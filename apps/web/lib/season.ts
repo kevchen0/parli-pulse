@@ -79,19 +79,56 @@ export const hasDatabase = (): boolean => Boolean(process.env.DATABASE_URL);
  * `typedRoutes` verifies every href against the routes that exist, which is
  * worth keeping -- it catches a renamed page at compile time. It cannot verify
  * a path whose season is only known at request time, so the assertion lives
- * here, once, rather than at each of the dozen call sites. The shape is checked
- * on the way in: `path` must name a real route under the season segment.
+ * here, once, rather than at each call site. The shape is checked on the way in:
+ * `path` must name a real route under the season segment.
  */
-type SeasonPath =
-  | ''
-  | '/rankings'
-  | '/rankings/debaters'
-  | '/rankings/schools'
-  | '/rankings/speakers'
-  | '/rankings/ratings'
-  | '/rankings/ratings/method'
-  | '/rankings/diagnostic';
+export type SeasonPath =
+  | '/points'
+  | '/points/debaters'
+  | '/points/schools'
+  | '/ratings'
+  | '/speakers'
+  | '/method'
+  | '/method/ratings'
+  | '/diagnostic';
 
-export function seasonHref(season: SeasonId, path: SeasonPath = '', hash = ''): never {
+export function seasonHref(season: SeasonId, path: SeasonPath, hash = ''): never {
   return `/${season}${path}${hash}` as never;
 }
+
+/**
+ * The site's navigation, as data.
+ *
+ * Grouped by whose numbers they are, because that is the distinction the whole
+ * project rests on and the one a reader most needs the navigation to make. A
+ * row that put the league's points beside our own rating with nothing between
+ * them would be telling the reader they are the same kind of claim.
+ */
+export interface NavItem {
+  label: string;
+  path: SeasonPath;
+  /** Sub-pages, shown when this section is the current one. */
+  children?: { label: string; path: SeasonPath }[];
+}
+
+export const SEASON_NAV: NavItem[] = [
+  {
+    label: 'Points',
+    path: '/points',
+    children: [
+      { label: 'Teams', path: '/points' },
+      { label: 'Debaters', path: '/points/debaters' },
+      { label: 'Schools', path: '/points/schools' },
+    ],
+  },
+  { label: 'Ratings', path: '/ratings' },
+  { label: 'Speakers', path: '/speakers' },
+  { label: 'Method', path: '/method' },
+];
+
+/** Pages that are not about one season. */
+export const SITE_NAV = [
+  { label: 'About', path: '/about' },
+  { label: 'Privacy', path: '/privacy' },
+  { label: 'Feedback', path: '/feedback' },
+] as const;

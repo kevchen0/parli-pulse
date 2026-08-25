@@ -29,6 +29,12 @@ export interface TeamRow {
   debater1: string;
   debater2: string;
   tournaments: number;
+  /**
+   * XXII.1.E: both partners autoqualified, so this partnership may accept a
+   * bid. Distinct from XXII.1.A, which autoqualifies an individual -- a debater
+   * can clear 40 points and still have no team eligible to accept.
+   */
+  bidEligible: boolean;
 }
 
 export async function getTeams(season: SeasonId, limit = 5000): Promise<TeamRow[]> {
@@ -38,10 +44,16 @@ export async function getTeams(season: SeasonId, limit = 5000): Promise<TeamRow[
     select ts.rank, ts.points, ts.tournaments_counted as tournaments,
            coalesce(s.short_name, s.name) as school, s.region,
            coalesce(a.first_name || ' ', '') || a.last_name as debater1,
-           coalesce(b.first_name || ' ', '') || b.last_name as debater2
+           coalesce(b.first_name || ' ', '') || b.last_name as debater2,
+           coalesce(qa.auto_qualified, false) and coalesce(qb.auto_qualified, false)
+             as "bidEligible"
     from ${t.teamSeasonTotals} ts
     join ${d1} a on a.id = ts.debater1_id
     join ${t.debaters} b on b.id = ts.debater2_id
+    left join ${t.debaterSeasonTotals} qa
+      on qa.season_id = ts.season_id and qa.debater_id = ts.debater1_id
+    left join ${t.debaterSeasonTotals} qb
+      on qb.season_id = ts.season_id and qb.debater_id = ts.debater2_id
     left join ${t.schools} s on s.id = ts.school_id
     where ts.season_id = ${season}
     order by ts.rank asc

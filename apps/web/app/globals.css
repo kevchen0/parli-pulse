@@ -1,21 +1,43 @@
+/* Ink and slate.
+   A reference work rather than a product page: a cool near-white ground, ink
+   text with a blue bias, and one muted slate-blue accent used for links and the
+   current page and nothing else. Semantic colour is kept separate from the
+   accent so "this differs from the league" never reads as "this is a link". */
 :root {
-  --bg: #fbfbfa;
+  --bg: #f6f7f9;
   --surface: #ffffff;
-  --border: #e4e2dd;
-  --text: #1a1a18;
-  --muted: #6b6862;
-  --accent: #7a4b2a;
-  --radius: 10px;
+  --sunk: #eceff3;
+  --border: #dde1e7;
+  --border-firm: #c3cad3;
+  --text: #151a20;
+  --muted: #59636f;
+  --faint: #838d99;
+  --accent: #2f5d7c;
+  --accent-soft: #e4edf3;
+  --good: #2c6549;
+  --warn: #7d5a13;
+  --bad: #93362d;
+  --radius: 4px;
+
+  --f-head: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-body: "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #161513;
-    --surface: #1e1d1a;
-    --border: #322f2a;
-    --text: #f2f0ec;
-    --muted: #a09b92;
-    --accent: #d9a074;
+    --bg: #101419;
+    --surface: #171c22;
+    --sunk: #131920;
+    --border: #262d36;
+    --border-firm: #38424e;
+    --text: #e3e8ee;
+    --muted: #98a2ae;
+    --faint: #6e7883;
+    --accent: #7fb0d0;
+    --accent-soft: #172935;
+    --good: #6db694;
+    --warn: #c4a04c;
+    --bad: #d8776a;
   }
 }
 
@@ -25,23 +47,28 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 16px/1.6 var(--f-body);
   -webkit-font-smoothing: antialiased;
 }
 
+h1, h2, h3 {
+  font-family: var(--f-head);
+  font-weight: 600;
+  letter-spacing: -0.006em;
+  text-wrap: balance;
+}
+h1 { font-size: 1.85rem; margin: 0 0 0.6rem; }
+h2 { font-size: 1.3rem; margin: 2rem 0 0.7rem; }
+h3 { font-size: 1.02rem; margin: 0 0 0.35rem; }
+
+/* Digits line up in every table and stat line. */
+table, .stats, .meta, .seasonstate { font-variant-numeric: tabular-nums; }
+
 a { color: inherit; }
 
-.wrap { max-width: 62rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+.wrap { max-width: 62rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
 
-.banner {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
-  color: var(--muted);
-  margin-bottom: 2rem;
-}
+
 
 h1 { font-size: 1.9rem; letter-spacing: -0.02em; margin: 0 0 0.35rem; }
 h2 { font-size: 1.05rem; letter-spacing: -0.01em; margin: 2.25rem 0 0.75rem; }
@@ -62,7 +89,7 @@ h2 { font-size: 1.05rem; letter-spacing: -0.01em; margin: 2.25rem 0 0.75rem; }
 .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--muted); flex: none; }
 .dot.on { background: #3f9142; }
 
-footer { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8125rem; }
+footer { margin-top: 0; padding-top: 1.25rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8125rem; }
 
 /* --- navigation --- */
 /* Scrolls rather than pushing the page sideways: six tabs do not fit a phone,
@@ -95,7 +122,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 td.rank { color: var(--muted); font-variant-numeric: tabular-nums; width: 3.5rem; }
 td.pts { font-weight: 600; font-variant-numeric: tabular-nums; }
 .region { color: var(--muted); font-size: 0.8125rem; }
-.qual { color: var(--accent); font-size: 0.75rem; font-weight: 600; }
+/* A marker, not a link: accent is reserved for things you can click. */
+.qual {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  background: var(--sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.05rem 0.3rem;
+  white-space: nowrap;
+  vertical-align: 0.05em;
+}
 
 .meta { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.25rem; font-size: 0.8125rem; color: var(--muted); }
 .meta b { color: var(--text); font-weight: 600; }
@@ -350,39 +390,13 @@ ol.footnotes li:target { color: var(--text); }
    A finished season must not read as this week's results, so every page under
    one carries a bar saying which it is and whether it is still running. */
 
-.seasonbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1rem;
-  margin: 1.25rem 0 0;
-  padding: 0.55rem 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  font-size: 0.8125rem;
-}
-/* A completed season is muted; a running one carries the accent. */
-.seasonbar[data-status='final'] { border-left: 3px solid var(--muted); }
-.seasonbar[data-status='live'] { border-left: 3px solid var(--accent); }
-.seasonbar[data-status='upcoming'] { border-left: 3px solid var(--border); }
 
-.seasonpick { display: flex; gap: 0.3rem; flex-wrap: wrap; }
-.seasonpick a {
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  text-decoration: none;
-  color: var(--muted);
-  border: 1px solid transparent;
-  font-variant-numeric: tabular-nums;
-}
-.seasonpick a[data-active='true'] {
-  color: var(--text);
-  border-color: var(--border);
-  background: var(--bg);
-  font-weight: 600;
-}
-.seasonpick a:hover { color: var(--text); }
+/* A completed season is muted; a running one carries the accent. */
+
+
+
+
+
 
 .seasonstate { margin: 0; color: var(--muted); }
 .seasonstate b { color: var(--text); font-weight: 600; }
@@ -418,3 +432,126 @@ ol.footnotes li:target { color: var(--text); }
 .prevlinks { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin-top: 0.5rem !important; }
 .prevlinks a { color: var(--accent); text-decoration: none; }
 .prevlinks a:hover { text-decoration: underline; }
+
+/* --- masthead ---
+   Flat, on a rule. Not a card: the header is the edge of the page, not an
+   object floating on it. */
+
+.masthead {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.mastrow {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0.85rem 1.25rem 0.7rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  flex-wrap: wrap;
+}
+.wordmark {
+  font-family: var(--f-head);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--text);
+}
+.sitenav { display: flex; gap: 1.1rem; flex-wrap: wrap; font-size: 0.875rem; }
+.sitenav a { color: var(--muted); text-decoration: none; }
+.sitenav a:hover { color: var(--text); }
+
+.unofficial {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0 1.25rem 0.7rem;
+  font-size: 0.75rem;
+  color: var(--faint);
+  line-height: 1.5;
+}
+.unofficial a { color: var(--faint); }
+
+/* --- season header and sections --- */
+
+.seasonhead {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  flex-wrap: wrap;
+}
+.seasonpicker { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; }
+.seasonpicker > span { color: var(--faint); }
+.seasonpicker select {
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-firm);
+  border-radius: var(--radius);
+  padding: 0.25rem 0.45rem;
+}
+.seasonstate { margin: 0; font-size: 0.8125rem; color: var(--muted); }
+.seasonstate[data-status='live']::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--good);
+  margin-right: 0.4rem;
+  vertical-align: 0.1em;
+}
+
+.sections, .subsections {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  display: flex;
+  gap: 1.4rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sections::-webkit-scrollbar, .subsections::-webkit-scrollbar { display: none; }
+.sections {
+  margin-top: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.sections a {
+  padding: 0.4rem 0 0.5rem;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sections a[data-current] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.sections a:hover { color: var(--text); }
+
+.subsections {
+  padding-top: 0.6rem;
+  padding-bottom: 0.1rem;
+  font-size: 0.875rem;
+  gap: 1rem;
+}
+.subsections a { color: var(--muted); text-decoration: none; white-space: nowrap; }
+.subsections a[data-current] { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.subsections a:hover { color: var(--text); }
+
+/* --- long-form pages --- */
+
+.prose { max-width: 40rem; }
+.prose p { margin: 0 0 0.9rem; }
+.prose ul { padding-left: 1.1rem; margin: 0 0 0.9rem; }
+.prose li { margin-bottom: 0.45rem; }
+.prose a { color: var(--accent); }
+
+footer .footlinks { display: flex; gap: 1.1rem; flex-wrap: wrap; margin-top: 0.5rem; }
+footer .footlinks a { color: var(--muted); text-decoration: none; }
+footer .footlinks a:hover { color: var(--text); }

@@ -14,6 +14,7 @@ export default async function DebatersPage(
   const qualified = debaters.filter((d) => d.autoQualified).length;
   return (
     <>
+      <h1>Debaters</h1>
       <p className="meta">
         <span><b>{debaters.length}</b> debaters with Article XXI points</span>
         <span>
@@ -38,7 +39,11 @@ export default async function DebatersPage(
                 </td>
                 <td>
                   {d.name}
-                  {d.autoQualified ? <span className="qual"> · TOC</span> : null}
+                  {d.autoQualified ? (
+                    <span className="qual" title="Autoqualified as an individual (XXII.1.A)">
+                      {' '}AQ
+                    </span>
+                  ) : null}
                 </td>
                 <td className="pts num">{Number(d.points).toFixed(1)}</td>
               </tr>

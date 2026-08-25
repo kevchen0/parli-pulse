@@ -18,11 +18,12 @@ export default async function RatingsPage(
 
   return (
     <>
-      <p className="lede" style={{ marginTop: '-1rem' }}>
+      <h1>Ratings</h1>
+      <p className="lede">
         A strength rating, not a season total. Article XXI points measure what a partnership
         accumulated — five wins at a small local outscore four at Stanford — while this measures
         how good they have looked against whoever they actually debated. The two disagree on
-        purpose. <b>The league&rsquo;s ranking is the official one.</b>
+        purpose; the league&rsquo;s ranking is the official one.
       </p>
 
       <p className="meta">
@@ -30,7 +31,7 @@ export default async function RatingsPage(
         <span><b>{summary.rankedRounds.toLocaleString()}</b> rounds behind them</span>
         <span><b>{summary.periods}</b> tournaments rated</span>
         <span>open divisions only<sup className="fnref"><a href="#fn5">5</a></sup></span>
-        <span className="methodlink"><Link href={seasonHref(season, '/rankings/ratings/method')}>How this is calculated &rarr;</Link></span>
+        <span className="methodlink"><Link href={seasonHref(season, '/method/ratings')}>How this is calculated &rarr;</Link></span>
       </p>
 
       <RatingTable rows={ratings} />
@@ -44,7 +45,7 @@ export default async function RatingsPage(
           twelve excellent rounds do not outrank ninety nearly as good, and a team that has
           only ever debated its own region cannot ride a thin rating to the top.
           Sorting by <b>Rating</b> instead shows the raw estimate.{' '}
-          <Link href={seasonHref(season, '/rankings/ratings/method', '#prior')}>The formula and why it is needed &rarr;</Link>
+          <Link href={seasonHref(season, '/method/ratings', '#prior')}>The formula and why it is needed &rarr;</Link>
         </li>
         <li id="fn2">
           <b>Rating.</b> A Glicko-2 rating: 1500 is the starting point for a partnership nobody
@@ -53,7 +54,7 @@ export default async function RatingsPage(
           could reasonably sit from the estimate. It narrows as a partnership debates more and
           widens again while they are away. This is the number a prediction should use; the
           uncertainty belongs in the width of the answer rather than in the estimate.{' '}
-          <Link href={seasonHref(season, '/rankings/ratings/method', '#reading')}>Two numbers, two jobs &rarr;</Link>
+          <Link href={seasonHref(season, '/method/ratings', '#reading')}>Two numbers, two jobs &rarr;</Link>
         </li>
         <li id="fn3">
           <b>Rounds.</b> Rated rounds, not ballots: a three-judge panel is one round, won on a
@@ -72,7 +73,7 @@ export default async function RatingsPage(
           rounds carry no bonus of their own — beating a stronger opponent is already worth more,
           and elim opponents are stronger, so a multiplier would count that twice. This is our
           own measure; the league publishes nothing like it.{' '}
-          <Link href={seasonHref(season, '/rankings/ratings/method')}>Full methodology &rarr;</Link>
+          <Link href={seasonHref(season, '/method/ratings')}>Full methodology &rarr;</Link>
         </li>
       </ol>
     </>

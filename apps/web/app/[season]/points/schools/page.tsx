@@ -12,6 +12,7 @@ export default async function SchoolsPage(
 
   return (
     <>
+      <h1>Schools</h1>
       <p className="meta">
         <span><b>{schools.length}</b> member schools</span>
         <span>Hybrid partnerships count half to each school</span>

@@ -11,6 +11,30 @@ const config = {
   // artifacts, so Next compiles them alongside the app.
   transpilePackages: ['@parli-pulse/rules', '@parli-pulse/db'],
   typedRoutes: true,
+
+  /**
+   * TLS itself is Vercel's: certificates are provisioned and renewed
+   * automatically, so there is nothing to install. These are the headers that
+   * do not come for free.
+   */
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          // Two years, so the browser refuses plain HTTP for this host well
+          // before a certificate could lapse.
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // The site has no camera, microphone or location feature and should
+          // not be able to acquire one by accident.
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+        ],
+      },
+    ];
+  },
 };
 
 export default config;

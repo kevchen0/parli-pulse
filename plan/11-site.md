@@ -31,6 +31,10 @@ When everything is bold, nothing is.
 
 ---
 
+**Status:** A, B, C and D landed together. E is analytics only; the headers are
+in `next.config.mjs` and TLS never needed anything. What remains is in *Still to
+be specified* at the foot of this file.
+
 ## Phase A — Information architecture
 
 The structure has to encode the one distinction the whole project rests on:

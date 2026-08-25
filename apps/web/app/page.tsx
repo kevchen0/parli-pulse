@@ -14,7 +14,7 @@ export default async function Home() {
   const previous = seasons.find((s) => s.id !== current && s.tournaments > 0);
 
   return (
-    <main>
+    <main className="wrap">
       <h1>Parli Pulse</h1>
       <p className="lede">
         Rankings for American high school parliamentary debate — the league&rsquo;s official
@@ -31,13 +31,13 @@ export default async function Home() {
           <p className="nowstate">
             <b>{live!.tournaments}</b> tournament{live!.tournaments === 1 ? '' : 's'} counted
             so far.{' '}
-            <Link href={seasonHref(current, '/rankings')}>See the standings →</Link>
+            <Link href={seasonHref(current, '/points')}>See the standings →</Link>
           </p>
         ) : (
           <p className="nowstate">
             The season has not published results yet. Standings appear here as tournaments
             report.{' '}
-            <Link href={seasonHref(current, '/rankings')}>Season page →</Link>
+            <Link href={seasonHref(current, '/points')}>Season page →</Link>
           </p>
         )}
       </section>
@@ -45,15 +45,15 @@ export default async function Home() {
       {previous && (
         <section className="prevbar">
           <p>
-            <b>{seasonLabel(previous.id)} is complete.</b> Final standings, speaker points
+            {seasonLabel(previous.id)} is complete. Final standings, speaker points
             and ratings for the whole season are kept in full.
           </p>
           <p className="prevlinks">
-            <Link href={seasonHref(previous.id, '/rankings')}>Teams</Link>
-            <Link href={seasonHref(previous.id, '/rankings/debaters')}>Debaters</Link>
-            <Link href={seasonHref(previous.id, '/rankings/schools')}>Schools</Link>
-            <Link href={seasonHref(previous.id, '/rankings/speakers')}>Speakers</Link>
-            <Link href={seasonHref(previous.id, '/rankings/ratings')}>Ratings</Link>
+            <Link href={seasonHref(previous.id, '/points')}>Teams</Link>
+            <Link href={seasonHref(previous.id, '/points/debaters')}>Debaters</Link>
+            <Link href={seasonHref(previous.id, '/points/schools')}>Schools</Link>
+            <Link href={seasonHref(previous.id, '/speakers')}>Speakers</Link>
+            <Link href={seasonHref(previous.id, '/ratings')}>Ratings</Link>
           </p>
         </section>
       )}

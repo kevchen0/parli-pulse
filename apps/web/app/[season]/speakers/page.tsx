@@ -15,7 +15,8 @@ export default async function SpeakersPage(
 
   return (
     <>
-      <p className="lede" style={{ marginTop: '-1rem' }}>
+      <h1>Speaker points</h1>
+      <p className="lede">
         Speaker points adjusted for the judge who awarded them. Panels differ by two points or
         more, so a raw average depends heavily on the draw.
       </p>

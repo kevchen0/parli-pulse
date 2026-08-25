@@ -23,7 +23,8 @@ export default async function MethodPage(
 
   return (
     <article className="method">
-      <p className="lede" style={{ marginTop: '-1rem' }}>
+      <h1>How the rating works</h1>
+      <p className="lede">
         Specification for the partnership rating. This is our own measure, not the
         league&rsquo;s; Article XXI points are the official standing.
       </p>
@@ -42,7 +43,7 @@ export default async function MethodPage(
       <section id="scope">
         <h2>1. Scope</h2>
         <p>
-          The unit is the <b>partnership</b>: an unordered pair of debater identities,
+          The unit is the partnership: an unordered pair of debater identities,
           resolved through the same merge the season standings use. Open divisions only.
         </p>
         <p>
@@ -63,8 +64,7 @@ export default async function MethodPage(
       <section id="rounds">
         <h2>2. From ballots to a result</h2>
         <p>
-          Tabroom stores one ballot per judge per entry. A round is one observation, not
-          one per ballot. For a panel of <code>n</code> judges returning a decision, of
+          Tabroom stores one ballot per judge per entry. A round is one observation, not one per ballot. For a panel of <code>n</code> judges returning a decision, of
           which <code>w</code> favour the side in question:
         </p>
         <div className="eqn">
@@ -90,7 +90,7 @@ export default async function MethodPage(
         <p>
           Each partnership carries a rating <code>r</code>, a deviation <code>RD</code>,
           and a volatility <code>&sigma;</code>. Ratings start at 1500, RD at 350,
-          &sigma; at 0.06. A <b>rating period is one tournament</b>: every round inside it
+          &sigma; at 0.06. A rating period is one tournament: every round inside it
           is evaluated against ratings held before the tournament began.
         </p>
         <p>Working on Glickman&rsquo;s internal scale:</p>
@@ -143,7 +143,7 @@ export default async function MethodPage(
           <div><code>&phi; &larr; &radic;(&phi;&sup2; + &sigma;&sup2;t)</code><span></span></div>
         </div>
         <p className="aside">
-          <b>No elimination-round multiplier.</b> Elim opponents average 53% more season
+          No elimination-round multiplier. Elim opponents average 53% more season
           points, so a stronger opponent is already priced by <code>&mu;<sub>j</sub></code>.
           A multiplier would count it twice. Weighting elims for stakes rather than
           opponent quality is a values choice and is not made here.
@@ -312,7 +312,7 @@ export default async function MethodPage(
           resolve at 73%, at 80&ndash;90% resolve at 82%.
         </p>
         <p className="aside">
-          <b>Ceiling.</b> Of partnerships meeting exactly twice, the same side won both
+          Of partnerships meeting exactly twice, the same side won both
           times 58% of the time. Of three-judge rounds, 56% split 2&ndash;1. Both imply a
           limit near 70% for any predictor. The residual is round-level noise, not model
           error.
@@ -354,7 +354,7 @@ export default async function MethodPage(
       </section>
 
       <p className="backlink">
-        <Link href={seasonHref(season, '/rankings/ratings')}>&larr; Ratings table</Link>
+        <Link href={seasonHref(season, '/ratings')}>&larr; Ratings table</Link>
       </p>
     </article>
   );

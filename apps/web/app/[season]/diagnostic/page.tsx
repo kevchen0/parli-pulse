@@ -46,7 +46,8 @@ export default async function DiagnosticPage(
 
   return (
     <>
-      <p className="lede" style={{ marginTop: '-1rem' }}>
+      <h1>Reconciliation</h1>
+      <p className="lede">
         Every partnership reconciled against the league&rsquo;s published standings, result by
         result. A season total is the weighted best five, so a single wrong result moves it —
         the breakdowns below show which tournament is responsible.
