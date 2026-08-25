@@ -155,10 +155,11 @@ ol.footnotes li:last-child { margin-bottom: 0; }
 ol.footnotes b { color: var(--text); font-weight: 600; }
 
 /* --- sortable headings --- */
-thead th:has(.sort) { padding: 0; }
+thead th:has(.sorthead) { padding: 0.6rem 0.9rem; }
+.sorthead { display: inline-flex; align-items: baseline; }
 button.sort {
-  display: inline-flex; align-items: center; gap: 0.3rem; width: 100%;
-  padding: 0.6rem 0.9rem; font: inherit; font-size: 0.75rem; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0; font: inherit; font-size: 0.75rem; font-weight: 500;
   text-transform: uppercase; letter-spacing: 0.04em; cursor: pointer;
   color: var(--muted); background: none; border: none; text-align: left;
 }
@@ -171,3 +172,9 @@ button.sort[data-active='true'] .arrow { opacity: 1; color: var(--accent); }
 td.school {
   max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* --- footnote references --- */
+sup.fnref { font-size: 0.62em; margin-left: 0.15em; letter-spacing: 0.02em; }
+sup.fnref a { color: var(--accent); text-decoration: none; }
+sup.fnref a:hover { text-decoration: underline; }
+ol.footnotes li:target { color: var(--text); }

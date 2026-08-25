@@ -20,39 +20,34 @@ export default async function SpeakersPage() {
       <p className="meta">
         <span><b>{speakers.length}</b> debaters with 20 or more ballots</span>
         <span><b>{summary.rankedBallots.toLocaleString()}</b> ballots between them</span>
+        <span>
+          open divisions only<sup className="fnref"><a href="#fn4">4</a></sup>
+        </span>
       </p>
 
       <SpeakerTable rows={speakers} />
 
       <ol className="footnotes">
-        <li>
-          <b>Z-score</b> measures every ballot against the judge who gave it — how many
-          standard deviations above or below that judge&rsquo;s own average it sits — and
-          averages a debater&rsquo;s ballots. Zero is exactly average; +1.00 is a full
-          deviation better than the typical ballot from the judges they faced. Debaters here
-          almost never draw the same judge twice — a ranked figure rests on{' '}
-          <b>{summary.avgJudges} different judges</b> on average — so it reflects many
-          judges&rsquo; standards rather than any one judge&rsquo;s opinion. Each judge&rsquo;s
-          own baseline is a median and an interquartile spread, so a single unusually low
-          ballot cannot shift everyone else they ranked, and a judge with few ballots is pulled
-          toward the field average.
+        <li id="fn1">
+          <b>Z-score.</b> Every ballot is measured against the judge who gave it, in standard
+          deviations from that judge&rsquo;s own average, and a debater&rsquo;s figure is the
+          mean of theirs. Zero is exactly average; +1.00 is a full standard deviation above the
+          typical ballot. It orders the table by default because it is the only column that
+          does not reward drawing generous judges.
         </li>
-        <li>
-          The smaller figure beside each z-score is the <b>95% confidence interval</b>: the
-          true average is very likely within that much of the number shown. It comes from the
-          spread of the debater&rsquo;s own ballots and how many they have, so it narrows over
-          a season. Where two debaters share a score, the one with the narrower interval is
-          listed first.
+        <li id="fn2">
+          <b>The ± figure</b> is the 95% confidence interval on that mean — wider for a debater
+          with fewer or more scattered ballots. Where two scores tie, the narrower interval
+          ranks first.
         </li>
-        <li>
-          <b>Raw</b> is the plain average speaker score with no judge adjustment, on the
-          familiar 25-30 scale. Where a tournament uses a different one — NYPDL runs 23-30, one
-          league 0-100 — scores are mapped onto 25-30 first so the column stays comparable.
-          Either column can order the table; click its heading, and again to reverse.
+        <li id="fn3">
+          <b>Raw.</b> The plain average speaker score, with no adjustment for the judge, on the
+          25-30 scale. Tournaments using a different one (NYPDL runs 23-30, for example) are
+          mapped onto 25-30 first.
         </li>
-        <li>
-          Open divisions only, per Article XXI.1.A. This is our own measure; the league
-          publishes no speaker standings and gives speaker points no ranking weight.
+        <li id="fn4">
+          Open divisions only. This is our own measure; the league publishes no speaker
+          standings and Article XXI gives speaker points no ranking weight.
         </li>
       </ol>
     </>
