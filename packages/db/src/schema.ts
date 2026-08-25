@@ -368,6 +368,13 @@ export const debaterSpeakerTotals = pgTable('debater_speaker_totals', {
   sdZ: real('sd_z'),
   /** Half-width of the 95% interval on `meanDisplay`, in display points. */
   marginDisplay: real('margin_display'),
+  /**
+   * Mean before any judge adjustment, on the canonical 25-30 scale. Scores
+   * from a tournament using another scale are mapped onto it first, so the
+   * figure stays comparable; it is "raw" in the sense of not accounting for
+   * who was judging.
+   */
+  meanRaw: real('mean_raw'),
   /** Null until the debater clears the minimum-ballot threshold. */
   rank: integer('rank'),
 }, (t) => [uniqueIndex('debater_speaker_season_idx').on(t.seasonId, t.debaterId)]);

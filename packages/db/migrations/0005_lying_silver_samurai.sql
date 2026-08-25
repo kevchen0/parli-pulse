@@ -1,0 +1,1 @@
+ALTER TABLE "debater_speaker_totals" ADD COLUMN "mean_raw" real;

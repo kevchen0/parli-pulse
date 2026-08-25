@@ -1,4 +1,5 @@
 import { dbReady, getSpeakers, getSpeakerSummary } from '@/lib/db';
+import SpeakerTable from './table';
 
 export const revalidate = 300;
 
@@ -12,64 +13,46 @@ export default async function SpeakersPage() {
   return (
     <>
       <p className="lede" style={{ marginTop: '-1rem' }}>
-        Speaker points normalized against the judge who awarded them. A raw score measures the
-        judge as much as the debater — panels differ by two points or more — so{' '}
-        <strong>every ballot is scored against the judge who gave it</strong>, and a
-        debater&rsquo;s figure is the average of those comparisons across every judge they
-        faced.
+        Speaker points adjusted for the judge who awarded them. Panels differ by two points or
+        more, so a raw average depends heavily on the draw.
       </p>
 
       <p className="meta">
         <span><b>{speakers.length}</b> ranked speakers</span>
         <span><b>{summary.total}</b> debaters with open-division ballots</span>
-        <span><b>{summary.scores.toLocaleString()}</b> ballots normalized</span>
+        <span><b>{summary.scores.toLocaleString()}</b> ballots</span>
         <span>minimum 20 ballots to rank</span>
       </p>
 
-      <p className="note">
-        <b>vs judges</b> averages one comparison per ballot: each is measured in standard
-        deviations against the average score <em>that particular judge</em> gives, then the
-        debater&rsquo;s ballots are averaged. So +0.50 across 40 ballots means half a deviation
-        better than typical, sustained over 40 separate judges&rsquo; standards — not a single
-        comparison. <b>Adjusted</b> puts that back on the 25-30 scale. <b>±95%</b> is the
-        confidence interval on it, from the spread of the debater&rsquo;s own ballots and how
-        many they have. Open divisions only. This is our own measure — Article XXI gives speaker points no
-        ranking weight, and the league publishes no speaker standings. It covers more debaters
-        than the team table does: the league records only results that earned points, so a
-        debater with strong speaks and a losing record appears here and not there.
-      </p>
+      <SpeakerTable rows={speakers} />
 
-      <div className="tablewrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th><th>School</th><th>Debater</th>
-              <th className="num">Ballots</th><th className="num">vs judges</th>
-              <th className="num">Adjusted</th><th className="num">±95%</th>
-            </tr>
-          </thead>
-          <tbody>
-            {speakers.map((s, i) => (
-              <tr key={`${s.name}-${i}`}>
-                <td className="rank">{s.rank}</td>
-                <td>
-                  {s.school ?? '—'}
-                  {s.region ? <span className="region"> · {s.region}</span> : null}
-                </td>
-                <td>{s.name}</td>
-                <td className="num region">{s.ballots}</td>
-                <td className="num">
-                  {Number(s.meanZ) > 0 ? '+' : ''}{Number(s.meanZ).toFixed(2)}
-                </td>
-                <td className="pts num">{Number(s.meanDisplay).toFixed(2)}</td>
-                <td className="num region">
-                  {s.marginDisplay === null ? '—' : `±${Number(s.marginDisplay).toFixed(2)}`}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ol className="footnotes">
+        <li>
+          <b>Adjusted</b> scores every ballot against the judge who gave it — how far above or
+          below that judge&rsquo;s own average it sits — then averages a debater&rsquo;s
+          ballots and puts the result back on the 25-30 scale. The figures at the top of this
+          table each rest on 19 to 71 different judges, so they average across many standards
+          rather than comparing anyone to a single judge. Judges are measured by median and
+          interquartile spread, so one unusually low ballot cannot shift everyone else they
+          ranked, and a judge with few ballots is pulled toward the field average.
+        </li>
+        <li>
+          The smaller figure beside each adjusted score is the <b>95% confidence interval</b>:
+          the true average is very likely within that much of the number shown. It comes from
+          the spread of the debater&rsquo;s own ballots and how many they have, so it narrows
+          over a season. Two debaters can share an average while one earned it consistently
+          and the other from a wide scatter.
+        </li>
+        <li>
+          <b>Raw</b> is the plain average with no judge adjustment. Where a tournament uses a
+          different scale — NYPDL runs 23-30, one league 0-100 — scores are mapped onto 25-30
+          first so the column stays comparable.
+        </li>
+        <li>
+          Open divisions only, per Article XXI.1.A. This is our own measure; the league
+          publishes no speaker standings and gives speaker points no ranking weight.
+        </li>
+      </ol>
     </>
   );
 }

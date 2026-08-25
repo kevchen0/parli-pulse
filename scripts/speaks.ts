@@ -135,10 +135,12 @@ async function main(): Promise<void> {
     // debater's season figure is the mean of those, so it averages across
     // every judge they faced rather than comparing them to any single one.
     const perDebater = new Map<string, number[]>();
+    const perDebaterRaw = new Map<string, number[]>();
     for (const r of scored) {
       if (!r.debaterId) continue;
       const id = canon.get(r.debaterId) ?? r.debaterId;
       (perDebater.get(id) ?? perDebater.set(id, []).get(id)!).push(r.z);
+      (perDebaterRaw.get(id) ?? perDebaterRaw.set(id, []).get(id)!).push(r.canonical);
     }
 
     const pool = poolStats.get('open') ?? [...poolStats.values()][0]!;
@@ -155,8 +157,10 @@ async function main(): Promise<void> {
           : 0;
         const sdZ = Math.sqrt(variance);
         const stderr = n > 1 ? sdZ / Math.sqrt(n) : sdZ;
+        const raws = perDebaterRaw.get(debaterId) ?? [];
         return {
           debaterId, ballots: n, meanZ, sdZ,
+          meanRaw: raws.length ? raws.reduce((a, b) => a + b, 0) / raws.length : 0,
           meanDisplay: pool.centre + meanZ * pool.spread,
           // Half-width of the 95% confidence interval on the mean:
           // 1.96 * (sd / sqrt(n)), converted from z units into display points
@@ -180,6 +184,7 @@ async function main(): Promise<void> {
       meanDisplay: Number(r.meanDisplay.toFixed(3)),
       sdZ: Number(r.sdZ.toFixed(4)),
       marginDisplay: Number(r.marginDisplay.toFixed(3)),
+      meanRaw: Number(r.meanRaw.toFixed(3)),
       rank: r.rank,
     }));
     for (let i = 0; i < values.length; i += 500) {

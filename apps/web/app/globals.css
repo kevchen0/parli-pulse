@@ -111,3 +111,45 @@ details.diag > summary .delta { color: var(--accent); font-weight: 600; }
 details.diag .tablewrap { border: none; border-top: 1px solid var(--border); border-radius: 0; }
 tbody tr.off td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .counted { color: var(--accent); font-size: 0.75rem; }
+
+/* --- table alignment ---
+   Numeric columns are left-aligned so a value sits under the first letter of
+   its heading, which is easier to scan than a right-aligned column drifting
+   away from the word above it. Tabular figures keep the digits in line. */
+td.pts, td.rank { font-variant-numeric: tabular-nums; }
+td.rank { text-align: left; }
+.margin { color: var(--muted); font-size: 0.78em; font-weight: 400; white-space: nowrap; }
+
+/* --- controls --- */
+.controls { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 0 0 0.85rem; }
+.controls input[type='search'] {
+  flex: 1 1 16rem; min-width: 0; padding: 0.45rem 0.7rem; font: inherit; font-size: 0.875rem;
+  color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+.controls input[type='search']:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.segmented { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.segmented button {
+  padding: 0.45rem 0.9rem; font: inherit; font-size: 0.875rem; cursor: pointer;
+  background: var(--surface); color: var(--muted); border: none;
+  border-left: 1px solid var(--border);
+}
+.segmented button:first-child { border-left: none; }
+.segmented button[data-active='true'] { background: var(--accent); color: var(--bg); font-weight: 500; }
+
+.showall {
+  display: block; width: 100%; margin-top: 0.6rem; padding: 0.55rem;
+  font: inherit; font-size: 0.875rem; cursor: pointer; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.showall:hover { color: var(--text); }
+
+/* --- footnotes --- */
+ol.footnotes {
+  margin: 2rem 0 0; padding: 1.1rem 1.1rem 1.1rem 2.2rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted); font-size: 0.8125rem; line-height: 1.55;
+}
+ol.footnotes li { margin-bottom: 0.6rem; }
+ol.footnotes li:last-child { margin-bottom: 0; }
+ol.footnotes b { color: var(--text); font-weight: 600; }
