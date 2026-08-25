@@ -65,10 +65,17 @@ h2 { font-size: 1.05rem; letter-spacing: -0.01em; margin: 2.25rem 0 0.75rem; }
 footer { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8125rem; }
 
 /* --- navigation --- */
-nav.tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--border); margin: 1.5rem 0 1.25rem; }
+/* Scrolls rather than pushing the page sideways: six tabs do not fit a phone,
+   and every rankings page inherits this bar. */
+nav.tabs {
+  display: flex; gap: 0.25rem; border-bottom: 1px solid var(--border);
+  margin: 1.5rem 0 1.25rem;
+  overflow-x: auto; scrollbar-width: none;
+}
+nav.tabs::-webkit-scrollbar { display: none; }
 nav.tabs a {
   padding: 0.5rem 0.85rem; font-size: 0.9rem; text-decoration: none; color: var(--muted);
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;
 }
 nav.tabs a[data-active='true'] { color: var(--text); border-bottom-color: var(--accent); font-weight: 500; }
 nav.tabs a:hover { color: var(--text); }
@@ -237,50 +244,59 @@ ol.footnotes li:target { color: var(--text); }
 }
 .method .aside b { color: var(--text); }
 
-.method figure.formula {
-  margin: 1.2rem 0;
-  padding: 1.1rem 1rem;
+/* Equation blocks: the equation left, what it is right, aligned down the page
+   so a reader can scan either column on its own. */
+.method .eqn {
+  margin: 0 0 1rem;
   border: 1px solid var(--border);
   background: var(--surface);
   border-radius: var(--radius);
-  text-align: center;
   overflow-x: auto;
 }
-.method figure.formula code {
-  font-size: 1.05rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  /* Wraps at the spaces rather than scrolling: the formula is the centre of the
-     page and a reader on a phone should not have to drag it into view. The
-     stacked fraction is its own inline-flex, so it never breaks internally. */
-  flex-wrap: wrap;
-  gap: 0.3rem;
+.method .eqn > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
 }
-@media (max-width: 34rem) {
-  .method figure.formula code { font-size: 0.95rem; }
+.method .eqn > div:last-child { border-bottom: none; }
+.method .eqn code {
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  background: none;
+  padding: 0;
 }
-.method figure.formula.small code { font-size: 0.95rem; }
-.method figure.formula figcaption {
-  margin-top: 0.85rem;
-  font-size: 0.85rem;
+.method .eqn span {
+  font-size: 0.75rem;
   color: var(--muted);
-  text-align: left;
-  line-height: 1.55;
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.method figure.formula figcaption b { color: var(--text); }
+.method .eqn.wide code { white-space: normal; }
+@media (max-width: 34rem) {
+  .method .eqn > div { flex-direction: column; gap: 0.25rem; }
+  .method .eqn span { text-align: left; }
+  .method .eqn code { white-space: normal; }
+}
 
-/* A stacked fraction, so the shrinkage reads as one rather than as a slash. */
-.frac {
-  display: inline-flex;
-  flex-direction: column;
-  vertical-align: middle;
-  text-align: center;
-  font-size: 0.82em;
-  line-height: 1.25;
+.method .stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
-.frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 0.35em; }
-.frac > span:last-child { padding: 0 0.35em; }
+.method .stats b { color: var(--text); }
+
+.method ul.tight { margin-top: -0.4rem; }
+.method ul.tight li { margin-bottom: 0.2rem; }
+
+.method .scroller { overflow-x: auto; }
+.method tr.pick td { background: color-mix(in srgb, var(--accent) 9%, transparent); }
 
 .method table.worked {
   width: 100%;

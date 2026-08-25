@@ -371,76 +371,47 @@ export async function getRatingSummary(): Promise<RatingSummary> {
 }
 
 /**
- * The figures the methodology page quotes.
+ * Parameters the methodology page states.
  *
  * Read from the season being displayed rather than written into the prose, so a
- * page explaining how the number is produced cannot come to disagree with the
- * number. `tau` in particular is recovered from the stored ratings by the same
- * function the pipeline used, so the worked examples are arithmetic the reader
- * can repeat rather than figures they have to trust.
+ * page describing how the number is produced cannot drift from the number.
  */
 export interface RatingMethodFigures {
+  /** Field spread, by method of moments over the ranked partnerships. */
   tau: number;
   measured: number;
   oppWinPct: number;
+  /** Proposition advantage in rating points. Negative when opposition wins more. */
   sideAdvantage: number;
-  testRounds: number;
-  examples: {
-    label: string;
-    rounds: number;
-    rating: number;
-    deviation: number;
-    /** Share of the distance from the field that survives shrinking. */
-    kept: number;
-    shrunk: number;
-  }[];
+  rounds: number;
+  periods: number;
+  partnerships: number;
 }
 
 export async function getRatingMethodFigures(): Promise<RatingMethodFigures> {
   const { db } = handle();
-  const rows = (await db.execute(sql`
-    select r.rating, r.deviation, r.shrunk_rating as shrunk, r.rounds_counted as rounds,
-           coalesce(a.first_name || ' ', '') || a.last_name as debater1,
-           coalesce(b.first_name || ' ', '') || b.last_name as debater2
-    from ${t.ratings} r
-    join ${t.debaters} a on a.id = split_part(r.subject_id, '|', 1)
-    join ${t.debaters} b on b.id = split_part(r.subject_id, '|', 2)
-    where r.season_id = ${CURRENT_SEASON}
-      and r.subject_kind = 'partnership'
-      and r.tournament_id is null
-      and r.rounds_counted >= ${MIN_RATED_ROUNDS}
-  `)).rows as unknown as {
-    rating: number; deviation: number; shrunk: number | null; rounds: number;
-    debater1: string; debater2: string;
-  }[];
+  const ranked = (await db.execute(sql`
+    select rating, deviation from ${t.ratings}
+    where season_id = ${CURRENT_SEASON} and subject_kind = 'partnership'
+      and tournament_id is null and rounds_counted >= ${MIN_RATED_ROUNDS}
+  `)).rows as unknown as { rating: number; deviation: number }[];
 
-  const tau = fieldSpread(rows.map((r) => ({ rating: Number(r.rating), deviation: Number(r.deviation) })));
-  const surname = (n: string): string => n.split(' ').at(-1) ?? n;
+  const tau = fieldSpread(
+    ranked.map((r) => ({ rating: Number(r.rating), deviation: Number(r.deviation) })),
+  );
 
-  // Two partnerships that both *look* strong, one confirmed and one not. That
-  // is the contrast the page is making: shrinking is not a penalty for being
-  // bad, it is a discount for being unmeasured. Picking by round count alone
-  // tends to surface a weak partnership, whose rating shrinks upward and
-  // illustrates the arithmetic while obscuring the argument.
-  const contenders = [...rows]
-    .sort((x, y) => Number(y.rating) - Number(x.rating))
-    .slice(0, 30)
-    .sort((x, y) => Number(x.deviation) - Number(y.deviation));
-  const pick = [contenders[0], contenders.at(-1)].filter(Boolean) as typeof rows;
-  const examples = pick.map((r) => {
-    const deviation = Number(r.deviation);
-    return {
-      label: `${surname(r.debater1)} & ${surname(r.debater2)}`,
-      rounds: r.rounds,
-      rating: Number(r.rating),
-      deviation,
-      kept: (tau * tau) / (tau * tau + deviation * deviation),
-      shrunk: Number(r.shrunk ?? r.rating),
-    };
-  });
+  const counts = (await db.execute(sql`
+    select (select count(*)::int from ${t.ratings}
+            where season_id = ${CURRENT_SEASON} and tournament_id is null) as partnerships,
+           (select count(distinct tournament_id)::int from ${t.ratings}
+            where season_id = ${CURRENT_SEASON} and tournament_id is not null) as periods,
+           (select (coalesce(sum(rounds_counted), 0) / 2)::int from ${t.ratings}
+            where season_id = ${CURRENT_SEASON} and tournament_id is null) as rounds
+  `)).rows[0] as { partnerships: number; periods: number; rounds: number };
 
+  // Decided open rounds, resolved on a majority of the ballots on one side.
   const sides = (await db.execute(sql`
-    select count(*) filter (where won.side = 2)::int as opp, count(*)::int as total
+    select count(*) filter (where side = 2)::int as opp, count(*)::int as total
     from (
       select b.section_id, min(b.side) as side,
              count(*) filter (where b.won) as w,
@@ -451,23 +422,21 @@ export async function getRatingMethodFigures(): Promise<RatingMethodFigures> {
       join ${t.tournaments} tn on tn.id = e.tournament_id
       where tn.season_id = ${CURRENT_SEASON} and e.division = 'open' and b.is_bye = false
       group by b.section_id, b.entry_id
-    ) as won
-    where won.d > 0 and won.w * 2 > won.d
+    ) as s
+    where s.d > 0 and s.w * 2 > s.d
   `)).rows[0] as { opp: number; total: number };
 
   const oppWinPct = sides.total ? (100 * sides.opp) / sides.total : 0;
-  // The same conversion the pipeline uses: a win rate becomes a rating gap
-  // through the logistic, on the 1500 scale.
-  const p = oppWinPct / 100;
-  const sideAdvantage = p > 0 && p < 1 ? -173.7178 * Math.log(p / (1 - p)) : 0;
+  const p = 1 - oppWinPct / 100;
+  const sideAdvantage = p > 0 && p < 1 ? 173.7178 * Math.log(p / (1 - p)) : 0;
 
   return {
     tau,
-    measured: rows.length,
+    measured: ranked.length,
     oppWinPct,
     sideAdvantage,
-    // Rounds in the held-out window the validation reports on.
-    testRounds: 2209,
-    examples,
+    rounds: Number(counts.rounds ?? 0),
+    periods: Number(counts.periods ?? 0),
+    partnerships: Number(counts.partnerships ?? 0),
   };
 }
