@@ -7,18 +7,13 @@ with their answers, so nobody re-investigates them.
 
 ## Still open — needed before the next phase
 
-### Rating design (Phase 5)
+### Rating design
 1. **Partnership or person?** The league keys a team by school *and* debaters,
    so one partnership competing under two registrations becomes two rows with
    its points split — Schrank & Schwartz appear as Stuyvesant 9.0 and
    Independent 7.6. We merge them. Ours is arguably the better model but it
    cannot reconcile against either of theirs. A product decision, not a bug.
-2. **Should novice/JV rounds feed the rating, or open only?** Points are
-   open-only per XXI.1.A, and speaker points now follow that. The rating could
-   still use everything for more evidence.
-3. **Minimum rounds before a partnership appears on the rating board.** 47% of
-   partnerships have fewer than ten open-division rounds, so this decides
-   whether the board has 370 rows or 700.
+   The rating now inherits this: it follows the people, like the standings.
 
 ### Rules still ambiguous
 4. **XXI.2.C one-third exception** — measured against the open field or the
@@ -62,6 +57,22 @@ with their answers, so nobody re-investigates them.
 
 ## Answered
 
+- **Should novice/JV rounds feed the rating?** Open only, matching XXI.1.A and
+  the speaker points. Mixing divisions would place a team above opponents it
+  could never meet, and the extra evidence would be evidence about a different
+  competition.
+- **Minimum rounds before a partnership appears on the rating board** — ten.
+  387 of 1,776 rated partnerships clear it. Every partnership keeps a rating and
+  a deviation regardless; the gate decides only who is ranked. It matters less
+  than it looked, because the board is ordered on the rating *less* its
+  deviation, which already pushes thin ratings down rather than out.
+- **Whether elim rounds need extra weight** — no, and neither do large fields.
+  Elim opponents average 53% more season points, so an opponent-adjusted rating
+  already pays more for beating them; a multiplier would count the same fact
+  twice. See [05-metrics.md](05-metrics.md).
+- **Whether the rating earns its place** — yes, on held-out rounds: 63.4%
+  against the league ranking's 61.2%, with a clearly better log loss. The
+  commitment was to report a failure if it lost, and it did not.
 - **Which season starts the live era** — 2025-26. Earlier seasons are archival
   (Phase 8); 2024-25 may be backfilled, and the schema and loader are
   season-keyed throughout, so `SEASON=2024-25 npm run load` is all it takes.

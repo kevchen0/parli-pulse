@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** phases 0-4 are complete and deployed. Phase 5 is next.
+**Status:** phases 0-5 are complete. Phase 6 is next.
 
 The 2026-27 season's first points-eligible tournament is Harvard, Sept 5-6
 (August tournaments are excluded by XXI.1.H). Before then, run the seasonal
@@ -56,11 +56,26 @@ both centre and spread shrunk toward the field by sample size.
 
 ---
 
-## Next
-
 ### Phase 5 — Glicko-2
-Implement, tune on 2025-26, validate on held-out late-season rounds. Must beat
-a naive "higher points wins" baseline or it does not ship.
+Partnership ratings at `/rankings/ratings`, ordered on the rating less its
+deviation, gated at ten rated rounds.
+
+The gate was that it beat "higher Article XXI points wins" on held-out rounds
+or be reported as a failure. On 2,209 rounds from February 2026 onward it
+predicted 63.4% against the league ranking's 61.2%, at a log loss of 0.638
+against 0.665. The accuracy gap's 95% interval is 0.0 to 4.3 points; the log
+loss gap is the surer of the two.
+
+7,699 rated rounds over 78 tournaments and 1,776 partnerships, of which 387
+clear the round gate. Method and the full comparison in
+[05-metrics.md](05-metrics.md); `npm run validate:rating` reruns it.
+
+No elim multiplier and no field-size weighting, both for the same reason:
+opponent quality already prices them.
+
+---
+
+## Next
 
 ### Phase 6 — Profiles and depth
 Debater, team, school and tournament pages. Head-to-head records.

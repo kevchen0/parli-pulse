@@ -59,28 +59,135 @@ Glicko cannot beat "higher Article XXI points wins", that is real information �
 points correlate with strength precisely because strong teams break and
 accumulate — and it should be reported rather than tuned away.
 
-## Glicko-2 rating
+## Glicko-2 rating — built, validated, shipped
 
-Rate the **team pairing**. A new pairing starts at the average of its debaters'
-priors rather than at the default, so a strong debater with a new partner isn't
-reset to zero.
+At `/rankings/ratings`. `npm run rate` computes it; `npm run validate:rating`
+reruns every number below.
 
-- Rating period = one tournament.
-- Elim losses get a reduced loss multiplier — advancing past prelims shouldn't
-  be punished.
-- Larger fields carry more weight via reduced RD inflation.
-- Ship the **RD** alongside the rating; gate the public leaderboard on a
-  minimum round count so a 3-round team can't top the board.
-- Season transitions **decay** (inflate RD) rather than reset.
-- Panels count as **one result weighted by ballot margin** — a 3-0 is stronger
-  evidence than a 2-1.
+### The gate, and whether it was cleared
 
-Validation: train through January, measure win prediction on Feb-April rounds.
-Must beat a naive "higher points wins" baseline or the metric isn't earning its
-place.
+The commitment was that the rating beat "higher Article XXI points wins" or be
+reported as a failure. It cleared it.
 
-Applies to 2024-25 onward only. Earlier seasons stay archival — see
-[01-product.md](01-product.md).
+The season is cut three ways. Train through December fits parameters, January
+chooses between variants, and February onward is touched once, at the end.
+Every model walks forward — predict a tournament, then learn from it — and each
+baseline gets a fitted logistic on its own statistic, so the comparison is with
+the best version of the league's ranking rather than a straw one.
+
+Held-out test, 2,209 rounds from February 2026 on:
+
+| | accuracy | log loss | Brier |
+|---|---|---|---|
+| Coin flip | 50.0% | 0.6931 | 0.2500 |
+| Side alone | 53.7% | 0.6909 | 0.2489 |
+| Season win rate to date | 61.3% | 0.6539 | 0.2311 |
+| **Article XXI points to date** | **61.2%** | **0.6654** | **0.2358** |
+| **Glicko-2** | **63.4%** | **0.6378** | **0.2234** |
+
+The accuracy gap is 2.2 points, 95% interval 0.0 to 4.3 on a paired bootstrap —
+real but not comfortable. The log loss gap of 0.028 is the surer finding and
+never reversed in two thousand resamples: the rating is better calibrated than
+it is decisive, which is what a system carrying its own uncertainty should look
+like.
+
+Two results worth keeping:
+
+- **Season win rate is nearly as good as Article XXI points**, and better
+  calibrated. Points buy their accuracy mostly by being a proxy for winning, not
+  by knowing anything about who was beaten.
+- **The rating's margin is widest where evidence is thinnest.** On rounds where
+  both teams had ten or more prior rounds it leads points by 2.0; on rounds
+  where either had fewer, by 2.2. That is the seeding below doing its work.
+
+### What it is made of
+
+Rating the **partnership**, one rating period per tournament, every round inside
+a period judged against the ratings held before it began.
+
+Three departures from plain Glicko-2, each measured on the January split rather
+than chosen:
+
+1. **A new partnership starts where its debaters left off**, not at 1500, with
+   its deviation widened for the fact that a pairing is a new thing. Worth 0.008
+   of log loss — five times the other two together, and the single reason this
+   is not stock Glicko-2. It is the only lever that touches sparsity.
+2. **Split panels are graded.** A 3-0 scores a full win, a 2-1 scores 0.67.
+   Worth 0.0015. Small, and free.
+3. **A side correction**, read off the season rather than fixed: about −17
+   rating points to proposition on 2025-26. Worth 0.0007.
+
+`tau` was swept and moves nothing at four decimal places — with periods one
+tournament long the volatility has no time to change — so it stays at
+Glickman's default.
+
+Deviation grows with time away rather than with tournaments missed, since three
+tournaments can share one weekend.
+
+### What was deliberately left out
+
+- **No elim multiplier.** The evidence above is why: elim opponents average 53%
+  more season points, so an opponent-adjusted rating already pays more for
+  beating them. A multiplier would count the same fact twice. On the 225
+  held-out elim rounds the rating and the points baseline tie exactly on
+  accuracy at 61.8%, but the rating's log loss is 0.638 against 0.678 — the
+  shape of a system that prices elims rather than flattering them.
+- **No field-size weighting.** Same reasoning. A large field means more and
+  better opponents, which the rating already sees.
+- **No reduced loss multiplier for elim losses.** An earlier draft of this
+  document called for one. It is the same double count wearing different
+  clothes, and it contradicts the analysis above it; it was written before the
+  measurements and is withdrawn.
+
+### How it is ranked
+
+The board sorts on the rating **less its deviation**, and shows both. A twelve
+round partnership at 1963 ± 144 and a fifty-two round one at 1934 ± 67 are not
+making the same claim, and ordering on the rating alone puts the twelve first —
+which reports how little is known rather than who is better. Under the
+subtraction a partnership rises by being confirmed as well as by winning.
+
+Predictions still use the rating itself. For a prediction the uncertainty
+belongs in the width of the answer, not in the estimate.
+
+Partnerships below **ten rated rounds** keep a rating and a deviation but are
+not ranked: 387 of 1,776 clear the line. That figure is much harsher than the
+"47% under ten rounds" measured above, because that measurement counted only
+partnerships the league scores; the rating sees every team in an open room,
+including the many from outside NPDL who appear once.
+
+### What is not rated, and why
+
+Of 9,031 open-division sections in 2025-26, 7,699 became rated rounds. The rest
+are left out rather than guessed at, per pattern F:
+
+| | |
+|---|---|
+| No result entered anywhere in the section | 395 |
+| Byes | 365 |
+| A team we only half know | 413 |
+| Even panel split down the middle | 159 |
+
+The 413 are entries recovered from ballot labels carrying one debater record or
+none. A partnership we know half of cannot be named, and the round is lost to
+its opponent too — unfortunate, and better than attributing it to the wrong
+pair.
+
+Coverage against the league's own partnership list is complete in the only
+sense available: all 740 of the 799 partnerships that have a decided open round
+in Tabroom are rated, and every one of the 59 that are not has no decided open
+round at all.
+
+### Still to do
+
+Test an **individual-level rating** against this one on the same held-out
+rounds. The prediction stated in advance was that it should win, because
+sparsity binds and pooling across partners is the only relief; the partnership
+seeding above is a weak form of that pooling and it was by far the largest
+single gain, which is evidence for the prediction rather than against it. The
+comparison is a fair one to run now that the harness exists.
+
+Seasons before 2025-26 stay archival — see [01-product.md](01-product.md).
 
 ## Speaker points
 

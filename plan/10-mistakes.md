@@ -28,8 +28,19 @@ everything.
    Tabroom, so champions came up one win short. Wins now derive from bracket
    position, which is independent of what got posted.
 
+25. **The rating's round extraction counted a panel twice.** Tabroom writes one
+    ballot per judge *per entry*, so a single-judge round holds two rows and a
+    three-judge round holds six. Taking the section's total as the panel size
+    made every ordinary round a 1-1 tie: 3,893 of 8,064 rounds were thrown away
+    as undecided. **This is Pattern A for the third time**, in a third piece of
+    code, written an hour after reading the two entries above it. *Found because
+    the skip count came out larger than the keep count.*
+
 **Rule:** a round is won on a majority of its ballots. Never `some`. And never
 count rounds when the rule pays per ballot — read tab's own `BalPm` instead.
+The panel size is the ballots on **one** side of a section, never the sum. Any
+new consumer of ballot data should print what it discarded and the number should
+be looked at: every instance of this pattern has been visible in a count.
 
 ## Pattern B: surnames are not identities
 
@@ -57,11 +68,23 @@ count rounds when the rule pays per ballot — read tab's own `BalPm` instead.
     became "casselengen" and never tied back to the student record carrying the
     space. Synthetic records must use the league's own spelling.
 
+26. **The rating keyed partnerships on the canonical debater pair, which is not
+    what a partnership is.** `rollup` collapses pairs a *second* time, on school
+    and surnames, because a label-recovered record carrying no first name never
+    merges into its student record — item 22 above, patched at the team level
+    rather than the debater level. The rating did not know about the second
+    collapse, so a partnership the standings treat as one was rated as two, each
+    on half the evidence. **Pattern G as much as Pattern B**: the rule existed,
+    inline, in one script. *Found by checking how many of the league's 799
+    partnerships got a rating, and asking why any did not.*
+
 **Rule:** all comparison and aggregation goes through
-`scripts/lib/standings.ts` or `packages/ingest/src/matching.ts`. Never write a
-new key. Identity needs *both* over- and under-merge guards: distinct first
-names and different partners at one tournament prove two people; an
-abbreviation and a missing first name prove nothing.
+`scripts/lib/standings.ts`, `scripts/lib/identity.ts`, or
+`packages/ingest/src/matching.ts`. Never write a new key. Identity needs *both*
+over- and under-merge guards: distinct first names and different partners at one
+tournament prove two people; an abbreviation and a missing first name prove
+nothing. And a partnership is not its debater pair — it is that pair after the
+collapse in `identity.ts`.
 
 ## Pattern C: field sizes decide points before any table is consulted
 
@@ -132,6 +155,30 @@ none exists, leave the gap and flag it. Do not infer a winner.
     tournament.** A pattern meant to disambiguate one shared payload matched
     `Open Parli` everywhere and dropped 450 results.
 
+**Rule:** when a second caller needs a rule that already exists inline, move the
+rule rather than copying it — and prove the move changed nothing. Extracting the
+partnership collapse out of `rollup.ts` was verified by snapshotting every
+standings row before and after and diffing them; that check costs a minute and
+is the only reason the extraction could be trusted.
+
+## Pattern H: a model that manufactures confidence
+
+27. **Seeding a new partnership made it more certain than the partnerships it
+    came from.** A new pairing starts at the average of its two debaters'
+    ratings, and the deviation was computed as the deviation of that average —
+    which, for two independent estimates, is smaller than either. So a pair who
+    had never debated together arrived better established than the partnership
+    one of them had built over six tournaments, and two debaters nobody had ever
+    seen arrived at 275 rather than the default 350. The arithmetic is right for
+    two readings of one quantity and wrong here: a pair is not the mean of its
+    debaters, it only tends to be. *Found by a test asserting the obvious —
+    that two unknowns produce an unknown.*
+
+**Rule:** any prior that combines evidence has to be checked at its degenerate
+ends. Combining no information must yield no information, and a derived estimate
+must never come out surer than what it was derived from. Both are one-line
+assertions and both failed on the first implementation.
+
 ## Infrastructure
 
 19. **`apps/web` was an empty directory.** Git tracks files, not directories,
@@ -141,6 +188,15 @@ none exists, leave the gap and flag it. Do not infer a winner.
     obscurely. Now `.mjs`, with the toolchain as a real dependency.
 21. **Next reads `.env` from the app directory**, not the repo root, so local
     builds rendered "database not connected" while the scripts worked fine.
+28. **Node's type stripping rejects TypeScript parameter properties.** There is
+    no build step, so `constructor(private readonly x: T) {}` is a runtime
+    `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` — and `tsc --build` passes it happily,
+    so the typecheck says nothing. Declare the field and assign it.
+29. **A new workspace package needs `npm install` before Next can import it.**
+    `packages/rating` typechecked, tested and ran from scripts, then the page
+    failed with "Can't resolve '@parli-pulse/rating'": nothing had created the
+    `node_modules` symlink. Scripts import packages by relative path and never
+    notice; only the web app uses the `@parli-pulse/*` specifiers.
 
 ---
 
@@ -159,3 +215,9 @@ Ranked by yield:
    but chasing why led straight to Pattern D.
 4. **Checking whether a fix actually moved the number.** Twice a fix appeared
    to do nothing; once it was stale duplicate code, once the wrong root cause.
+5. **Writing the test that asserts the obvious.** Pattern H was found by a test
+   saying two unknown debaters make an unknown partnership — a line nobody would
+   write if they were only testing what they thought was hard.
+6. **Reading the counts a script prints about what it threw away.** Both new
+   Pattern A instances and the identity drift showed up as a number that was the
+   wrong size, before any of them showed up as a wrong rating.

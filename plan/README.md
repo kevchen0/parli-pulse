@@ -39,9 +39,10 @@ judge-normalized speaker points that exist nowhere today.
 
 ## Status
 
-Phases 0-4 complete and deployed; Phase 5 (Glicko-2) is next. Per-entry
-Article XXI agreement is 98%, partnership season totals 87% exact, and the
-league's top 100 92% exact.
+Phases 0-5 complete; Phase 6 (profiles) is next. Per-entry Article XXI
+agreement is 98%, partnership season totals 87% exact, and the league's top 100
+92% exact. The Glicko-2 rating beats the league's own ranking at predicting
+held-out rounds, 63.4% against 61.2%.
 
 See [00-session-log.md](00-session-log.md) for the handoff and
 [06-roadmap.md](06-roadmap.md) for the phases.

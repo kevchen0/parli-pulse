@@ -47,10 +47,24 @@ win/loss, raw speaks), `speaker_scores` (raw + z + display), `entry_results`
 shape, so a backtest mismatch points at the specific rule that diverged rather
 than at a single opaque total.
 
+`ratings` holds two kinds of row per subject: one per tournament, carrying the
+rating as it stood after that rating period so a season can be charted, and one
+with a null `tournament_id` — the current figure, its deviation widened for
+however long the partnership has been away. The subject id is the partnership
+key from `scripts/lib/identity.ts`, which is what lets a rating join to a
+standings row.
+
 ## Entity resolution
 
 Tabroom school names vary (`Mountain View`, `Mountain View/Mountain View`).
 `SchoolList` is the canonical authority for school → short name → region.
+
+**A partnership is a pair of people, then a collapse.** `debaters.canonical_id`
+merges one person's several Tabroom records; `collapsePartnerships` in
+`scripts/lib/identity.ts` then merges pairs that are the same partnership seen
+twice, on school and surnames with no contradicting first name. Both the
+standings and the rating go through it. They have to reach the same answer or
+the site shows a team with points and no rating.
 
 **Debaters key on Tabroom student id**, which is stable across tournaments.
 This is strictly better than the sheet's surname matching — see the
