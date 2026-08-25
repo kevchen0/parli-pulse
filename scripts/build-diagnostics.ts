@@ -121,6 +121,7 @@ try {
       seasonId: SEASON,
       schoolName: o.school,
       region: o.region || null,
+      teamId: p.ours?.teamId ?? null,
       debater1: o.partner1,
       debater2: o.partner2,
       officialRank: o.rank,

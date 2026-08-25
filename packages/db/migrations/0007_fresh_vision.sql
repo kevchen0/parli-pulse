@@ -1,0 +1,1 @@
+ALTER TABLE "standing_diagnostics" ADD COLUMN "team_id" text;

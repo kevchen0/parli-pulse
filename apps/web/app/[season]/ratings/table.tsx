@@ -6,8 +6,7 @@ import type { RatingRow } from '@/lib/db';
 type SortKey = 'shown' | 'rating' | 'rounds';
 type Direction = 'desc' | 'asc';
 
-/** Shown before the reader asks for the rest, so the page opens quickly. */
-const INITIAL_ROWS = 100;
+import { PAGE_SIZE, pageNumbers } from '@/app/pager';
 
 /**
  * The rating a partnership has established, as opposed to the one it might
@@ -84,7 +83,7 @@ export default function RatingTable({ rows }: { rows: RatingRow[] }) {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortKey>('shown');
   const [direction, setDirection] = useState<Direction>('desc');
-  const [showAll, setShowAll] = useState(false);
+  const [page, setPage] = useState(1);
 
   // Positions are computed over everyone, so a search narrows the table
   // without renumbering it.
@@ -111,8 +110,12 @@ export default function RatingTable({ rows }: { rows: RatingRow[] }) {
     else { setSort(key); setDirection('desc'); }
   };
 
-  const visible = showAll ? sorted : sorted.slice(0, INITIAL_ROWS);
-  const hidden = sorted.length - visible.length;
+  // Sorting or searching puts the reader at the top of a new result set, so the
+  // page resets with them rather than stranding them on page seven of a list
+  // that no longer has seven pages.
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const current = Math.min(page, totalPages);
+  const visible = sorted.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
   return (
     <>
@@ -166,11 +169,41 @@ export default function RatingTable({ rows }: { rows: RatingRow[] }) {
         </table>
       </div>
 
-      {hidden > 0 ? (
-        <button type="button" className="showall" onClick={() => setShowAll(true)}>
-          Show all {sorted.length}
-        </button>
-      ) : null}
+      {sorted.length > PAGE_SIZE && (
+        <nav className="pager" aria-label="Pages">
+          <span className="pagerrange">
+            {(current - 1) * PAGE_SIZE + 1}–{Math.min(current * PAGE_SIZE, sorted.length)} of{' '}
+            {sorted.length}
+          </span>
+          <span className="pagerpages">
+            {current > 1 && (
+              <button type="button" onClick={() => setPage(current - 1)} aria-label="Previous page">
+                ‹
+              </button>
+            )}
+            {pageNumbers(current, totalPages).map((p, i) =>
+              p === '…' ? (
+                <span key={`gap-${i}`} className="pagergap" aria-hidden>…</span>
+              ) : (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPage(p)}
+                  data-current={p === current || undefined}
+                  aria-current={p === current ? 'page' : undefined}
+                >
+                  {p}
+                </button>
+              ),
+            )}
+            {current < totalPages && (
+              <button type="button" onClick={() => setPage(current + 1)} aria-label="Next page">
+                ›
+              </button>
+            )}
+          </span>
+        </nav>
+      )}
       {sorted.length === 0 ? <p className="empty">No partnerships match “{query}”.</p> : null}
     </>
   );

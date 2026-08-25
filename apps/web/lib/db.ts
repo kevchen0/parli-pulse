@@ -30,11 +30,30 @@ export interface TeamRow {
   debater2: string;
   tournaments: number;
   /**
-   * XXII.1.E: both partners autoqualified, so this partnership may accept a
-   * bid. Distinct from XXII.1.A, which autoqualifies an individual -- a debater
-   * can clear 40 points and still have no team eligible to accept.
+   * How many of the two partners autoqualified individually (XXII.1.A).
+   *
+   * Two means the partnership may accept a bid under XXII.1.E. One means it
+   * cannot, and would need an at-large bid. This is counted rather than
+   * flagged because the difference between one and two is the whole question.
+   *
+   * The count is the only usable signal here: partnership points and individual
+   * points are different scales -- an individual pools across every partner --
+   * so comparing a partnership total to the individual threshold marks nobody.
+   * On 2025-26 the highest-scoring partnership without both partners qualified
+   * held 39 points against a 40-point individual line.
    */
-  bidEligible: boolean;
+  partnersQualified: number;
+  /**
+   * How this total stands against the league's published sheet.
+   *
+   * `pending` means the sheet has no row for this partnership yet, which during
+   * a season is the normal state for a tournament the league has not written up.
+   * `differs` means it has one and we disagree, which is a real problem with one
+   * of the two figures and is worth a reader knowing about.
+   */
+  reconciliation: 'agrees' | 'differs' | 'pending';
+  /** The league's figure, where it has one. */
+  officialPoints: number | null;
 }
 
 export async function getTeams(season: SeasonId, limit = 5000): Promise<TeamRow[]> {
@@ -45,8 +64,14 @@ export async function getTeams(season: SeasonId, limit = 5000): Promise<TeamRow[
            coalesce(s.short_name, s.name) as school, s.region,
            coalesce(a.first_name || ' ', '') || a.last_name as debater1,
            coalesce(b.first_name || ' ', '') || b.last_name as debater2,
-           coalesce(qa.auto_qualified, false) and coalesce(qb.auto_qualified, false)
-             as "bidEligible"
+           (coalesce(qa.auto_qualified, false)::int
+            + coalesce(qb.auto_qualified, false)::int) as "partnersQualified",
+           sd.official_points as "officialPoints",
+           case
+             when sd.id is null then 'pending'
+             when abs(coalesce(sd.delta, 0)) > 0.05 then 'differs'
+             else 'agrees'
+           end as reconciliation
     from ${t.teamSeasonTotals} ts
     join ${d1} a on a.id = ts.debater1_id
     join ${t.debaters} b on b.id = ts.debater2_id
@@ -55,6 +80,11 @@ export async function getTeams(season: SeasonId, limit = 5000): Promise<TeamRow[
     left join ${t.debaterSeasonTotals} qb
       on qb.season_id = ts.season_id and qb.debater_id = ts.debater2_id
     left join ${t.schools} s on s.id = ts.school_id
+    -- The link is stored by build-diagnostics rather than re-derived here;
+    -- matching partnerships on surnames is how two real Menlo teams eighty
+    -- points apart became one.
+    left join ${t.standingDiagnostics} sd
+      on sd.team_id = ts.id and sd.season_id = ts.season_id
     where ts.season_id = ${season}
     order by ts.rank asc
     limit ${limit}

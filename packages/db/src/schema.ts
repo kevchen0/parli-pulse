@@ -393,6 +393,12 @@ export const standingDiagnostics = pgTable('standing_diagnostics', {
   seasonId: text('season_id').notNull().references(() => seasons.id),
   schoolName: text('school_name').notNull(),
   region: text('region'),
+  /**
+   * The partnership this official row was matched to, stored rather than
+   * re-derived. Matching on surnames collapses two real Menlo partnerships
+   * eighty points apart, so anything that needs the link reads it from here.
+   */
+  teamId: text('team_id'),
   debater1: text('debater1').notNull(),
   debater2: text('debater2').notNull(),
   officialRank: integer('official_rank'),

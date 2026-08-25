@@ -17,6 +17,11 @@
   --good: #2c6549;
   --warn: #7d5a13;
   --bad: #93362d;
+  /* Qualification marks. Gold and silver read as standings rather than as
+     status, which is what they are. */
+  --gold: #8a6a12;
+  --silver: #77808a;
+  --pending: #a8760a;
   --radius: 4px;
 
   --f-head: "Source Serif 4", Georgia, "Times New Roman", serif;
@@ -38,6 +43,9 @@
     --good: #6db694;
     --warn: #c4a04c;
     --bad: #d8776a;
+    --gold: #d3ab48;
+    --silver: #98a2ae;
+    --pending: #d8a03d;
   }
 }
 
@@ -122,20 +130,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 td.rank { color: var(--muted); font-variant-numeric: tabular-nums; width: 3.5rem; }
 td.pts { font-weight: 600; font-variant-numeric: tabular-nums; }
 .region { color: var(--muted); font-size: 0.8125rem; }
-/* A marker, not a link: accent is reserved for things you can click. */
-.qual {
-  display: inline-block;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  background: var(--sunk);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.05rem 0.3rem;
-  white-space: nowrap;
-  vertical-align: 0.05em;
-}
+
 
 .meta { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.25rem; font-size: 0.8125rem; color: var(--muted); }
 .meta b { color: var(--text); font-weight: 600; }
@@ -555,3 +550,71 @@ ol.footnotes li:target { color: var(--text); }
 footer .footlinks { display: flex; gap: 1.1rem; flex-wrap: wrap; margin-top: 0.5rem; }
 footer .footlinks a { color: var(--muted); text-decoration: none; }
 footer .footlinks a:hover { color: var(--text); }
+
+/* --- qualification and reconciliation marks ---
+   Text, not chips: these sit inside a name or beside a number and a filled
+   badge at that size fights the row it is in. */
+
+abbr.aq, abbr.al {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  cursor: help;
+  white-space: nowrap;
+}
+abbr.aq { color: var(--gold); }
+abbr.al { color: var(--silver); }
+
+/* An asterisk beside a total: amber when the sheet has no row yet, red when it
+   has one and we disagree. Colour alone never carries it -- the mark is present
+   either way, and the title says which. */
+abbr.tick {
+  font-weight: 700;
+  text-decoration: none;
+  cursor: help;
+}
+abbr.tick.pending { color: var(--pending); }
+abbr.tick.differs { color: var(--bad); }
+
+/* --- pager --- */
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  margin-top: 0.9rem;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.pagerrange { color: var(--faint); }
+.pagerpages { display: flex; flex-wrap: wrap; gap: 0.15rem; }
+.pagerpages a,
+.pagerpages button {
+  display: inline-block;
+  min-width: 1.9rem;
+  padding: 0.22rem 0.4rem;
+  text-align: center;
+  text-decoration: none;
+  color: var(--muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.pagerpages a:hover,
+.pagerpages button:hover { color: var(--text); background: var(--sunk); }
+.pagerpages a[data-current],
+.pagerpages button[data-current] {
+  color: var(--text);
+  border-color: var(--border-firm);
+  background: var(--surface);
+  font-weight: 600;
+}
+.pagergap { padding: 0.22rem 0.2rem; color: var(--faint); }
+
+.footnotes abbr.tick { margin-right: 0.1rem; }
