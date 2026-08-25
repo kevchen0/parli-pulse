@@ -130,6 +130,8 @@ export async function getSpeakers(limit = 5000): Promise<SpeakerRow[]> {
 export interface SpeakerSummary {
   ranked: number;
   total: number;
+  /** Ballots belonging to the ranked debaters -- what the table is built on. */
+  rankedBallots: number;
   scores: number;
   excluded: number;
 }
@@ -141,6 +143,8 @@ export async function getSpeakerSummary(): Promise<SpeakerSummary> {
             where season_id = ${CURRENT_SEASON} and rank is not null) as ranked,
            (select count(*)::int from ${t.debaterSpeakerTotals}
             where season_id = ${CURRENT_SEASON}) as total,
+           (select coalesce(sum(ballots), 0)::int from ${t.debaterSpeakerTotals}
+            where season_id = ${CURRENT_SEASON} and rank is not null) as "rankedBallots",
            -- Only scores that were actually normalized; the table also holds
            -- novice and JV ballots, which this measure does not rate.
            (select count(*)::int from ${t.speakerScores} where z is not null) as scores,
@@ -149,6 +153,7 @@ export async function getSpeakerSummary(): Promise<SpeakerSummary> {
   const row = r.rows[0] as Record<string, unknown>;
   return {
     ranked: Number(row.ranked ?? 0), total: Number(row.total ?? 0),
+    rankedBallots: Number(row.rankedBallots ?? 0),
     scores: Number(row.scores ?? 0), excluded: Number(row.excluded ?? 0),
   };
 }

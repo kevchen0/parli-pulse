@@ -19,7 +19,7 @@ export default async function SpeakersPage() {
 
       <p className="meta">
         <span><b>{speakers.length}</b> debaters with 20 or more ballots</span>
-        <span><b>{summary.scores.toLocaleString()}</b> ballots</span>
+        <span><b>{summary.rankedBallots.toLocaleString()}</b> ballots between them</span>
       </p>
 
       <SpeakerTable rows={speakers} />
