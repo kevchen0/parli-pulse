@@ -1,7 +1,7 @@
 import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
 import { dbReady, getSummary, getTeams, type TeamRow } from '@/lib/db';
 import { seasonHref } from '@/lib/season';
-import Pager, { PAGE_SIZE, clampPage, pageCount } from '@/app/pager';
+import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
 
 export const revalidate = 300;
 
@@ -27,7 +27,7 @@ export default async function TeamsPage({
   searchParams,
 }: {
   params: Promise<{ season: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
   const { season } = await params;
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
@@ -40,9 +40,20 @@ export default async function TeamsPage({
     );
   }
 
-  const totalPages = pageCount(teams.length);
-  const page = clampPage((await searchParams).page, totalPages);
-  const shown = teams.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const sp = await searchParams;
+  const query = (sp.q ?? '').trim();
+  const needle = query.toLowerCase();
+  const matches = needle
+    ? teams.filter(
+        (x) =>
+          x.debater1.toLowerCase().includes(needle) ||
+          x.debater2.toLowerCase().includes(needle) ||
+          (x.school ?? '').toLowerCase().includes(needle),
+      )
+    : teams;
+  const totalPages = pageCount(matches.length);
+  const page = clampPage(sp.page, totalPages);
+  const shown = matches.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const bids = teams.filter((x) => x.partnersQualified >= 2).length;
   const unresolved = teams.filter((x) => x.reconciliation !== 'agrees').length;
 
@@ -66,6 +77,13 @@ export default async function TeamsPage({
           </span>
         )}
       </p>
+
+      <TableSearch
+        action={seasonHref(season, '/points')}
+        query={query}
+        placeholder="Search debaters or schools"
+      />
+      {matches.length === 0 && <p className="empty">Nothing matches “{query}”.</p>}
 
       <div className="tablewrap">
         <table>
@@ -125,7 +143,8 @@ export default async function TeamsPage({
       <Pager
         page={page}
         total={totalPages}
-        rows={teams.length}
+        rows={matches.length}
+        query={query}
         basePath={seasonHref(season, '/points')}
       />
 

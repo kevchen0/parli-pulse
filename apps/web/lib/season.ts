@@ -88,7 +88,6 @@ export type SeasonPath =
   | '/points/schools'
   | '/ratings'
   | '/speakers'
-  | '/method'
   | '/method/ratings'
   | '/diagnostic';
 
@@ -123,11 +122,11 @@ export const SEASON_NAV: NavItem[] = [
   },
   { label: 'Ratings', path: '/ratings' },
   { label: 'Speakers', path: '/speakers' },
-  { label: 'Method', path: '/method' },
 ];
 
 /** Pages that are not about one season. */
 export const SITE_NAV = [
+  { label: 'Method', path: '/method' },
   { label: 'About', path: '/about' },
   { label: 'Privacy', path: '/privacy' },
   { label: 'Feedback', path: '/feedback' },

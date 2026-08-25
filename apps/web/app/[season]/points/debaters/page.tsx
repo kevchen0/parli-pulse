@@ -1,7 +1,7 @@
 import { dbReady, getDebaters } from '@/lib/db';
 import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
 import { seasonHref } from '@/lib/season';
-import Pager, { PAGE_SIZE, clampPage, pageCount } from '@/app/pager';
+import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
 
 export const revalidate = 300;
 
@@ -10,7 +10,7 @@ export default async function DebatersPage({
   searchParams,
 }: {
   params: Promise<{ season: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
   const { season } = await params;
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
@@ -18,9 +18,19 @@ export default async function DebatersPage({
   if (debaters.length === 0) return <p className="empty">No standings yet.</p>;
 
   const qualified = debaters.filter((d) => d.autoQualified).length;
-  const totalPages = pageCount(debaters.length);
-  const page = clampPage((await searchParams).page, totalPages);
-  const shown = debaters.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const sp = await searchParams;
+  const query = (sp.q ?? '').trim();
+  const needle = query.toLowerCase();
+  const matches = needle
+    ? debaters.filter(
+        (d) =>
+          d.name.toLowerCase().includes(needle) ||
+          (d.school ?? '').toLowerCase().includes(needle),
+      )
+    : debaters;
+  const totalPages = pageCount(matches.length);
+  const page = clampPage(sp.page, totalPages);
+  const shown = matches.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   return (
     <>
       <h1>Debaters</h1>
@@ -31,6 +41,13 @@ export default async function DebatersPage({
           autoqualification line<sup className="fnref"><a href="#fn-aq">1</a></sup>
         </span>
       </p>
+      <TableSearch
+        action={seasonHref(season, '/points/debaters')}
+        query={query}
+        placeholder="Search debaters or schools"
+      />
+      {matches.length === 0 && <p className="empty">Nothing matches “{query}”.</p>}
+
       <div className="tablewrap">
         <table>
           <thead>
@@ -54,7 +71,22 @@ export default async function DebatersPage({
                     </abbr>
                   ) : null}
                 </td>
-                <td className="pts num">{Number(d.points).toFixed(1)}</td>
+                  <td className="pts num">
+                    {Number(d.points).toFixed(1)}
+                    {d.reconciliation === 'pending' && (
+                      <abbr className="tick pending" title="Not yet published in the league's sheet">
+                        {' '}*
+                      </abbr>
+                    )}
+                    {d.reconciliation === 'differs' && (
+                      <abbr
+                        className="tick differs"
+                        title={`Up to ${Number(d.exposure).toFixed(1)} points rest on partnerships that disagree with the sheet`}
+                      >
+                        {' '}*
+                      </abbr>
+                    )}
+                  </td>
               </tr>
             ))}
           </tbody>
@@ -64,7 +96,8 @@ export default async function DebatersPage({
       <Pager
         page={page}
         total={totalPages}
-        rows={debaters.length}
+        rows={matches.length}
+        query={query}
         basePath={seasonHref(season, '/points/debaters')}
       />
 
@@ -76,6 +109,22 @@ export default async function DebatersPage({
           <a href={seasonHref(season, '/points')}>teams table</a>. Autoqualification also
           depends on results being reported by the deadline, so treat this as a guide rather
           than a statement about who is going.
+        </li>
+        <li id="fn-recon">
+          An asterisk beside a total means it is not settled against the league&rsquo;s
+          published sheet.{' '}
+          <abbr className="tick pending">*</abbr>{' '}
+          amber means the sheet has no row yet, which is normal for a tournament the
+          league has not written up.{' '}
+          <abbr className="tick differs">*</abbr>{' '}
+          red means results behind this total disagree with the sheet by enough to matter.
+          The league publishes no per-debater table we mirror, so this is derived from the
+          partnerships behind the total rather than compared directly, and thresholded on
+          size — a total is marked when at least one per cent of it rests on partnerships
+          that disagree. It says a result feeding this figure is unsettled, not that the
+          league&rsquo;s debater total differs.
+          The <a href={seasonHref(season, '/diagnostic')}>reconciliation page</a> shows
+          which result caused it.
         </li>
       </ol>
     </>

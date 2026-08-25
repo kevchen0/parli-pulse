@@ -618,3 +618,49 @@ abbr.tick.differs { color: var(--bad); }
 .pagergap { padding: 0.22rem 0.2rem; color: var(--faint); }
 
 .footnotes abbr.tick { margin-right: 0.1rem; }
+
+/* --- table search and page jump --- */
+
+.tablesearch { display: flex; gap: 0.4rem; align-items: center; margin: 0 0 0.9rem; flex-wrap: wrap; }
+.tablesearch input {
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.55rem;
+  min-width: min(20rem, 100%);
+  flex: 1 1 14rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-firm);
+  border-radius: var(--radius);
+}
+.tablesearch button {
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.35rem 0.7rem;
+  color: var(--text);
+  background: var(--sunk);
+  border: 1px solid var(--border-firm);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.tablesearch button:hover { background: var(--surface); }
+.clearsearch { font-size: 0.8125rem; color: var(--muted); text-decoration: none; }
+.clearsearch:hover { color: var(--text); }
+
+/* The gap in the pager takes a page number instead of stating that pages are
+   missing: with eight hundred rows, the gap is exactly where a reader acts. */
+.pagerjump { display: inline-flex; }
+.pagerjump input {
+  width: 3.2rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  text-align: center;
+  padding: 0.22rem 0.25rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px dashed var(--border-firm);
+  border-radius: var(--radius);
+  font-variant-numeric: tabular-nums;
+}
+.pagerjump input::placeholder { color: var(--faint); }
+.pagerjump input:focus { border-style: solid; outline: 2px solid var(--accent); outline-offset: 1px; }

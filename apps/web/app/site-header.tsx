@@ -21,7 +21,7 @@ export default function SiteHeader() {
         <nav className="sitenav" aria-label="About this site">
           <Link href={`/${currentSeason()}/points` as never}>Rankings</Link>
           {SITE_NAV.map((item) => (
-            <Link key={item.path} href={item.path}>{item.label}</Link>
+            <Link key={item.path} href={item.path as never}>{item.label}</Link>
           ))}
         </nav>
       </div>

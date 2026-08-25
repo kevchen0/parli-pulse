@@ -99,17 +99,66 @@ export interface DebaterRow {
   school: string | null;
   region: string | null;
   autoQualified: boolean;
+  /**
+   * Whether the results behind this total are settled against the sheet.
+   *
+   * Derived, not compared: the league publishes nothing per debater that we
+   * mirror, so this reports exposure to unsettled partnerships rather than a
+   * measured difference in the debater's own figure.
+   *
+   * It is thresholded on size for a reason. Flagging every total with any
+   * unsettled partnership behind it marked 42 of 47 schools -- true, and so
+   * nearly universal that it carried no information. Exposure of at least one
+   * per cent of the total marks 14, which is a signal.
+   */
+  reconciliation: 'agrees' | 'differs' | 'pending';
+  /** Points of disagreement behind this total, summed across partnerships. */
+  exposure: number;
 }
 
 export async function getDebaters(season: SeasonId, limit = 5000): Promise<DebaterRow[]> {
   const { db } = handle();
   const rows = await db.execute(sql`
+    -- How each partnership stands against the sheet, so a debater or school
+    -- total can say whether the results behind it are settled.
+    with team_state as (
+      select ts.id, ts.debater1_id, ts.debater2_id, ts.school_id,
+             case
+               when sd.id is null then 'pending'
+               when abs(coalesce(sd.delta, 0)) > 0.05 then 'differs'
+               else 'agrees'
+             end as state,
+             abs(coalesce(sd.delta, 0)) as gap
+      from ${t.teamSeasonTotals} ts
+      left join ${t.standingDiagnostics} sd
+        on sd.team_id = ts.id and sd.season_id = ts.season_id
+      where ts.season_id = ${season}
+    ),
+    per_debater as (
+      select debater_id,
+             sum(gap) as exposure,
+             bool_or(state = 'differs') as any_differs,
+             bool_or(state = 'pending') as any_pending
+      from (
+        select debater1_id as debater_id, state, gap from team_state
+        union all
+        select debater2_id as debater_id, state, gap from team_state
+      ) x group by debater_id
+    )
     select ds.rank, ds.points, ds.auto_qualified as "autoQualified",
+           coalesce(pd.exposure, 0) as exposure,
+           case
+             when pd.any_differs and coalesce(pd.exposure, 0) >= 0.01 * ds.points
+               then 'differs'
+             when pd.any_pending then 'pending'
+             else 'agrees'
+           end as reconciliation,
            coalesce(d.first_name || ' ', '') || d.last_name as name,
            coalesce(s.short_name, s.name) as school, s.region
     from ${t.debaterSeasonTotals} ds
     join ${t.debaters} d on d.id = ds.debater_id
     left join ${t.schools} s on s.id = d.school_id
+    left join per_debater pd on pd.debater_id = ds.debater_id
     where ds.season_id = ${season}
     order by ds.rank asc
     limit ${limit}
@@ -122,14 +171,44 @@ export interface SchoolRow {
   points: number;
   name: string;
   region: string | null;
+  /** As on debaters: exposure to unsettled partnerships, not a measured gap. */
+  reconciliation: 'agrees' | 'differs' | 'pending';
+  exposure: number;
 }
 
 export async function getSchools(season: SeasonId): Promise<SchoolRow[]> {
   const { db } = handle();
   const rows = await db.execute(sql`
-    select ss.rank, ss.points, coalesce(s.short_name, s.name) as name, s.region
+    with team_state as (
+      select ts.school_id,
+             case
+               when sd.id is null then 'pending'
+               when abs(coalesce(sd.delta, 0)) > 0.05 then 'differs'
+               else 'agrees'
+             end as state,
+             abs(coalesce(sd.delta, 0)) as gap
+      from ${t.teamSeasonTotals} ts
+      left join ${t.standingDiagnostics} sd
+        on sd.team_id = ts.id and sd.season_id = ts.season_id
+      where ts.season_id = ${season}
+    ),
+    per_school as (
+      select school_id, sum(gap) as exposure,
+             bool_or(state = 'differs') as any_differs,
+             bool_or(state = 'pending') as any_pending
+      from team_state where school_id is not null group by school_id
+    )
+    select ss.rank, ss.points, coalesce(s.short_name, s.name) as name, s.region,
+           coalesce(ps.exposure, 0) as exposure,
+           case
+             when ps.any_differs and coalesce(ps.exposure, 0) >= 0.01 * ss.points
+               then 'differs'
+             when ps.any_pending then 'pending'
+             else 'agrees'
+           end as reconciliation
     from ${t.schoolSeasonTotals} ss
     join ${t.schools} s on s.id = ss.school_id
+    left join per_school ps on ps.school_id = ss.school_id
     where ss.season_id = ${season}
     order by ss.rank asc
   `);

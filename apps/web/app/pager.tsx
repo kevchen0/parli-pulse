@@ -40,6 +40,41 @@ export function clampPage(raw: string | undefined, total: number): number {
 }
 
 /**
+ * A search box over the table below it.
+ *
+ * A plain GET form: it needs no JavaScript, the result is a URL that can be
+ * shared, and the browser's own history works. `name="q"` is read back by the
+ * page, so a search survives a reload and a page change.
+ */
+export function TableSearch({
+  action,
+  query,
+  placeholder,
+}: {
+  action: string;
+  query: string;
+  placeholder: string;
+}) {
+  return (
+    <form className="tablesearch" method="get" action={action} role="search">
+      <input
+        type="search"
+        name="q"
+        defaultValue={query}
+        placeholder={placeholder}
+        aria-label={placeholder}
+      />
+      <button type="submit">Search</button>
+      {query ? (
+        <Link href={action as never} className="clearsearch">
+          Clear
+        </Link>
+      ) : null}
+    </form>
+  );
+}
+
+/**
  * The pager for a server-rendered table, as links.
  *
  * Links rather than buttons so a page can be shared, opened in a new tab and
@@ -50,14 +85,22 @@ export default function Pager({
   total,
   basePath,
   rows,
+  query = '',
 }: {
   page: number;
   total: number;
   basePath: string;
   rows: number;
+  query?: string;
 }) {
   if (total <= 1) return null;
-  const href = (p: number) => (p === 1 ? basePath : `${basePath}?page=${p}`) as never;
+  const href = (p: number) => {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (p > 1) params.set('page', String(p));
+    const qs = params.toString();
+    return (qs ? `${basePath}?${qs}` : basePath) as never;
+  };
   const first = (page - 1) * PAGE_SIZE + 1;
   const last = Math.min(page * PAGE_SIZE, rows);
 
@@ -74,9 +117,20 @@ export default function Pager({
         )}
         {pageNumbers(page, total).map((p, i) =>
           p === '…' ? (
-            <span key={`gap-${i}`} className="pagergap" aria-hidden>
-              …
-            </span>
+            // The gap is where a reader with eight hundred rows actually needs
+            // to act, so it takes a page number rather than stating that some
+            // pages are missing. A GET form, so it works without JavaScript.
+            <form key={`jump-${i}`} className="pagerjump" method="get" action={basePath}>
+              {query ? <input type="hidden" name="q" value={query} /> : null}
+              <input
+                type="number"
+                name="page"
+                min={1}
+                max={total}
+                placeholder="…"
+                aria-label={`Go to a page between 1 and ${total}`}
+              />
+            </form>
           ) : (
             <Link
               key={p}
