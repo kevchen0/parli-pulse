@@ -125,7 +125,7 @@ async function buildResolver(
 
   const nameOf = await loadNameIndex(db);
   const collapsed = collapsePartnerships(
-    [...schoolsByPair].map(([pair, schools]) => ({
+    [...schoolsByPair].sort((x, y) => x[0].localeCompare(y[0])).map(([pair, schools]) => ({
       pair,
       schoolId: dominantSchool(schools, memberSchools) ?? '',
     })),
@@ -159,6 +159,11 @@ export async function loadRatingData(db: Db, season: string): Promise<RatingData
         and e.division = 'open'
         and b.entry_id is not null
       group by 1, 2, 3, 4, 5, 6, 7
+      -- Postgres does not promise an order without one, and the collapse below
+      -- is order-sensitive: the first pair of a group names it unless a fully
+      -- named pair displaces it. Without this the ratings, and the validation
+      -- numbers that justify them, move slightly between identical runs.
+      order by b.section_id, b.entry_id
     `)
   ).rows as unknown as BallotRow[];
 
