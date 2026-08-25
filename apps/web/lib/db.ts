@@ -132,6 +132,8 @@ export interface SpeakerSummary {
   total: number;
   /** Ballots belonging to the ranked debaters -- what the table is built on. */
   rankedBallots: number;
+  /** Mean number of distinct judges behind a ranked debater's figure. */
+  avgJudges: number;
   scores: number;
   excluded: number;
 }
@@ -145,6 +147,16 @@ export async function getSpeakerSummary(): Promise<SpeakerSummary> {
             where season_id = ${CURRENT_SEASON}) as total,
            (select coalesce(sum(ballots), 0)::int from ${t.debaterSpeakerTotals}
             where season_id = ${CURRENT_SEASON} and rank is not null) as "rankedBallots",
+           -- How many different judges a ranked figure rests on, measured
+           -- rather than asserted: the footnote quotes this.
+           (select round(avg(j))::int from (
+              select count(distinct s.judge_id) as j
+              from ${t.debaterSpeakerTotals} st
+              join ${t.debaters} d on coalesce(d.canonical_id, d.id) = st.debater_id
+              join ${t.speakerScores} s on s.debater_id = d.id and s.z is not null
+              where st.season_id = ${CURRENT_SEASON} and st.rank is not null
+              group by st.debater_id
+            ) x) as "avgJudges",
            -- Only scores that were actually normalized; the table also holds
            -- novice and JV ballots, which this measure does not rate.
            (select count(*)::int from ${t.speakerScores} where z is not null) as scores,
@@ -154,6 +166,7 @@ export async function getSpeakerSummary(): Promise<SpeakerSummary> {
   return {
     ranked: Number(row.ranked ?? 0), total: Number(row.total ?? 0),
     rankedBallots: Number(row.rankedBallots ?? 0),
+    avgJudges: Number(row.avgJudges ?? 0),
     scores: Number(row.scores ?? 0), excluded: Number(row.excluded ?? 0),
   };
 }

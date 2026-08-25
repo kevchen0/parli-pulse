@@ -29,11 +29,13 @@ export default async function SpeakersPage() {
           <b>Z-score</b> measures every ballot against the judge who gave it — how many
           standard deviations above or below that judge&rsquo;s own average it sits — and
           averages a debater&rsquo;s ballots. Zero is exactly average; +1.00 is a full
-          deviation better than the typical ballot from the judges they faced. The figures at
-          the top of this table each rest on 19 to 71 different judges, so they average across
-          many standards rather than comparing anyone to a single judge. Judges are measured by
-          median and interquartile spread, so one unusually low ballot cannot shift everyone
-          else they ranked, and a judge with few ballots is pulled toward the field average.
+          deviation better than the typical ballot from the judges they faced. Debaters here
+          almost never draw the same judge twice — a ranked figure rests on{' '}
+          <b>{summary.avgJudges} different judges</b> on average — so it reflects many
+          judges&rsquo; standards rather than any one judge&rsquo;s opinion. Each judge&rsquo;s
+          own baseline is a median and an interquartile spread, so a single unusually low
+          ballot cannot shift everyone else they ranked, and a judge with few ballots is pulled
+          toward the field average.
         </li>
         <li>
           The smaller figure beside each z-score is the <b>95% confidence interval</b>: the
