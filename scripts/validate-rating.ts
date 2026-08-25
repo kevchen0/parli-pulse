@@ -27,7 +27,12 @@ import { createDb } from '../packages/db/src/client.ts';
 import * as t from '../packages/db/src/schema.ts';
 import { weightedTotal } from '../packages/rules/src/index.ts';
 import {
+  type BradleyTerryRound,
   DEFAULT_OPTIONS,
+  ballotScore,
+  fieldSpread,
+  fitBradleyTerry,
+  shrinkToField,
   type RatedRound,
   type RatingPeriod,
   SeasonRun,
@@ -300,6 +305,154 @@ class GlickoModel implements Model {
   observe(period: RatingPeriod): void { this.run.runPeriod(period); }
 }
 
+/**
+ * Glicko-2 with the field prior applied before predicting.
+ *
+ * Glicko starts a competitor at "could be anywhere" and widens its predictions
+ * by both deviations. The field is not anywhere: true partnership strengths are
+ * spread about 117 rating points, which is far tighter than the default. Pulling
+ * each rating toward the field in proportion to its deviation adds that
+ * information, and it is the same penalty a global fit gets from L2 -- the thing
+ * that stops an isolated pool drifting.
+ *
+ * The spread is estimated from the ratings seen so far, so nothing is tuned.
+ */
+class ShrunkGlickoModel implements Model {
+  readonly name: string;
+  private readonly inner: GlickoModel;
+  private tau = 150;
+
+  constructor(name: string, options: Partial<SeasonOptions>, members: ReadonlyMap<string, readonly string[]>) {
+    this.name = name;
+    this.inner = new GlickoModel(name, options, members);
+  }
+  predict(round: RatedRound, date: string): number {
+    const run = this.inner.run;
+    const a = run.ratingAt(round.a, date);
+    const b = run.ratingAt(round.b, date);
+    const adv = round.sideA === 1 ? run.options.sideAdvantage : -run.options.sideAdvantage;
+    return winProbability(
+      { rating: shrinkToField(a, this.tau), deviation: a.deviation },
+      { rating: shrinkToField(b, this.tau), deviation: b.deviation },
+      adv,
+    );
+  }
+  observe(period: RatingPeriod): void {
+    this.inner.observe(period);
+    const seen = this.inner.run.standingsAt(period.date).filter((s) => s.rounds >= 5);
+    if (seen.length > 20) this.tau = fieldSpread(seen.map((s) => s.rating));
+  }
+}
+
+/**
+ * Bradley-Terry, refitted from scratch before each rating period.
+ *
+ * `membersOf` decides what is being rated. Returning the partnership itself
+ * rates partnerships; returning its two debaters rates people, and pools each
+ * debater's evidence across every partner they had -- the thing sparsity is
+ * supposed to respond to.
+ */
+class BradleyTerryModel implements Model {
+  readonly name: string;
+  private readonly lambda: number;
+  private readonly marginWeight: number;
+  private readonly membersOf: (subject: string) => readonly string[];
+  private readonly index = new Map<string, number>();
+  private readonly seen: BradleyTerryRound[] = [];
+  private fit = { strength: new Float64Array(0), side: 0 };
+  private dirty = false;
+
+  constructor(
+    name: string,
+    lambda: number,
+    marginWeight: number,
+    membersOf: (subject: string) => readonly string[],
+  ) {
+    this.name = name;
+    this.lambda = lambda;
+    this.marginWeight = marginWeight;
+    this.membersOf = membersOf;
+  }
+
+  private idsFor(subject: string): number[] {
+    return this.membersOf(subject).map((m) => {
+      let i = this.index.get(m);
+      if (i === undefined) {
+        i = this.index.size;
+        this.index.set(m, i);
+      }
+      return i;
+    });
+  }
+
+  private refit(): void {
+    if (!this.dirty) return;
+    this.fit = fitBradleyTerry(this.seen, this.index.size, { lambda: this.lambda });
+    this.dirty = false;
+  }
+
+  predict(round: RatedRound): number {
+    this.refit();
+    // A subject unseen so far has no parameter; an out-of-range index reads as
+    // zero strength, which is exactly the right answer for an unknown team.
+    const a = this.idsFor(round.a);
+    const b = this.idsFor(round.b);
+    const strength = this.fit.strength;
+    const z = (idx: readonly number[], sign: number): number =>
+      idx.reduce((t, i) => t + sign * (strength[i] ?? 0), 0);
+    return 1 / (1 + Math.exp(-(z(a, 1) + z(b, -1) + this.fit.side * (round.sideA === 1 ? 1 : -1))));
+  }
+
+  observe(period: RatingPeriod): void {
+    for (const round of period.rounds) {
+      this.seen.push({
+        a: this.idsFor(round.a),
+        b: this.idsFor(round.b),
+        score: ballotScore(round.wonA, round.ballots, this.marginWeight),
+        side: round.sideA === 1 ? 1 : -1,
+      });
+    }
+    this.dirty = true;
+  }
+}
+
+/**
+ * Does a stated probability mean what it says?
+ *
+ * Accuracy throws away everything a model says beyond which side it favours.
+ * "70% Nueva" and "95% Nueva" score identically when Nueva wins and identically
+ * when they lose, which is why log loss and Brier are reported beside it -- both
+ * price the confidence, not just the call. This table is the readable form of
+ * the same question: group the rounds by how sure the model was, and check how
+ * often it was right in each group. A model whose 70% bucket wins 70% of the
+ * time is telling the truth about its own uncertainty.
+ */
+function calibration(predictions: readonly Prediction[]): void {
+  const buckets = [
+    [0.5, 0.55], [0.55, 0.6], [0.6, 0.65], [0.65, 0.7],
+    [0.7, 0.8], [0.8, 0.9], [0.9, 1.01],
+  ] as const;
+  console.log('  stated confidence      rounds   said    actual');
+  console.log('  ' + '-'.repeat(48));
+  for (const [lo, hi] of buckets) {
+    // Read from the favourite's side, so every round sits in one bucket.
+    const inBucket = predictions.filter((p) => {
+      const c = Math.max(p.p, 1 - p.p);
+      return c >= lo && c < hi;
+    });
+    if (inBucket.length === 0) continue;
+    const said = inBucket.reduce((t, p) => t + Math.max(p.p, 1 - p.p), 0) / inBucket.length;
+    const actual = inBucket.filter((p) => p.p > 0.5).length / inBucket.length;
+    console.log(
+      `  ${(100 * lo).toFixed(0)}-${(100 * hi).toFixed(0)}%`.padEnd(23) +
+        `${String(inBucket.length).padStart(6)}  ${pct(said)}   ${pct(actual)}`,
+    );
+  }
+  const ceiling =
+    predictions.reduce((t, p) => t + Math.max(p.p, 1 - p.p), 0) / predictions.length;
+  console.log(`  if every stated probability were exactly right: ${pct(ceiling)} accuracy`);
+}
+
 // --- Harness ---------------------------------------------------------------
 
 /**
@@ -527,14 +680,42 @@ async function main(): Promise<void> {
     }
     console.log(`\nchosen: ${chosen.name}`);
 
+    // --- The Bradley-Terry penalty, also chosen on dev ---
+    //
+    // This one parameter is the whole design, so it gets the same treatment as
+    // the Glicko variants: swept on January and then left alone.
+    const sweepLambda = (label: string, membersOf: (s: string) => readonly string[]): number => {
+      const rows = [0.5, 1, 2, 4, 8, 16].map((lambda) => {
+        const m = new BradleyTerryModel(`${label} lambda ${lambda}`, lambda, 1, membersOf);
+        fit(m, train);
+        return { lambda, s: score(evaluate(m, dev, counterOver(train))) };
+      });
+      rows.sort((a, b) => a.s.logLoss - b.s.logLoss);
+      console.log(`\n${label}: penalty swept on dev`);
+      for (const r of rows) {
+        console.log(`  lambda ${String(r.lambda).padEnd(6)} ${pct(r.s.accuracy)}    ${num(r.s.logLoss)}`);
+      }
+      return rows[0]!.lambda;
+    };
+    const btLambda = sweepLambda('Bradley-Terry (pairs)', (s) => [s]);
+    const btPeopleLambda = sweepLambda(
+      'Bradley-Terry (people)',
+      (s) => data.members.get(s) ?? [s],
+    );
+
     // --- The held-out test, run once ---
     const fitting = [...train, ...dev];
+    const memberLookup = (subject: string): readonly string[] =>
+      data.members.get(subject) ?? [subject];
     const models: Model[] = [
       new CoinFlip(),
       new SideOnly(),
       new WinRate(),
       new ArticleXxiPoints(pointsByPeriod),
       new GlickoModel('Glicko-2', chosen.options, data.members),
+      new ShrunkGlickoModel('Glicko-2 + field prior', chosen.options, data.members),
+      new BradleyTerryModel('Bradley-Terry (pairs)', btLambda, 1, (s) => [s]),
+      new BradleyTerryModel('Bradley-Terry (people)', btPeopleLambda, 1, memberLookup),
     ];
     const results = models.map((m) => {
       fit(m, fitting);
@@ -564,7 +745,12 @@ async function main(): Promise<void> {
       })),
     );
 
-    const glickoP = results.at(-1)!.predictions;
+    for (const r of results.slice(-3)) {
+      console.log(`\ncalibration, ${r.name}:`);
+      calibration(r.predictions);
+    }
+
+    const glickoP = results.find((r) => r.name === 'Glicko-2')!.predictions;
     const pointsP = results.find((r) => r.name === 'Article XXI points')!.predictions;
     const glicko = score(glickoP);
     const points = score(pointsP);
