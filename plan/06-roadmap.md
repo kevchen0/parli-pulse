@@ -90,6 +90,11 @@ additive, which cannot see the partnership the board is about.
 
 ## Next
 
+### Phase 6a — Site structure and identity
+Navigation that encodes what is the league's and what is ours, a real season
+control, an About/Privacy/Method/Feedback set, and an identity that is chosen
+rather than defaulted. Planned in [11-site.md](11-site.md).
+
 ### Phase 6 — Profiles and depth
 Debater, team, school and tournament pages. Head-to-head records.
 
