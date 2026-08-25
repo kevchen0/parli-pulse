@@ -56,15 +56,24 @@ both centre and spread shrunk toward the field by sample size.
 
 ---
 
-### Phase 5 — Glicko-2
-Partnership ratings at `/rankings/ratings`, ordered on the rating less its
-deviation, gated at ten rated rounds.
+### Phase 5 — Glicko-2 with a field prior
+Partnership ratings at `/rankings/ratings`, ordered on the rating shrunk toward
+the field by its deviation, gated at ten rated rounds. Method written for a
+reader at `/rankings/ratings/method`.
 
 The gate was that it beat "higher Article XXI points wins" on held-out rounds
 or be reported as a failure. On 2,209 rounds from February 2026 onward it
-predicted 63.4% against the league ranking's 61.2%, at a log loss of 0.638
-against 0.665. The accuracy gap's 95% interval is 0.0 to 4.3 points; the log
-loss gap is the surer of the two.
+predicted 63.4% against the league ranking's 59.8%, at a log loss of 0.638
+against 0.665 — a 3.6 point gap, 95% interval 1.2 to 6.0 on a paired bootstrap.
+The log loss gap is the surer of the two.
+
+The board is ordered on the shrunk figure and predictions use the raw one.
+Glicko alone put a twelve-round partnership at the top on 92% in-region rounds;
+deviation counts how many rounds a team has debated, not whether they connect to
+anything. Shrinking by deviation fixes that ordering, and shrinking *before*
+predicting makes prediction worse, because the win probability already widens by
+both deviations. Two dead ends are recorded in [05-metrics.md](05-metrics.md) so
+they are not retried.
 
 7,699 rated rounds over 78 tournaments and 1,776 partnerships, of which 387
 clear the round gate. Method and the full comparison in
@@ -72,6 +81,10 @@ clear the round gate. Method and the full comparison in
 
 No elim multiplier and no field-size weighting, both for the same reason:
 opponent quality already prices them.
+
+Rating individual debaters predicts better still — 64.4% — and was set aside
+deliberately: it can only pool evidence across partners by assuming strength is
+additive, which cannot see the partnership the board is about.
 
 ---
 

@@ -28,13 +28,21 @@ Live at `/rankings`: teams, debaters, schools, speakers, ratings, and a
 diagnostic tab reconciling every partnership against the league result by
 result.
 
-**Phase 5 shipped.** Glicko-2 on partnerships, at `/rankings/ratings`. The gate
-was that it beat "higher Article XXI points wins" on held-out rounds or be
+**Phase 5 shipped.** Glicko-2 on partnerships with a field prior, at
+`/rankings/ratings`, explained for a reader at `/rankings/ratings/method`. The
+gate was that it beat "higher Article XXI points wins" on held-out rounds or be
 reported as a failure; on 2,209 rounds from February 2026 it predicted 63.4%
-against the league ranking's 61.2%, at a log loss of 0.638 against 0.665. The
-accuracy gap's 95% interval is 0.0 to 4.3 points, so the log loss is the sturdier
-claim. Method, the full comparison table, and everything deliberately left out
-are in [05-metrics.md](05-metrics.md).
+against the league ranking's 59.8%, at a log loss of 0.638 against 0.665 — a 3.6
+point gap, 95% interval 1.2 to 6.0 on a paired bootstrap.
+
+**The board is ordered on the shrunk rating; predictions use the raw one.**
+Glicko alone handed the top of the board to a twelve-round partnership who had
+spent 92% of those rounds inside their own region — deviation counts rounds
+debated, not whether they connect to anything. Shrinking each rating toward the
+field by its deviation fixes the ordering; shrinking before *predicting* makes
+prediction worse, because the win probability already widens by both deviations.
+Two plausible fixes that failed are recorded in [05-metrics.md](05-metrics.md)
+so they are not tried again.
 
 | | |
 |---|---|
@@ -49,7 +57,7 @@ are in [05-metrics.md](05-metrics.md).
 | `npm run load` | rebuild a season from cached payloads (`SEASON=` to pick) |
 | `npm run rollup` | identity merging, then team/debater/school standings |
 | `npm run speaks` | judge-normalized speaker points |
-| `npm run rate` | Glicko-2 partnership ratings |
+| `npm run rate` | Glicko-2 partnership ratings, with the field prior |
 | `npm run validate:rating` | the held-out comparison against the league ranking |
 | `npm run diagnostics` | the reconciliation the site displays |
 | `npm run backtest` | fields, per-entry, partnerships |

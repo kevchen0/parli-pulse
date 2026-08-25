@@ -198,6 +198,23 @@ assertions and both failed on the first implementation.
     `node_modules` symlink. Scripts import packages by relative path and never
     notice; only the web app uses the `@parli-pulse/*` specifiers.
 
+30. **An unordered query fed an order-sensitive collapse.** The section
+    extraction had no `ORDER BY`, and the partnership collapse names a group
+    after the first pair it sees. Postgres does not promise an order without
+    one, so identical runs of the validation disagreed — 64.0% one run, 63.4%
+    the next, with no code change between — and the variant selection picked a
+    different winner each time. Any query whose row order reaches a decision
+    needs an explicit `ORDER BY`, and a script whose output should be
+    reproducible should be run twice and diffed before its numbers are quoted.
+31. **`tsc --build` passed while the script crashed at runtime, twice.** Both
+    times an identifier was genuinely undefined — once a missing import, once a
+    helper that had been renamed — and both times the incremental build info
+    was stale enough to report success. `npm run typecheck` is not proof a
+    script runs. Run the script.
+
+**Rule:** a number nobody re-derived is a number nobody has checked. Run it
+twice, and run it after the typecheck rather than instead of it.
+
 ---
 
 ## What actually caught these
@@ -215,6 +232,7 @@ Ranked by yield:
    but chasing why led straight to Pattern D.
 4. **Checking whether a fix actually moved the number.** Twice a fix appeared
    to do nothing; once it was stale duplicate code, once the wrong root cause.
+   The converse caught #30: a number that moved when nothing had changed.
 5. **Writing the test that asserts the obvious.** Pattern H was found by a test
    saying two unknown debaters make an unknown partnership — a line nobody would
    write if they were only testing what they thought was hard.
