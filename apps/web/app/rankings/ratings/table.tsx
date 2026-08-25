@@ -11,14 +11,16 @@ const INITIAL_ROWS = 100;
 
 /**
  * The rating a partnership has established, as opposed to the one it might
- * have: the rating less its deviation.
+ * have: the rating pulled toward the field in proportion to its deviation.
  *
  * This is what the table sorts on by default. A partnership that has won a
  * great deal over twelve rounds and one that has won as much over ninety are
  * not making the same claim, and ordering on the rating alone puts the twelve
- * first -- which reports how little is known, not who is better.
+ * first -- which reports how little is known, not who is better. Computed by
+ * `npm run rate` and stored, so the site and the pipeline cannot disagree about
+ * the order; the method is at /rankings/ratings/method.
  */
-const shown = (r: RatingRow): number => Number(r.rating) - Number(r.deviation);
+const shown = (r: RatingRow): number => Number(r.shrunk ?? r.rating);
 
 const value = (r: RatingRow, key: SortKey): number =>
   key === 'rating' ? Number(r.rating) : key === 'rounds' ? r.rounds : shown(r);
