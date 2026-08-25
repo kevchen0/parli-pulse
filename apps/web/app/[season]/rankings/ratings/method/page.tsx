@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { MIN_RATED_ROUNDS } from '@parli-pulse/rating';
+import { seasonHref } from '@/lib/season';
 import { dbReady, getRatingMethodFigures } from '@/lib/db';
 
 export const revalidate = 300;
@@ -14,8 +15,11 @@ const n0 = (x: number) => Math.round(x).toLocaleString();
  * the equation that performs it. Parameters are read from the season on display
  * rather than typed into the prose, so the spec cannot drift from the pipeline.
  */
-export default async function MethodPage() {
-  const f = dbReady() ? await getRatingMethodFigures() : null;
+export default async function MethodPage(
+  { params }: { params: Promise<{ season: string }> },
+) {
+  const { season } = await params;
+  const f = dbReady() ? await getRatingMethodFigures(season) : null;
 
   return (
     <article className="method">
@@ -350,7 +354,7 @@ export default async function MethodPage() {
       </section>
 
       <p className="backlink">
-        <Link href="/rankings/ratings">&larr; Ratings table</Link>
+        <Link href={seasonHref(season, '/rankings/ratings')}>&larr; Ratings table</Link>
       </p>
     </article>
   );

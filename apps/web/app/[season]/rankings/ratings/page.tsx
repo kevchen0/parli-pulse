@@ -1,13 +1,17 @@
 import Link from 'next/link';
 import { MIN_RATED_ROUNDS } from '@parli-pulse/rating';
+import { seasonHref } from '@/lib/season';
 import { dbReady, getRatingSummary, getRatings } from '@/lib/db';
 import RatingTable from './table';
 
 export const revalidate = 300;
 
-export default async function RatingsPage() {
+export default async function RatingsPage(
+  { params }: { params: Promise<{ season: string }> },
+) {
+  const { season } = await params;
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
-  const [ratings, summary] = await Promise.all([getRatings(), getRatingSummary()]);
+  const [ratings, summary] = await Promise.all([getRatings(season), getRatingSummary(season)]);
   if (ratings.length === 0) {
     return <p className="empty">No ratings yet. Run <code>npm run rate</code>.</p>;
   }
@@ -26,7 +30,7 @@ export default async function RatingsPage() {
         <span><b>{summary.rankedRounds.toLocaleString()}</b> rounds behind them</span>
         <span><b>{summary.periods}</b> tournaments rated</span>
         <span>open divisions only<sup className="fnref"><a href="#fn5">5</a></sup></span>
-        <span className="methodlink"><Link href="/rankings/ratings/method">How this is calculated &rarr;</Link></span>
+        <span className="methodlink"><Link href={seasonHref(season, '/rankings/ratings/method')}>How this is calculated &rarr;</Link></span>
       </p>
 
       <RatingTable rows={ratings} />
@@ -40,7 +44,7 @@ export default async function RatingsPage() {
           twelve excellent rounds do not outrank ninety nearly as good, and a team that has
           only ever debated its own region cannot ride a thin rating to the top.
           Sorting by <b>Rating</b> instead shows the raw estimate.{' '}
-          <Link href="/rankings/ratings/method#prior">The formula and why it is needed &rarr;</Link>
+          <Link href={seasonHref(season, '/rankings/ratings/method', '#prior')}>The formula and why it is needed &rarr;</Link>
         </li>
         <li id="fn2">
           <b>Rating.</b> A Glicko-2 rating: 1500 is the starting point for a partnership nobody
@@ -49,7 +53,7 @@ export default async function RatingsPage() {
           could reasonably sit from the estimate. It narrows as a partnership debates more and
           widens again while they are away. This is the number a prediction should use; the
           uncertainty belongs in the width of the answer rather than in the estimate.{' '}
-          <Link href="/rankings/ratings/method#reading">Two numbers, two jobs &rarr;</Link>
+          <Link href={seasonHref(season, '/rankings/ratings/method', '#reading')}>Two numbers, two jobs &rarr;</Link>
         </li>
         <li id="fn3">
           <b>Rounds.</b> Rated rounds, not ballots: a three-judge panel is one round, won on a
@@ -68,7 +72,7 @@ export default async function RatingsPage() {
           rounds carry no bonus of their own — beating a stronger opponent is already worth more,
           and elim opponents are stronger, so a multiplier would count that twice. This is our
           own measure; the league publishes nothing like it.{' '}
-          <Link href="/rankings/ratings/method">Full methodology &rarr;</Link>
+          <Link href={seasonHref(season, '/rankings/ratings/method')}>Full methodology &rarr;</Link>
         </li>
       </ol>
     </>

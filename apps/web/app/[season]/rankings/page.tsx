@@ -2,9 +2,12 @@ import { dbReady, getSummary, getTeams } from '@/lib/db';
 
 export const revalidate = 300;
 
-export default async function TeamsPage() {
+export default async function TeamsPage(
+  { params }: { params: Promise<{ season: string }> },
+) {
+  const { season } = await params;
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
-  const [teams, summary] = await Promise.all([getTeams(), getSummary()]);
+  const [teams, summary] = await Promise.all([getTeams(season), getSummary(season)]);
   if (teams.length === 0) {
     return <p className="empty">No standings yet. Run <code>npm run load</code> then <code>npm run rollup</code>.</p>;
   }

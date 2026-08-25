@@ -3,9 +3,12 @@ import SpeakerTable from './table';
 
 export const revalidate = 300;
 
-export default async function SpeakersPage() {
+export default async function SpeakersPage(
+  { params }: { params: Promise<{ season: string }> },
+) {
+  const { season } = await params;
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
-  const [speakers, summary] = await Promise.all([getSpeakers(), getSpeakerSummary()]);
+  const [speakers, summary] = await Promise.all([getSpeakers(season), getSpeakerSummary(season)]);
   if (speakers.length === 0) {
     return <p className="empty">No speaker standings yet. Run <code>npm run speaks</code>.</p>;
   }

@@ -2,9 +2,12 @@ import { dbReady, getSchools } from '@/lib/db';
 
 export const revalidate = 300;
 
-export default async function SchoolsPage() {
+export default async function SchoolsPage(
+  { params }: { params: Promise<{ season: string }> },
+) {
+  const { season } = await params;
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
-  const schools = await getSchools();
+  const schools = await getSchools(season);
   if (schools.length === 0) return <p className="empty">No standings yet.</p>;
 
   return (

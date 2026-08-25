@@ -1,8 +1,17 @@
 import Link from 'next/link';
-import { CURRENT_SEASON, hasDatabase } from '@/lib/season';
+import { dbReady, getSeasons } from '@/lib/db';
+import { currentSeason, seasonHref, seasonLabel } from '@/lib/season';
 
-export default function Home() {
-  const connected = hasDatabase();
+export const revalidate = 300;
+
+export default async function Home() {
+  const current = currentSeason();
+  const seasons = dbReady() ? await getSeasons() : [];
+  const live = seasons.find((s) => s.id === current);
+  const hasLive = (live?.tournaments ?? 0) > 0;
+  // The most recent season that actually holds results, which during the weeks
+  // either side of an opener is not the current one.
+  const previous = seasons.find((s) => s.id !== current && s.tournaments > 0);
 
   return (
     <main>
@@ -13,45 +22,87 @@ export default function Home() {
         results.
       </p>
 
-      <p className="status">
-        <span className={connected ? 'dot on' : 'dot'} aria-hidden />
-        {connected
-          ? `Database connected — ${CURRENT_SEASON} season.`
-          : 'Database not connected yet. Rankings appear once ingestion runs.'}
-      </p>
+      {/* A season that has opened with nothing published is a real state, and
+          saying so plainly is better than an empty table or a stale one wearing
+          this season's label. */}
+      <section className="nowbar">
+        <p className="nowseason">{seasonLabel(current)}</p>
+        {hasLive ? (
+          <p className="nowstate">
+            <b>{live!.tournaments}</b> tournament{live!.tournaments === 1 ? '' : 's'} counted
+            so far.{' '}
+            <Link href={seasonHref(current, '/rankings')}>See the standings →</Link>
+          </p>
+        ) : (
+          <p className="nowstate">
+            The season has not published results yet. Standings appear here as tournaments
+            report.{' '}
+            <Link href={seasonHref(current, '/rankings')}>Season page →</Link>
+          </p>
+        )}
+      </section>
 
-      <h2>Rankings</h2>
+      {previous && (
+        <section className="prevbar">
+          <p>
+            <b>{seasonLabel(previous.id)} is complete.</b> Final standings, speaker points
+            and ratings for the whole season are kept in full.
+          </p>
+          <p className="prevlinks">
+            <Link href={seasonHref(previous.id, '/rankings')}>Teams</Link>
+            <Link href={seasonHref(previous.id, '/rankings/debaters')}>Debaters</Link>
+            <Link href={seasonHref(previous.id, '/rankings/schools')}>Schools</Link>
+            <Link href={seasonHref(previous.id, '/rankings/speakers')}>Speakers</Link>
+            <Link href={seasonHref(previous.id, '/rankings/ratings')}>Ratings</Link>
+          </p>
+        </section>
+      )}
+
+      <h2>What is here</h2>
       <div className="grid">
         <section className="card">
-          <h3><Link href="/rankings">Teams</Link></h3>
-          <p>Partnership standings under the Article XXI diminishing-returns formula.</p>
+          <h3>Teams, debaters and schools</h3>
+          <p>
+            Article XXI points under the diminishing-returns formula, individual points
+            pooled across every partner, and member-school totals with hybrids counting
+            half to each.
+          </p>
         </section>
         <section className="card">
-          <h3><Link href="/rankings/debaters">Debaters</Link></h3>
-          <p>Individual points pooled across every partner, with TOC qualification.</p>
+          <h3>Speaker points</h3>
+          <p>
+            Normalized within each judge, so a generous panel and a harsh one are
+            comparable, with a confidence interval on every figure.
+          </p>
         </section>
         <section className="card">
-          <h3><Link href="/rankings/schools">Schools</Link></h3>
-          <p>Member-school totals, with hybrid partnerships counting half to each.</p>
+          <h3>Rating</h3>
+          <p>
+            A Glicko-2 rating over every ballot, shrunk toward the field by its own
+            uncertainty and kept visually distinct from official points.
+          </p>
+        </section>
+        <section className="card">
+          <h3>Reconciliation</h3>
+          <p>
+            Every partnership checked against the league&rsquo;s published standings,
+            result by result, with the differences shown rather than hidden.
+          </p>
         </section>
       </div>
 
       <h2>Still to come</h2>
       <div className="grid">
         <section className="card">
-          <h3>Rating</h3>
-          <p>A Glicko-2 rating over every ballot, shown with its confidence interval and
-            kept visually distinct from official points.</p>
-        </section>
-        <section className="card">
-          <h3>Speaker points</h3>
-          <p>Normalized within each judge, so a generous panel and a harsh one are
-            comparable.</p>
-        </section>
-        <section className="card">
           <h3>Profiles</h3>
-          <p>Debater, team, school, and tournament pages, including head-to-head
-            records.</p>
+          <p>Debater, team, school and tournament pages, including head-to-head records.</p>
+        </section>
+        <section className="card">
+          <h3>Judge scoring</h3>
+          <p>
+            Panel rate, dissent frequency and speaker generosity, shrunk by sample size and
+            shown as distributions rather than a leaderboard.
+          </p>
         </section>
       </div>
     </main>

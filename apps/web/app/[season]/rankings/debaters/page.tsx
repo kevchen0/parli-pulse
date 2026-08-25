@@ -3,9 +3,12 @@ import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
 
 export const revalidate = 300;
 
-export default async function DebatersPage() {
+export default async function DebatersPage(
+  { params }: { params: Promise<{ season: string }> },
+) {
+  const { season } = await params;
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
-  const debaters = await getDebaters();
+  const debaters = await getDebaters(season);
   if (debaters.length === 0) return <p className="empty">No standings yet.</p>;
 
   const qualified = debaters.filter((d) => d.autoQualified).length;

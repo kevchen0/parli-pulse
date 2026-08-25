@@ -1,0 +1,95 @@
+# Nightly ingest for the live season.
+#
+# Runs here rather than on Vercel because payloads reach 84MB and a cron there
+# has an execution-time limit this would exceed. The order is not negotiable:
+# load rebuilds the season, rollup decides who is one person and who is two, and
+# everything downstream groups by the identities rollup settles.
+name: ingest
+
+on:
+  schedule:
+    # 09:10 UTC, a little after 02:10 Pacific -- late enough that a Sunday
+    # tournament has finished posting, early enough to be done before anyone
+    # looks. Offset from the hour because every cron on the hour queues.
+    - cron: '10 9 * * *'
+  workflow_dispatch:
+    inputs:
+      season:
+        description: 'Season to ingest, e.g. 2026-27'
+        required: false
+        type: string
+      refetch_all:
+        description: 'Ignore the 45-day window and refetch every tournament'
+        required: false
+        default: false
+        type: boolean
+
+# One ingest at a time. Two runs writing the same season would race on a table
+# that is cleared and rewritten rather than merged into.
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    # The cache is ~800MB and each step is minutes, not seconds.
+    timeout-minutes: 90
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SEASON: ${{ inputs.season || vars.CURRENT_SEASON || '2026-27' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      # Payloads are gitignored and expensive to re-fetch, so they persist
+      # between runs. The key rolls weekly: a cache that never rotates grows
+      # without bound, and one that never persists refetches 800MB nightly.
+      - name: Restore the payload cache
+        uses: actions/cache@v4
+        with:
+          path: data/raw
+          key: tabroom-${{ env.SEASON }}-${{ github.run_id }}
+          restore-keys: |
+            tabroom-${{ env.SEASON }}-
+
+      # Before anything is scored: if the league has revised a point table, a
+      # whole season would otherwise be computed under last year's rules.
+      - name: Check the point tables against the Board Code
+        run: npm run check:rules
+
+      - name: Fetch
+        run: npm run fetch ${{ inputs.refetch_all && '-- --all' || '' }}
+
+      - name: Load
+        run: npm run load
+
+      - name: Roll up standings
+        run: npm run rollup
+
+      - name: Speaker points
+        run: npm run speaks
+
+      - name: Ratings
+        run: npm run rate
+
+      - name: Diagnostics
+        run: npm run diagnostics
+
+      # A rules change or a failed fetch should reach someone, not just colour a
+      # square in the Actions tab.
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "### Ingest failed for $SEASON" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "The site is now serving data older than it appears to be." >> "$GITHUB_STEP_SUMMARY"
+          echo "Check the failing step above; \`check:rules\` failing means a" >> "$GITHUB_STEP_SUMMARY"
+          echo "point table moved and the season must not be loaded until" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`SEASON_RULES\` is updated." >> "$GITHUB_STEP_SUMMARY"

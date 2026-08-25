@@ -27,6 +27,7 @@ import { createDb } from '../packages/db/src/client.ts';
 import * as t from '../packages/db/src/schema.ts';
 import { weightedTotal } from '../packages/rules/src/index.ts';
 import {
+  type BradleyTerryFit,
   type BradleyTerryRound,
   DEFAULT_OPTIONS,
   ballotScore,
@@ -230,8 +231,8 @@ class ArticleXxiPoints implements Model {
   features(round: RatedRound): number[] {
     return [(this.total(round.a) - this.total(round.b)) / 10, sideFeature(round)];
   }
-  predict(round: RatedRound, date: string): number {
-    return logistic(this.beta, this.features(round, date));
+  predict(round: RatedRound): number {
+    return logistic(this.beta, this.features(round));
   }
   setBeta(beta: number[]): void { this.beta = beta; }
   observe(period: RatingPeriod): void {
@@ -359,7 +360,10 @@ class BradleyTerryModel implements Model {
   private readonly membersOf: (subject: string) => readonly string[];
   private readonly index = new Map<string, number>();
   private readonly seen: BradleyTerryRound[] = [];
-  private fit = { strength: new Float64Array(0), side: 0 };
+  private fit: Pick<BradleyTerryFit, 'strength' | 'side'> = {
+    strength: new Float64Array(0),
+    side: 0,
+  };
   private dirty = false;
 
   constructor(

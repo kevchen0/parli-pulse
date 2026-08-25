@@ -9,7 +9,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --build",
+    "typecheck": "tsc --build && tsc --noEmit -p apps/web/tsconfig.json",
     "backtest": "node scripts/backtest-fields.ts && node scripts/backtest-points.ts && node scripts/backtest-teams.ts",
     "backtest:fields": "node scripts/backtest-fields.ts",
     "backtest:points": "node scripts/backtest-points.ts",
@@ -17,6 +17,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "fetch": "node --env-file=.env scripts/fetch.ts",
+    "check:rules": "node scripts/check-rules.ts",
     "load": "node --env-file=.env scripts/load.ts",
     "rollup": "node --env-file=.env scripts/rollup.ts",
     "compare": "node --env-file=.env scripts/compare-top.ts",

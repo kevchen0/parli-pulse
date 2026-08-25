@@ -153,6 +153,26 @@ const SEASON_RULES: Record<Season, SeasonRules> = {
     elimPointsTable: [],       // filled below; the table is declared later
     diminishingReturnsWeights: [1.0, 0.9, 0.6, 0.3, 0.1],
   },
+  /**
+   * Registered explicitly rather than left to fall through the default.
+   *
+   * Checked against the published Board Code on 2026-08-25, eleven days before
+   * the season's first points-eligible tournament: XXI.3.A still carries the
+   * 2025-26 values, and the document's most recent internal reference is to the
+   * 2026 NPDL-TOC, so the July revision XXI.11 provides for has not been
+   * published at the usual URL. Same tables until it is.
+   *
+   * `rulesForSeason` falls back silently for an unknown season, and a silent
+   * fallback that happens to be right is indistinguishable from one that is
+   * not. Naming the season converts the assumption into a statement, and
+   * `npm run check:rules` fails the moment the league publishes something else.
+   */
+  '2026-27': {
+    season: '2026-27',
+    prelimPoints: PRELIM_POINTS_2025_26,
+    elimPointsTable: [],
+    diminishingReturnsWeights: [1.0, 0.9, 0.6, 0.3, 0.1],
+  },
 };
 
 export const DEFAULT_SEASON: Season = '2025-26';

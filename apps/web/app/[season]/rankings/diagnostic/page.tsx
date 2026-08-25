@@ -28,12 +28,15 @@ function ResultRow({ r }: { r: DiagnosticResult }) {
   );
 }
 
-export default async function DiagnosticPage() {
+export default async function DiagnosticPage(
+  { params }: { params: Promise<{ season: string }> },
+) {
+  const { season } = await params;
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
   const [rows, summary, tournaments] = await Promise.all([
-    getDiagnostics(),
-    getDiagnosticSummary(),
-    getTournamentDiagnostics(),
+    getDiagnostics(season),
+    getDiagnosticSummary(season),
+    getTournamentDiagnostics(season),
   ]);
   if (summary.total === 0) {
     return <p className="empty">No diagnostics yet. Run <code>npm run diagnostics</code>.</p>;

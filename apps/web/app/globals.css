@@ -345,3 +345,76 @@ ol.footnotes li:target { color: var(--text); }
 .method .jobs p { margin: 0; font-size: 0.9375rem; color: var(--muted); }
 
 .method .backlink { margin-top: 2.5rem; font-size: 0.875rem; }
+
+/* --- season framing ---
+   A finished season must not read as this week's results, so every page under
+   one carries a bar saying which it is and whether it is still running. */
+
+.seasonbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin: 1.25rem 0 0;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 0.8125rem;
+}
+/* A completed season is muted; a running one carries the accent. */
+.seasonbar[data-status='final'] { border-left: 3px solid var(--muted); }
+.seasonbar[data-status='live'] { border-left: 3px solid var(--accent); }
+.seasonbar[data-status='upcoming'] { border-left: 3px solid var(--border); }
+
+.seasonpick { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.seasonpick a {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--muted);
+  border: 1px solid transparent;
+  font-variant-numeric: tabular-nums;
+}
+.seasonpick a[data-active='true'] {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--bg);
+  font-weight: 600;
+}
+.seasonpick a:hover { color: var(--text); }
+
+.seasonstate { margin: 0; color: var(--muted); }
+.seasonstate b { color: var(--text); font-weight: 600; }
+
+/* --- front door --- */
+
+.nowbar {
+  margin: 1.5rem 0 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.nowseason {
+  margin: 0 0 0.2rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.nowstate { margin: 0; color: var(--muted); font-size: 0.9375rem; }
+.nowstate a { color: var(--accent); font-weight: 500; }
+
+.prevbar {
+  margin: 0 0 1.5rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+}
+.prevbar p { margin: 0; color: var(--muted); }
+.prevbar b { color: var(--text); }
+.prevlinks { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin-top: 0.5rem !important; }
+.prevlinks a { color: var(--accent); text-decoration: none; }
+.prevlinks a:hover { text-decoration: underline; }

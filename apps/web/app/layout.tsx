@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <p className="banner">
             <strong>Unofficial.</strong> Not affiliated with or endorsed by the National
             Parliamentary Debate League. Official rankings are published at{' '}
-            <a href="https://www.parliamentarydebate.org/rankings-2025-26">
+            <a href="https://www.parliamentarydebate.org/rankings">
               parliamentarydebate.org
             </a>
             .
