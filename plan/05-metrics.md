@@ -1,5 +1,64 @@
 # Metrics beyond Article XXI
 
+## Which rating system — the evidence
+
+Measured on the 2025-26 season, since these properties decide the choice:
+
+| | |
+|---|---|
+| Partnerships with under 10 open rounds | **47%** (328 of 698, averaging 6) |
+| Debaters with more than one partner | 20% (239 of 1,178) |
+| Average opponent quality, prelim vs elim | 9.35 → **14.32** season points |
+| Strong-vs-strong pairings | 5.5% prelim → **22.8% elim** |
+| Side split, open divisions | 47.4% / **52.6%** |
+| Elims as a share of ballots | 21% |
+
+**Elim rounds need no special weighting.** Opponents in elims average 53% more
+season points, and top-tier matchups are four times as common. Any
+opponent-adjusted rating already pays more for an elim win, endogenously.
+Adding a multiplier on top would count the same thing twice. A rating cannot
+see *stress* — if elims should count extra for reasons beyond opponent quality,
+that is a values choice and should be argued as one, not smuggled in as a
+parameter.
+
+**Sparsity is the binding constraint,** not partner churn. Nearly half of
+partnerships have fewer than ten rounds, which no amount of modelling
+manufactures evidence for. It argues for showing uncertainty rather than hiding
+it, and for pooling a debater's rounds across their partnerships where possible
+— a debater with three partners at six rounds each has eighteen rounds of
+signal rather than three unratable fragments.
+
+**Side bias is real.** A 5.2-point edge is large enough that a rating ignoring
+it credits the difference to skill.
+
+### The options
+
+- **Article XXI points** measure accumulation, not strength. No opponent
+  adjustment inside a tournament, so 5-0 at a small local can outscore 4-2 at
+  Stanford. That is a fair description of a season, not of a team.
+- **Glicko-2 on partnerships** measures strength, prices elims automatically,
+  and states its own uncertainty. Interpretable and standard. Leaves half the
+  field effectively unrated, which is honest but thin.
+- **Individual-level (TrueSkill-shaped)** pools evidence across partners, which
+  is the only thing that relieves sparsity, and answers the question people
+  actually argue about. Harder to explain, and assumes team skill is additive.
+- **Bradley-Terry with covariates** fits best and can model side bias and judge
+  effects explicitly, but produces coefficients rather than a rating anyone can
+  narrate.
+
+### Recommendation
+
+Build **Glicko-2 on partnerships** first as the interpretable baseline, ship it
+with RD visible and a minimum-rounds gate, then evaluate an individual-level
+rating against it on held-out late-season rounds. Correct for side in either
+case. Do not add an elim multiplier.
+
+The prediction, stated in advance so it can be wrong: individual-level should
+win, because sparsity binds and pooling across partners is the only relief. If
+Glicko cannot beat "higher Article XXI points wins", that is real information —
+points correlate with strength precisely because strong teams break and
+accumulate — and it should be reported rather than tuned away.
+
 ## Glicko-2 rating
 
 Rate the **team pairing**. A new pairing starts at the average of its debaters'

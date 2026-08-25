@@ -1,80 +1,98 @@
 # Open questions
 
-Nothing here blocks Phases 0-2.
+What is still unresolved, and what has been settled. Answered items stay here
+with their answers, so nobody re-investigates them.
 
-## Before Phase 3 — rules engine
+---
 
-1. **XXI.2.C one-third exception** — measured against the open field or the
-   AFS? Does a bye count as "advanced without debating"? (Byes are common: 12
-   of Berkeley's 16 double-octo sections.)
-2. **XXI.3.B points floor** — "lowest-seeded breaking team with a winning
-   record" by prelim seed or by bracket position? The `Tournaments` tab's
-   `Breaking Record` column looks like the answer; confirm it means what it
-   appears to.
-3. **XXI.2.F** — does "no team shall lose points" floor at 0, or at what their
-   prelim record would have earned?
-4. **Adjustment stacking** — do the break-% penalty and prelim-count adjustment
-   stack additively, and is the result floored before or after the points floor?
-   (Berkeley and Cal both had only one adjustment active, so the data doesn't
-   settle it.)
-5. **XXI.6.C multiple open divisions** — how to detect programmatically versus
-   an Open/JV split? Stanford's `Parli - Open` / `Parli - TOC` is exactly this
-   ambiguity.
-6. **Walkover detection** — the same-school-unscored-elim-section heuristic
-   looks promising. Is it reliable, or are there walkovers it would miss?
-7. **`manual_adj`** — what drives it? A few real examples would let me classify
-   backtest mismatches correctly.
-8. **Two-person rule** — confirm `Incorrect Team Size?` encodes XXI.1.G.
-9. **CHSSA / OSAA scoring differences** — you mentioned differences beyond the
-   rules text, and that these are effectively prelim-only. Please write these
-   up; they're the least documented part of the engine.
-10. **Cal's off-by-one open field** — I compute 58 after forfeit exclusion, the
-    sheet says 59. Which is right?
-11. **Nueva's N/JV field** — sheet records 37, the forfeit-adjusted figure is
-    34. Is the exclusion meant to apply to novice/JV fields, or only to open?
+## Still open — needed before the next phase
 
-26. **Forfeit exclusion divergence.** XXI.2.A read literally (count prelims
-    with no win/loss, threshold 2) reproduces only 62% of official open fields.
-    `dropped` OR three-plus missing reproduces 88%. Is the league's practice
-    "the team stopped competing" rather than a literal ballot count?
-27. **Which season does the alternative non-break table belong to?**
-    (3-1=4, 3-2=3, 4-0=9, 4-1=8, 5-0=12, 4-2=5, 5-1=11, 6-0=14.) It is
-    definitively not 2025-26. If it is 2026-27, the engine needs that season's
-    full table before the season opens.
-28. **State qualifier / alternate results** are not derivable from Tabroom.
-    Is there a source beyond the sheet, or is manual entry expected?
+### Rating design (Phase 5)
+1. **Partnership or person?** The league keys a team by school *and* debaters,
+   so one partnership competing under two registrations becomes two rows with
+   its points split — Schrank & Schwartz appear as Stuyvesant 9.0 and
+   Independent 7.6. We merge them. Ours is arguably the better model but it
+   cannot reconcile against either of theirs. A product decision, not a bug.
+2. **Should novice/JV rounds feed the rating, or open only?** Points are
+   open-only per XXI.1.A, and speaker points now follow that. The rating could
+   still use everything for more evidence.
+3. **Minimum rounds before a partnership appears on the rating board.** 47% of
+   partnerships have fewer than ten open-division rounds, so this decides
+   whether the board has 370 rows or 700.
 
-## Before Phase 4 — speaker points
+### Rules still ambiguous
+4. **XXI.2.C one-third exception** — measured against the open field or the
+   AFS? Does a bye count as "advanced without debating"? Byes are common: 12 of
+   Berkeley's 16 double-octo sections.
+5. **XXI.3.B points floor** — "lowest-seeded breaking team with a winning
+   record" by prelim seed or bracket position? The `Tournaments` tab's
+   `Breaking Record` column behaves like the answer; confirm it means that.
+6. **XXI.2.F** — does "no team shall lose points" floor at 0, or at what the
+   team's own prelim record would have earned?
+7. **XXI.6.C multiple open divisions** — how to detect programmatically versus
+   an Open/JV split. Stanford's `Parli - Open` / `Parli - TOC` is the case.
+8. **`manual_adj`** — what drives it? Berkeley HS and Apollo both carry a +1
+   nobody can derive. A few real examples would let the backtest classify
+   these instead of leaving them unexplained.
+9. **Forfeit exclusion.** XXI.2.A read literally reproduces 62% of official
+   open fields; `dropped` OR three-plus missing reproduces 88%. Is the league's
+   practice "the team stopped competing" rather than a ballot count?
+10. **UCLA's prelim count.** Tabroom shows six preliminary rounds, the league
+    recorded five, which is worth four points to six teams. Dropped round, or a
+    hidden elim counted as a prelim?
+11. **The alternative non-break table** (3-1=4, 3-2=3, 4-0=9, 4-1=8, 5-0=12,
+    4-2=5, 5-1=11, 6-0=14). Definitively not 2025-26 — all 774 non-breaking
+    rows match XXI.3.A exactly. If it is 2026-27, the engine needs that
+    season's table before the season opens. `rulesForSeason()` exists for this.
 
-12. Pool novice/JV speaks with open for a judge's baseline, or keep separate?
-    (Judges score novice rounds higher; I'd keep them separate.)
-13. Minimum ballots before a debater appears on the speaker leaderboard?
-14. Which leagues besides NYPDL declare a non-25-30 scale? I'd rather seed the
-    config table from you than guess from data.
-15. Should punitive sub-25 scores count in a debater's own displayed average?
-    (I'd keep them — they're real results — but never display them as such.)
+### Product and policy
+12. **Debater profile pages** — these are minors. What is shown, and is there
+    an opt-out? Needed before Phase 6.
+13. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.
+14. **Domain name.** Is `parli-pulse` the public name?
+15. **Public "report an error" form** feeding `manual_overrides`?
+16. **Independent or NPDL-affiliated?** The build stays independent-safe either
+    way, but it changes framing and whether the reconciliation report becomes a
+    tool for the Reporting Director.
+17. **Historical archive** — how far back, and where do those sheets live?
+    Roughly 2019 was mentioned. Are they shaped consistently enough for one
+    mirror renderer?
 
-## Before Phase 5 — rating
+---
 
-16. Should novice/JV rounds feed the rating, or open only? (Points are
-    open-only per XXI.1.A, but the rating could use everything.)
-17. Minimum rounds before appearing on the rating leaderboard — 10? 15?
+## Answered
 
-## Season coverage
-
-18. Which season starts the "live" era — 2024-25 or 2025-26? Depends on whether
-    the 24-25 rules are close enough to today's to recompute under one engine.
-19. How far back does the archive go, and where do those sheets live? You
-    mentioned roughly 2019.
-20. Are the historical sheets shaped consistently enough for one mirror
-    renderer, or does each season need its own?
-
-## Product and policy
-
-21. Debater profile pages — these are minors. What's shown, and is there an
-    opt-out?
-22. Judge pages public, or coach-only behind a login?
-23. Domain name. Is `parli-pulse` the public name?
-24. Public "report an error" form feeding `manual_overrides`?
-25. Independent or NPDL-affiliated? Still undecided; the build stays
-    independent-safe either way.
+- **Which season starts the live era** — 2025-26. Earlier seasons are archival
+  (Phase 8); 2024-25 may be backfilled, and the schema and loader are
+  season-keyed throughout, so `SEASON=2024-25 npm run load` is all it takes.
+- **CHSSA and OSAA scoring** — they use the ordinary XXI.3.A prelim table, not
+  the reduced XXI.4.B schedule, and are prelim-only in practice. Implementing
+  XXI.4.B literally dropped CHSSA agreement from 44% to 0%. Qualifier results
+  follow XXI.4.C exactly: `qual` = 8, `alt` = 4.
+- **Adjustment order** — the XXI.3.B points floor lifts the *base*, and
+  adjustments apply on top. Not a floor on the final total. Verified at NYPDL
+  September OL.
+- **The two-person rule** — `Incorrect Team Size?` does encode XXI.1.G.
+  Applying it reproduces Princeton-Campos (32.5) and Dalton-Alexander (16.2)
+  exactly.
+- **Hybrid school value** — half to each school, per XXI.9.C. 56/56 schools
+  exact at half, 43/56 at full.
+- **Individual points** — the debater's own results pooled across every
+  partner, per XXI.8.A. Not averaged between partners.
+- **Speaker pools** — open divisions only, and novice kept separate. Judges
+  score novice rounds differently; mixing distorts both.
+- **Minimum ballots to rank a speaker** — 20. From the data: the spread of
+  season means is 0.75 sd among debaters with ten ballots or fewer, 0.52 by
+  twenty, 0.41 by thirty.
+- **Punitive sub-25 scores** — kept in a debater's own average, since they are
+  real results, but never surfaced as such. Robust judge statistics stop one
+  from distorting everyone else. See [08-risks-policy.md](08-risks-policy.md).
+- **Non-standard speaker scales** — NYPDL 23-30 (verified: 157 scores land
+  exactly on 23, with a smooth distribution above), YFL 1 at 0-100. Everything
+  else 25-30. Held in a config table, never inferred.
+- **Walkovers** — XXI.5.C adjustments are visible in the data (same-school
+  elim sections with no scored ballot), but the engine still reads the value
+  from the sheet's `walkover_adjustment`. Auto-detection is possible and
+  unbuilt.
+- **State qualifier results** are not derivable from Tabroom and come from the
+  sheet's own result column.

@@ -8,7 +8,7 @@ judge-normalized speaker points that exist nowhere today.
 
 | File | What it holds |
 |---|---|
-| [00-session-log.md](00-session-log.md) | **Running log of changes.** Read this first when resuming |
+| [00-session-log.md](00-session-log.md) | **Current state and handoff. Read this first.** |
 | [01-product.md](01-product.md) | What we're building and why; the pages and surfaces |
 | [02-findings.md](02-findings.md) | **Measurements and known facts.** Everything verified against live data |
 | [03-rules-engine.md](03-rules-engine.md) | Article XXI implementation spec |
@@ -39,5 +39,9 @@ judge-normalized speaker points that exist nowhere today.
 
 ## Status
 
-See [00-session-log.md](00-session-log.md) for current state and
-[06-roadmap.md](06-roadmap.md) for the phase plan.
+Phases 0-4 complete and deployed; Phase 5 (Glicko-2) is next. Per-entry
+Article XXI agreement is 98%, partnership season totals 87% exact, and the
+league's top 100 92% exact.
+
+See [00-session-log.md](00-session-log.md) for the handoff and
+[06-roadmap.md](06-roadmap.md) for the phases.

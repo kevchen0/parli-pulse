@@ -22,8 +22,11 @@ Contains: `categories[].events[]` (one per division) → `rounds[]` →
 `students[]` (stable student ids), `hybrid`, `dropped`; plus `result_sets[]`
 (`Prelim Seeds`, `Speaker Awards`, `Bracket`, `Final Places`).
 
-Downloaded all 44 NPDL 2025-26 tournaments (278 MB, cached in `data/raw/tabroom/`).
-**42/44 returned full data**; 15,390 parli ballots. The two failures
+Downloaded the 2025-26 slate (97 tournaments, ~370 MB, cached in
+`data/raw/tabroom/`; gitignored).
+42 of the first 44 returned full data. Note the league's `Tournaments` tab
+carries 97 tournaments including CHSSA league events and state qualifiers,
+where circuit 179 lists only sanctioned invitationals. The two failures
 (`37257` Jon Schamber, `37432` Rutgers) never published results at all — they
 need manual entry, not authentication.
 
