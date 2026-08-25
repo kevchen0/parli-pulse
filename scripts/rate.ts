@@ -26,9 +26,9 @@
  * numbers. `rating` is the estimate itself and is what a prediction should use,
  * since the win probability already widens by both deviations. `shrunkRating`
  * pulls that estimate toward the field in proportion to how little is known,
- * and is what the board is ordered on: a rating built on twelve rounds inside
- * one region should not outrank one built on ninety across the country, and
- * without the shrinkage it does.
+ * and is what the board is ordered on: a rating built on twelve rounds should
+ * not outrank one built on ninety unless it is far enough ahead to survive the
+ * discount, and without the shrinkage it does.
  */
 import { eq, sql } from 'drizzle-orm';
 import { createDb } from '../packages/db/src/client.ts';
@@ -85,9 +85,9 @@ async function main(): Promise<void> {
     const asOf = data.periods.at(-1)!.date;
     // Ordered on the shrunk figure, not the rating. A partnership climbs by
     // being confirmed as well as by winning, which is the only ordering that
-    // survives half the field having fewer than ten rounds -- and the only one
-    // that does not hand the top of the board to a team which has beaten a weak
-    // regional field twelve times.
+    // survives half the field having fewer than ten rounds -- ordering on the
+    // rating itself hands the top of the board to whichever thin rating ran
+    // hottest.
     const standings = run.standingsAt(asOf);
 
     // The spread of *true* strengths, which is not the spread of the observed

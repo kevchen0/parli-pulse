@@ -78,16 +78,15 @@ export interface SeasonOptions {
    *
    * This is what makes a second pass over the season possible. Glicko is a
    * forward-only filter: a result is judged against what its opponents' ratings
-   * were at the time, and nothing ever goes back to reconsider it. In a league
-   * of loosely connected regional pools that is a real defect -- an October
-   * round inside Oregon is scored against opponents who were all still sitting
-   * at the default, and when those same teams travel in March and lose, the fact
-   * that the pool was weaker than it looked never reaches October.
+   * were at the time, and nothing ever goes back to reconsider it. An October
+   * round is scored against opponents who were all still sitting at the default,
+   * and what those opponents turned out to be never reaches October.
    *
-   * Running the season again from these, with deviations widened back out, lets
-   * what was learned late inform what happened early. It is the difference
-   * between a filter and a smoother, and a season that has finished should be
-   * read with the smoother.
+   * Running the season again from these, with deviations widened back out,
+   * should let what was learned late inform what happened early. **It does not
+   * work** -- see `shrinkToField` for the measurements. Kept because the option
+   * is what the measurement was made with, and because it is the obvious idea
+   * that someone will otherwise reach for again.
    */
   initialRatings?: ReadonlyMap<string, Rating>;
   /**
@@ -471,16 +470,25 @@ export { DEFAULT_RATING, DEFAULT_DEVIATION, DEFAULT_VOLATILITY };
  * Pulls every rating toward the field in proportion to how little is known.
  *
  * This is the penalty a global fit gets from L2, applied to a rating Glicko
- * produced. It is the answer to localized clustering, and to the thin ratings
- * that come with it.
+ * produced. What it corrects is **thin evidence**, not isolation: a rating built
+ * on ten or twelve rounds is a high-variance estimate, and some partnerships'
+ * luck runs one way and takes the rating with it. Left alone, the board reports
+ * whoever has been luckiest in the fewest rounds.
+ *
+ * It does *not* know anything about who those rounds were against. Among
+ * partnerships with forty rounds or more the shrinkage applied is flat across
+ * how much of their season was in-region -- 44, 43, 48 and 44 points across the
+ * bands -- and in-region share is uncorrelated with both round count (-0.02) and
+ * deviation (0.03). A well-measured partnership inside an isolated pool keeps
+ * its rating, and the deviation does not warn anyone. See plan/05-metrics.md.
  *
  * Two earlier attempts are worth recording, because both look right and neither
  * is. Running the season repeatedly so late results inform early ones *inflates*
- * an isolated pool rather than correcting it -- the feedback is positive, and a
- * pool that never travels has no outside result to anchor it. Adding a virtual
- * drawn round against the field to each rating period only rescales: every
- * partnership plays roughly six rounds a period, so all of them get anchored in
- * the same proportion and nothing reorders.
+ * a thin rating rather than correcting it -- the feedback is positive, since a
+ * team rated higher on one pass raises its opponents on the next, which raises
+ * the team again. Adding a virtual drawn round against the field to each rating
+ * period only rescales: every partnership plays roughly six rounds a period, so
+ * all of them get anchored in the same proportion and nothing reorders.
  *
  * What both miss is that the penalty has to scale with a partnership's *total*
  * evidence, not their evidence per weekend. That is what the deviation already

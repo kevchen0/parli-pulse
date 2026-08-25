@@ -6,18 +6,18 @@
  * was known when it happened. That is the right shape for a live rating and the
  * wrong shape for two problems this league has.
  *
- * **Pool isolation.** A partnership that debates almost entirely inside one
- * region can be carried upward by beating opponents who are themselves rated on
- * the same thin, local evidence, and nothing in a sequential update pulls the
- * whole pool back toward the field. Cleveland's Waldron & Bernardo spent 92% of
- * their rounds in Oregon, never beat anyone above 1725, and came out rated 1963.
- * Fitting every round simultaneously against a penalty that pulls unsupported
- * strengths toward the middle is what answers that: a cluster with few links to
- * the rest of the field cannot drift far from it, because the penalty is the
- * only thing holding those parameters up.
+ * **Sparsity.** The penalty is shrinkage: a partnership with six rounds cannot
+ * move far from average, without needing a separate gate to say so. That is the
+ * same correction `shrinkToField` applies to a Glicko rating, arrived at by a
+ * different route, and the two reaching nearly the same top ten is worth more
+ * than either alone.
  *
- * **Sparsity.** The penalty is also shrinkage. A partnership with six rounds
- * simply cannot move far from average, without needing a separate gate to say so.
+ * It is **not** a fix for pool isolation, though it was built in the belief that
+ * it would be. In principle a cluster with few links to the rest of the field is
+ * held up only by the penalty; in this data the effect does not appear. Among
+ * partnerships with forty rounds or more, the discount relative to Glicko runs
+ * -19, -16, -7 and +1 points across rising in-region share -- flat, and if
+ * anything sloping the wrong way. See plan/05-metrics.md.
  *
  * The cost is that this is not a rating anyone can narrate -- there is no "they
  * gained 30 points at Berkeley", only a coefficient -- and it has to be refitted

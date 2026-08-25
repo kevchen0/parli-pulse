@@ -189,42 +189,67 @@ comparison is a fair one to run now that the harness exists.
 
 Seasons before 2025-26 stay archival — see [01-product.md](01-product.md).
 
-## Localized clustering, and what does not fix it
+## Thin ratings, and the isolation question they were confused with
 
 The 2025-26 rating put Cleveland's Waldron & Bernardo top of the board on twelve
-rounds, 92% of them against Oregon opposition, having never beaten anyone rated
-above 1725 -- and rated 1963. La Costa Canyon's Reichuber & Sharp were ninth on
-ten rounds with the same shape. Both readings are wrong, and the coach spotted
-them from circuit knowledge before any of this was measured.
+rounds, never having beaten anyone rated above 1725, at 1963. La Costa Canyon's
+Reichuber & Sharp were ninth on ten rounds with the same shape. Both readings
+are wrong, and the coach spotted them from circuit knowledge before any of this
+was measured.
 
-**The cause is connectivity, not sample size.** A partnership that debates almost
-entirely inside one region is rated against opponents who are themselves rated on
-the same thin local evidence. Nothing anchors the pool to the rest of the field,
-so the whole cluster can drift upward together and each team's rating looks
-well-supported from the inside. Deviation does not catch it: RD measures how many
-rounds someone has debated, not whether those rounds connect to anything. Twelve
-rounds inside Oregon and twelve rounds spread across three circuits earn the same
-RD and are not the same evidence.
+**The cause is thin evidence.** A rating built on ten or twelve rounds is a
+high-variance estimate. Run a few hundred partnerships through a short season and
+some will have their luck run one way and their rating will go with it. Ordering
+the board on the raw rating reports whoever has been luckiest in the fewest
+rounds.
 
-The diagnostic that makes it visible is the gap between a partnership's rating
-and the best rating it has actually beaten. Earned ratings sit at or below that
-line -- Georgatos & Miller rate 1881 having beaten 1933. Extrapolated ones sit far
-above it: Waldron & Bernardo by 97 points, Megy & Chowdhury by 131 on rounds that
-were 100% in-region.
+Shrinking each rating toward the field by its own deviation is the fix, and it
+works: the top twelve all have sixteen rounds or more, and the p95 gap between a
+partnership's rating and the best rating it has actually beaten falls from 65
+points to 25. Method and formula in `packages/rating/src/season.ts`.
+
+### The isolation claim was wrong, and is retracted
+
+Both flagged partnerships had also spent almost all their rounds in-region --
+Waldron & Bernardo 92%, Megy & Chowdhury 100% -- and this document previously
+asserted that the cause was **connectivity** rather than sample size, and that
+the field prior and a penalised global fit both corrected it. That was an
+over-reading of a correlation in two hand-picked cases. Checked properly, on the
+question a reader actually asked -- tau is global and RD knows nothing about
+regions, so by what mechanism would either fix a regional problem?
+
+  - In-region share is uncorrelated with round count (**-0.02**) and with
+    deviation (**0.03**). Siloed partnerships are not thin ones; the two
+    offenders happened to be both.
+  - Among partnerships with forty rounds or more, so that thin evidence cannot be
+    doing the work, the shrinkage applied is **flat** across in-region share:
+    44, 43, 48 and 44 points across rising bands.
+  - Bradley-Terry's penalty is no better. Its discount relative to Glicko across
+    the same bands runs **-19, -16, -7, +1** -- flat, and sloping the wrong way
+    if anything.
+
+**Neither method addresses isolation.** Both shrink by evidence, and evidence is
+counted in rounds, not in connections. A well-measured partnership inside an
+isolated pool keeps its rating and nothing warns anyone. The two methods agreeing
+on a top ten is still worth something, but it is agreement about discounting thin
+ratings, not about anchoring pools.
+
+On this season no isolation effect is visible -- among well-measured
+partnerships, ratings do not rise with in-region share. That is not evidence
+there is no problem; detecting one needs cross-pool results the league does not
+generate. It is an open limitation, stated on the public methodology page rather
+than papered over.
 
 ### Two fixes that look right and are not
 
 **Iterating the season makes it worse.** Glicko is a forward-only filter: an
-October round inside Oregon is scored against opponents still sitting at the
-default, and when those teams travel in March and lose, nothing carries that
-back. Running the season again from the finished ratings should let late evidence
-reach early rounds. It does the opposite -- three passes moved Waldron & Bernardo
-from 1963 to **2238** and widened their extrapolation gap from 97 points to 180,
-with the whole field inflating past 2000. The feedback is positive, not
-corrective: a team rated higher on pass one raises its opponents on pass two,
-which raises the team again on pass three, and inside an isolated pool there is
-nothing to damp it. The anchor a smoother needs is an outside result, and a pool
-that never leaves home does not have one.
+October round is scored against opponents still sitting at the default, and what
+those opponents turned out to be never reaches October. Running the season again
+from the finished ratings should let late evidence reach early rounds. It does
+the opposite -- three passes moved Waldron & Bernardo from 1963 to **2238** and
+widened their gap from 97 points to 180, with the whole field inflating past
+2000. The feedback is positive, not corrective: a team rated higher on pass one
+raises its opponents on pass two, which raises the team again on pass three.
 
 **A virtual drawn round each period only rescales.** The Glicko analogue of an L2
 penalty looks like a drawn round against a 1500-rated opponent added to every
@@ -233,59 +258,28 @@ estimated. Swept from one to three virtual rounds at deviations from 120 to 300,
 it compressed the whole scale and reordered nothing: Waldron & Bernardo stayed
 first at every setting. Every partnership debates about six rounds a period, so
 all of them get anchored in the same proportion. **The penalty has to scale with
-a partnership's total evidence, not their evidence per weekend.**
+a partnership's total evidence, not their evidence per weekend** -- which is what
+the deviation already measures, and why the shrinkage is written in terms of it.
 
-### Shrinking by deviation does fix it
+### Rank on the shrunk figure; predict on the raw one
 
-That is what deviation already measures, so the penalty is written in terms of it
--- the posterior mean under a normal prior on true strength:
-
-    shrunk = 1500 + (rating - 1500) * tau^2 / (tau^2 + RD^2)
-
-`tau` is the spread of *true* strengths, which is not the spread of the observed
-ratings: observed spread is true spread plus measurement noise, and subtracting
-the mean squared deviation recovers it. On 2025-26 it comes out at **117 rating
-points**, estimated rather than tuned. `fieldSpread` and `shrinkToField` in
-`packages/rating/src/season.ts`.
-
-Singel & Greenleaf at RD 67 keep 75% of their distance from the field; twelve
-rounds inside one region at RD 129 keep 45%. That difference reorders the board.
-The top twelve becomes Singel & Greenleaf, Georgatos & Miller, Bomze & Chen,
-Shivakumar & Kassayan, Wee & Savla -- round counts of 52, 92, 61, 48 and 72, with
-the thin regional teams gone and the p95 extrapolation gap down from 65 points to
-25.
-
-**Rank on the shrunk figure; predict on the raw one.** Shrinking before
-predicting is worse than not shrinking at all -- 62.7% and 0.6638 log loss
-against 63.4% and 0.6378 -- because `winProbability` already widens by both
-deviations, and shrinking the estimate as well counts the same uncertainty twice.
-The two jobs want different numbers, and this is why: for a prediction the
+Shrinking before predicting is worse than not shrinking at all -- 62.7% and
+0.6638 log loss against 63.4% and 0.6378 -- because `winProbability` already
+widens by both deviations, and shrinking the estimate as well counts the same
+uncertainty twice. The two jobs want different numbers: for a prediction the
 uncertainty belongs in the width of the answer, and for a ranking it belongs in
 the estimate, because a board must not reward being unmeasured.
 
-This supersedes the `rating - RD` "established" column, which was reaching for the
-same idea with a cruder instrument -- it still had Waldron & Bernardo second.
+This supersedes the `rating - RD` "established" column, which was reaching for
+the same idea with a cruder instrument -- it still had Waldron & Bernardo second.
 
-### A penalised global fit also works
-
-Bradley-Terry on partnerships, penalty 1, reaches much the same ordering by
-fitting every round at once against a penalty that pulls unsupported strengths
-toward the field. Its top ten round counts run 52, 92, 61, 48, 72, 70, 29, 68, 36
-and 19. It costs prediction accuracy -- 61.2% against Glicko's 63.4% -- partly as
-an artefact of the comparison, since walk-forward prediction penalises it for
-having no way to seed a partnership appearing for the first time, where Glicko
-starts it from its debaters. Kept in `packages/rating/src/bradley-terry.ts` as a
-cross-check on the shrinkage above: two different methods reaching the same top
-ten is worth more than either alone.
-
-### Rating people fixes it too, and was rejected on other grounds
+### Rating people predicts better, and was rejected on other grounds
 
 Bradley-Terry on individual debaters, with a partnership scored as the sum of its
 two, beat everything measured: 64.4% accuracy and 0.6290 log loss against
 Glicko's 63.4% and 0.6378, with the largest gain exactly where sparsity binds --
-65.0% on rounds where a team had fewer than ten. It also cleared the clustering
-problem. This was the outcome predicted in advance above, and pooling across
-partners is why.
+65.0% on rounds where a team had fewer than ten. This was the outcome predicted
+in advance above, and pooling across partners is why.
 
 It is not what ships, by the coach's decision: **strength is not additive.** The
 model has no way to say two debaters are better together than apart, and it will

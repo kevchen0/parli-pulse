@@ -33,6 +33,7 @@ export default async function MethodPage() {
         <a href="#glicko">1. Glicko-2</a>
         <a href="#side">2. Side and panels</a>
         <a href="#prior">3. The field prior</a>
+        <a href="#isolation">&mdash; and its limits</a>
         <a href="#reading">Reading a rating</a>
         <a href="#checked">How we checked</a>
         <a href="#limits">What it cannot do</a>
@@ -153,22 +154,18 @@ export default async function MethodPage() {
       </section>
 
       <section id="prior">
-        <h2>Idea three: the field prior, and why it is needed</h2>
+        <h2>Idea three: how much of a rating to believe</h2>
         <p>
-          Glicko on its own has a flaw that shows up badly in this league. Run plainly,
-          it put a partnership with <b>twelve rounds</b> at the top of the board &mdash;
-          92% of those rounds against opponents from their own region, having never
-          beaten anyone rated above 1725, and rated 1963.
+          Glicko on its own has a flaw that shows up badly in a league this size. Run
+          plainly, it put a partnership with <b>twelve rounds</b> at the top of the
+          board, rated 1963 &mdash; having never beaten anyone rated above 1725.
         </p>
         <p>
-          The cause is not sample size. It is <b>connectivity</b>. A partnership that
-          debates almost entirely inside one region is rated against opponents who are
-          themselves rated on the same thin local evidence. Nothing anchors that pool to
-          the rest of the country, so the whole cluster can drift upward together, and
-          from the inside every rating in it looks well-supported. The deviation does not
-          catch this: it counts how many rounds you have debated, not whether they connect
-          to anything. Twelve rounds inside one region and twelve spread across three
-          circuits earn the same &plusmn; and are not the same evidence.
+          Nothing went wrong in the arithmetic. A rating built on ten or twelve rounds
+          is simply a <em>high-variance</em> estimate: run enough partnerships through a
+          short season and a few will have their luck run one way, and their rating goes
+          with it. Order the board on the raw rating and it reports whoever has been
+          luckiest in the fewest rounds, which is not the question anyone is asking.
         </p>
 
         <h3>The fix</h3>
@@ -245,6 +242,36 @@ export default async function MethodPage() {
           , computed across the{' '}
           {figures ? figures.measured.toLocaleString() : ''} partnerships with{' '}
           {MIN_RATED_ROUNDS} rounds or more.
+        </p>
+
+        <h3 id="isolation">What this does not fix</h3>
+        <p className="aside">
+          The partnership above had also spent <b>92% of its rounds against opponents from
+          its own region</b>, and it is tempting to say the correction handles that too.
+          It does not, and the distinction matters.
+        </p>
+        <p>
+          A team that debates almost entirely inside one region is rated against opponents
+          who are themselves rated on the same local evidence. Nothing anchors that pool to
+          the rest of the country, so in principle the whole cluster could drift together
+          &mdash; and the deviation would never notice, because it counts how many rounds a
+          partnership has debated, not whether they connect to anything.
+        </p>
+        <p>
+          The shrinkage above is <b>blind to this</b>. It discounts a rating for resting on
+          few rounds, and the partnership at the top of the board was caught because it had
+          twelve of them, not because of where they were. Checked directly: among
+          partnerships with forty rounds or more, the shrinkage applied is flat across how
+          much of their season was in-region &mdash; 44, 43, 48 and 44 points across the
+          bands &mdash; and in-region share is uncorrelated with round count and with
+          deviation alike. <b>A well-measured partnership inside an isolated pool keeps its
+          rating, and nothing here warns you.</b>
+        </p>
+        <p>
+          On this season no such case is visible: among well-measured partnerships, ratings
+          do not rise with in-region share. That is not the same as knowing there is no
+          problem &mdash; detecting one would need results the league does not generate.
+          It is a real limitation and it is recorded rather than papered over.
         </p>
       </section>
 

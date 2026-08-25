@@ -215,6 +215,24 @@ assertions and both failed on the first implementation.
 **Rule:** a number nobody re-derived is a number nobody has checked. Run it
 twice, and run it after the typecheck rather than instead of it.
 
+32. **Named a correlation as the cause and built the explanation on it.** Two
+    partnerships were wrongly top of the board; both were thin *and* debated
+    almost entirely in-region, and I concluded the cause was pool isolation, that
+    deviation could not see connectivity, and that the field prior fixed it. The
+    first claim was untestable as stated and the third was false. Shrinkage is
+    blind to who a partnership played: in-region share is uncorrelated with
+    round count (-0.02) and deviation (0.03), and among partnerships with forty
+    rounds or more the shrinkage applied is flat across in-region share. The fix
+    worked because the offenders were *thin*, which is a different problem with
+    the same two examples. It reached a plan document, four source docstrings and
+    a public methodology page before the coach asked the obvious question: tau is
+    global and RD knows nothing about regions, so by what mechanism?
+
+**Rule:** when a fix works, check it works *for the reason claimed* -- find the
+cases that have the supposed cause without the correlate, and confirm the fix
+still fires. A mechanism nobody tested is a story, and it will be repeated in
+every document that cites it.
+
 ---
 
 ## What actually caught these
@@ -239,3 +257,7 @@ Ranked by yield:
 6. **Reading the counts a script prints about what it threw away.** Both new
    Pattern A instances and the identity drift showed up as a number that was the
    wrong size, before any of them showed up as a wrong rating.
+7. **Being asked how something works by someone who will not accept the
+   summary.** #32 survived being written into five places and died in one
+   question from the coach, who knew the circuit and could see the mechanism did
+   not follow.
