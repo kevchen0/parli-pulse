@@ -1,0 +1,175 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import type { RatingRow } from '@/lib/db';
+
+type SortKey = 'shown' | 'rating' | 'rounds';
+type Direction = 'desc' | 'asc';
+
+/** Shown before the reader asks for the rest, so the page opens quickly. */
+const INITIAL_ROWS = 100;
+
+/**
+ * The rating a partnership has established, as opposed to the one it might
+ * have: the rating less its deviation.
+ *
+ * This is what the table sorts on by default. A partnership that has won a
+ * great deal over twelve rounds and one that has won as much over ninety are
+ * not making the same claim, and ordering on the rating alone puts the twelve
+ * first -- which reports how little is known, not who is better.
+ */
+const shown = (r: RatingRow): number => Number(r.rating) - Number(r.deviation);
+
+const value = (r: RatingRow, key: SortKey): number =>
+  key === 'rating' ? Number(r.rating) : key === 'rounds' ? r.rounds : shown(r);
+
+/**
+ * Orders by the chosen column, then settles ties on evidence, in the same
+ * direction whichever way the column is sorted: the narrower deviation first,
+ * then the greater number of rounds, then the name, so the order never depends
+ * on how rows happened to arrive.
+ */
+function compare(a: RatingRow, b: RatingRow, key: SortKey, dir: Direction): number {
+  const primary = Math.round(value(b, key)) - Math.round(value(a, key));
+  if (primary !== 0) return dir === 'desc' ? primary : -primary;
+  if (a.deviation !== b.deviation) return Number(a.deviation) - Number(b.deviation);
+  if (a.rounds !== b.rounds) return b.rounds - a.rounds;
+  return a.debater1.localeCompare(b.debater1);
+}
+
+function SortHeader({
+  label, notes, active, direction, onClick,
+}: {
+  label: string;
+  notes: number[];
+  active: boolean;
+  direction: Direction;
+  onClick: () => void;
+}) {
+  // The footnote links sit outside the button: an anchor nested inside one is
+  // invalid, and a click on the reference would also sort the table.
+  return (
+    <th>
+      <span className="sorthead">
+        <button
+          type="button"
+          className="sort"
+          data-active={active}
+          onClick={onClick}
+          aria-label={`Sort by ${label}, ${active && direction === 'desc' ? 'ascending' : 'descending'}`}
+        >
+          {label}
+          <span className="arrow" aria-hidden>
+            {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
+          </span>
+        </button>
+        {notes.length > 0 ? (
+          <sup className="fnref">
+            {notes.map((n, i) => (
+              <span key={n}>
+                {i > 0 ? ' ' : ''}
+                <a href={`#fn${n}`}>{n}</a>
+              </span>
+            ))}
+          </sup>
+        ) : null}
+      </span>
+    </th>
+  );
+}
+
+export default function RatingTable({ rows }: { rows: RatingRow[] }) {
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<SortKey>('shown');
+  const [direction, setDirection] = useState<Direction>('desc');
+  const [showAll, setShowAll] = useState(false);
+
+  // Positions are computed over everyone, so a search narrows the table
+  // without renumbering it.
+  const positions = useMemo(() => {
+    const order = [...rows].sort((a, b) => compare(a, b, sort, 'desc'));
+    return new Map(order.map((r, i) => [r, i + 1]));
+  }, [rows, sort]);
+
+  const sorted = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    const filtered = needle
+      ? rows.filter(
+          (r) =>
+            r.debater1.toLowerCase().includes(needle) ||
+            r.debater2.toLowerCase().includes(needle) ||
+            (r.school ?? '').toLowerCase().includes(needle),
+        )
+      : rows;
+    return [...filtered].sort((a, b) => compare(a, b, sort, direction));
+  }, [rows, query, sort, direction]);
+
+  const toggle = (key: SortKey): void => {
+    if (key === sort) setDirection((d) => (d === 'desc' ? 'asc' : 'desc'));
+    else { setSort(key); setDirection('desc'); }
+  };
+
+  const visible = showAll ? sorted : sorted.slice(0, INITIAL_ROWS);
+  const hidden = sorted.length - visible.length;
+
+  return (
+    <>
+      <div className="controls">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search debater or school"
+          aria-label="Search debater or school"
+        />
+      </div>
+
+      <div className="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>School</th>
+              <th>Partnership</th>
+              <SortHeader label="Rounds" notes={[3]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} />
+              <SortHeader label="Established" notes={[1]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} />
+              <SortHeader label="Rating" notes={[2]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} />
+              <th>
+                <span className="sorthead">
+                  XXI rank
+                  <sup className="fnref"><a href="#fn4">4</a></sup>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map((r) => (
+              <tr key={r.subjectId}>
+                <td className="rank">{positions.get(r)}</td>
+                <td className="school" title={r.school ?? undefined}>
+                  {r.school ?? '—'}
+                  {r.region ? <span className="region"> · {r.region}</span> : null}
+                </td>
+                <td>{r.debater1} &amp; {r.debater2}</td>
+                <td className="region">{r.rounds}</td>
+                <td className="pts">{Math.round(shown(r))}</td>
+                <td>
+                  {Math.round(Number(r.rating))}
+                  <span className="margin"> ± {Math.round(Number(r.deviation))}</span>
+                </td>
+                <td className="region">{r.pointsRank ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {hidden > 0 ? (
+        <button type="button" className="showall" onClick={() => setShowAll(true)}>
+          Show all {sorted.length}
+        </button>
+      ) : null}
+      {sorted.length === 0 ? <p className="empty">No partnerships match “{query}”.</p> : null}
+    </>
+  );
+}

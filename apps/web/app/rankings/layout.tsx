@@ -6,6 +6,7 @@ const tabs = [
   { href: '/rankings/debaters', label: 'Debaters' },
   { href: '/rankings/schools', label: 'Schools' },
   { href: '/rankings/speakers', label: 'Speakers' },
+  { href: '/rankings/ratings', label: 'Ratings' },
   { href: '/rankings/diagnostic', label: 'Diagnostic' },
 ] as const;
 
@@ -16,7 +17,8 @@ export default function RankingsLayout({ children }: { children: React.ReactNode
       <p className="lede">
         Article XXI points for the {CURRENT_SEASON} season, computed from publicly available
         Tabroom results. Where these differ from the league&rsquo;s published figures, the
-        league&rsquo;s are correct.
+        league&rsquo;s are correct. Speakers and Ratings are our own measures, which the league
+        does not publish and Article XXI does not use.
       </p>
       <nav className="tabs">
         {tabs.map((t) => (

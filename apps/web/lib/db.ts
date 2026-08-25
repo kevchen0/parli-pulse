@@ -1,4 +1,5 @@
 import { and, desc, eq, sql } from 'drizzle-orm';
+import { MIN_RATED_ROUNDS } from '@parli-pulse/rating';
 import { createDb } from '@parli-pulse/db';
 import * as t from '@parli-pulse/db';
 import { CURRENT_SEASON } from './season';
@@ -280,5 +281,86 @@ export async function getSummary(): Promise<Summary> {
     debaters: Number(row.debaters ?? 0),
     ballots: Number(row.ballots ?? 0),
     disagreements: Number(row.disagreements ?? 0),
+  };
+}
+
+export interface RatingRow {
+  subjectId: string;
+  debater1: string;
+  debater2: string;
+  school: string | null;
+  region: string | null;
+  rating: number;
+  deviation: number;
+  rounds: number;
+  /** The partnership's Article XXI rank, for contrast. Null if unranked. */
+  pointsRank: number | null;
+  points: number | null;
+}
+
+/**
+ * Partnership ratings, gated on the minimum round count.
+ *
+ * Ordered on the rating less its deviation rather than the rating itself, which
+ * is what the table shows first: a partnership rises by being confirmed as well
+ * as by winning. Both figures are stored and both are displayed.
+ */
+export async function getRatings(limit = 5000): Promise<RatingRow[]> {
+  const { db } = handle();
+  const rows = await db.execute(sql`
+    select r.subject_id as "subjectId", r.rating, r.deviation,
+           r.rounds_counted as rounds,
+           coalesce(a.first_name || ' ', '') || a.last_name as debater1,
+           coalesce(b.first_name || ' ', '') || b.last_name as debater2,
+           coalesce(s.short_name, s.name) as school, s.region,
+           ts.rank as "pointsRank", ts.points
+    from ${t.ratings} r
+    join ${t.debaters} a on a.id = split_part(r.subject_id, '|', 1)
+    join ${t.debaters} b on b.id = split_part(r.subject_id, '|', 2)
+    left join ${t.teamSeasonTotals} ts
+      on ts.season_id = r.season_id
+     and least(ts.debater1_id, ts.debater2_id) || '|'
+      || greatest(ts.debater1_id, ts.debater2_id) = r.subject_id
+    left join ${t.schools} s on s.id = coalesce(ts.school_id, a.school_id)
+    where r.season_id = ${CURRENT_SEASON}
+      and r.subject_kind = 'partnership'
+      and r.tournament_id is null
+      and r.rounds_counted >= ${MIN_RATED_ROUNDS}
+    order by (r.rating - r.deviation) desc
+    limit ${limit}
+  `);
+  return rows.rows as unknown as RatingRow[];
+}
+
+export interface RatingSummary {
+  ranked: number;
+  total: number;
+  /** Rated rounds behind the ranked partnerships. */
+  rankedRounds: number;
+  /** Tournaments that formed a rating period. */
+  periods: number;
+}
+
+export async function getRatingSummary(): Promise<RatingSummary> {
+  const { db } = handle();
+  const r = await db.execute(sql`
+    select (select count(*)::int from ${t.ratings}
+            where season_id = ${CURRENT_SEASON} and tournament_id is null
+              and rounds_counted >= ${MIN_RATED_ROUNDS}) as ranked,
+           (select count(*)::int from ${t.ratings}
+            where season_id = ${CURRENT_SEASON} and tournament_id is null) as total,
+           -- Rounds, not rows: a round is counted by both partnerships in it.
+           (select (coalesce(sum(rounds_counted), 0) / 2)::int from ${t.ratings}
+            where season_id = ${CURRENT_SEASON} and tournament_id is null
+              and rounds_counted >= ${MIN_RATED_ROUNDS}) as "rankedRounds",
+           (select count(distinct tournament_id)::int from ${t.ratings}
+            where season_id = ${CURRENT_SEASON} and tournament_id is not null) as periods
+  `);
+  const row = r.rows[0] as Record<string, unknown>;
+  return {
+    ranked: Number(row.ranked ?? 0),
+    total: Number(row.total ?? 0),
+    rankedRounds: Number(row.rankedRounds ?? 0),
+    periods: Number(row.periods ?? 0),
   };
 }
