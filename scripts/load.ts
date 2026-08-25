@@ -388,7 +388,22 @@ async function main(): Promise<void> {
     console.log(`  ${'schools'.padEnd(26)} ${schoolRows.length}`);
     await insertAll(db, t.tournaments, rows.tournaments, 'tournaments');
     await insertAll(db, t.events, rows.events, 'events');
-    await insertAll(db, t.debaters, [...debaters.values()], 'debaters');
+    // Debaters are not season-scoped either, so they must be updated in place.
+    // Inserting with onConflictDoNothing leaves an existing row pointing at
+    // whatever school it resolved to on an earlier run -- which is how
+    // "Brooklyn Technical High School Parliamentary Debate Team" survived as a
+    // school of its own after the alias for it was added.
+    const debaterRows = [...debaters.values()];
+    for (let i = 0; i < debaterRows.length; i += 500) {
+      await db.insert(t.debaters).values(debaterRows.slice(i, i + 500) as never).onConflictDoUpdate({
+        target: t.debaters.id,
+        set: {
+          firstName: sql`excluded.first_name`, lastName: sql`excluded.last_name`,
+          schoolId: sql`excluded.school_id`,
+        },
+      });
+    }
+    console.log(`  ${'debaters'.padEnd(26)} ${debaterRows.length}`);
     await insertAll(db, t.judges, [...judges.values()], 'judges');
     await insertAll(db, t.entries, rows.entries, 'entries');
     await insertAll(db, t.entryDebaters, rows.entryDebaters, 'entry_debaters');

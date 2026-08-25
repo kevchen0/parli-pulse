@@ -75,6 +75,12 @@ also carries a 95% interval, so a 20-ballot debater reads +-0.34 against a
 only point-earning results, so a losing record with good speaks appears on one
 board and not the other. The pages label which is which.
 
+**Upsert, do not insert**: `schools` and `debaters` are not season-scoped and
+so are never cleared. Inserting them with `onConflictDoNothing` leaves stale
+rows untouched, which is how a corrected membership flag changed nothing and
+how "Brooklyn Technical High School Parliamentary Debate Team" survived as its
+own school after the alias for it was added. Both are upserted now.
+
 **Membership**: XXI.9.A ranks member schools only. `SchoolList` names all 379
 schools seen in the season, not members -- the league's own `School` tab is the
 member list, 56 of them. School rankings now cover 47 rather than 156. Note

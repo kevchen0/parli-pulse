@@ -105,6 +105,8 @@ export interface SpeakerRow {
   marginDisplay: number | null;
   /** Mean before judge adjustment, on the canonical scale. */
   meanRaw: number | null;
+  /** Spread of this debater's own ballots, in z units. */
+  sdZ: number | null;
 }
 
 export async function getSpeakers(limit = 5000): Promise<SpeakerRow[]> {
@@ -112,6 +114,7 @@ export async function getSpeakers(limit = 5000): Promise<SpeakerRow[]> {
   const rows = await db.execute(sql`
     select st.rank, st.ballots, st.mean_z as "meanZ", st.mean_display as "meanDisplay",
            st.margin_display as "marginDisplay", st.mean_raw as "meanRaw",
+           st.sd_z as "sdZ",
            coalesce(d.first_name || ' ', '') || d.last_name as name,
            coalesce(s.short_name, s.name) as school, s.region
     from ${t.debaterSpeakerTotals} st

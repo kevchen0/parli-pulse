@@ -3,23 +3,81 @@
 import { useMemo, useState } from 'react';
 import type { SpeakerRow } from '@/lib/db';
 
-type SortKey = 'adjusted' | 'raw';
+type SortKey = 'z' | 'raw';
+type Direction = 'desc' | 'asc';
 
 /** Shown before the reader asks for the rest, so the page opens quickly. */
 const INITIAL_ROWS = 100;
 
+/** Half-width of the 95% interval on the mean, in z units. */
+const marginZ = (r: SpeakerRow): number | null =>
+  r.sdZ === null || r.ballots < 2 ? null : (1.96 * Number(r.sdZ)) / Math.sqrt(r.ballots);
+
+/**
+ * Compared at the precision the table prints. Two scores that both read +0.69
+ * are a tie as far as a reader is concerned, and ordering them on a fourth
+ * decimal nobody can see looks arbitrary -- it put the wider interval first.
+ */
+const value = (r: SpeakerRow, key: SortKey): number =>
+  Math.round((key === 'raw' ? Number(r.meanRaw ?? 0) : Number(r.meanZ)) * 100) / 100;
+
+/**
+ * Orders by the chosen column, then settles ties on evidence: the narrower
+ * interval first, and failing that the larger number of ballots. Two debaters
+ * with the same average are not equally well established, and ordering them
+ * arbitrarily would reshuffle on every rebuild.
+ */
+function compare(a: SpeakerRow, b: SpeakerRow, key: SortKey, dir: Direction): number {
+  const primary = value(b, key) - value(a, key);
+  if (primary !== 0) return dir === 'desc' ? primary : -primary;
+  // Settle on evidence, in the same direction regardless of sort order: the
+  // narrower interval first, then the larger number of ballots, then the name
+  // so the order never depends on how rows arrived.
+  const ma = marginZ(a);
+  const mb = marginZ(b);
+  if (ma !== null && mb !== null && ma !== mb) return ma - mb;
+  if (a.ballots !== b.ballots) return b.ballots - a.ballots;
+  return a.name.localeCompare(b.name);
+}
+
+function SortHeader({
+  label, active, direction, onClick,
+}: {
+  label: string;
+  active: boolean;
+  direction: Direction;
+  onClick: () => void;
+}) {
+  return (
+    <th>
+      <button
+        type="button"
+        className="sort"
+        data-active={active}
+        onClick={onClick}
+        aria-label={`Sort by ${label}, ${active && direction === 'desc' ? 'ascending' : 'descending'}`}
+      >
+        {label}
+        <span className="arrow" aria-hidden>
+          {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
+        </span>
+      </button>
+    </th>
+  );
+}
+
 export default function SpeakerTable({ rows }: { rows: SpeakerRow[] }) {
   const [query, setQuery] = useState('');
-  const [sort, setSort] = useState<SortKey>('adjusted');
+  const [sort, setSort] = useState<SortKey>('z');
+  const [direction, setDirection] = useState<Direction>('desc');
   const [showAll, setShowAll] = useState(false);
 
-  // Raw positions are computed once over everyone, so a search narrows the
-  // table without renumbering it -- a debater keeps the same position whether
-  // or not their school is filtered in.
-  const rawRank = useMemo(() => {
-    const order = [...rows].sort((a, b) => Number(b.meanRaw ?? 0) - Number(a.meanRaw ?? 0));
+  // Positions are computed over everyone, so a search narrows the table
+  // without renumbering it.
+  const positions = useMemo(() => {
+    const order = [...rows].sort((a, b) => compare(a, b, sort, 'desc'));
     return new Map(order.map((r, i) => [r, i + 1]));
-  }, [rows]);
+  }, [rows, sort]);
 
   const sorted = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -30,12 +88,13 @@ export default function SpeakerTable({ rows }: { rows: SpeakerRow[] }) {
             (r.school ?? '').toLowerCase().includes(needle),
         )
       : rows;
-    return [...filtered].sort((a, b) =>
-      sort === 'raw'
-        ? Number(b.meanRaw ?? 0) - Number(a.meanRaw ?? 0)
-        : Number(b.meanDisplay) - Number(a.meanDisplay),
-    );
-  }, [rows, query, sort]);
+    return [...filtered].sort((a, b) => compare(a, b, sort, direction));
+  }, [rows, query, sort, direction]);
+
+  const toggle = (key: SortKey): void => {
+    if (key === sort) setDirection((d) => (d === 'desc' ? 'asc' : 'desc'));
+    else { setSort(key); setDirection('desc'); }
+  };
 
   const visible = showAll ? sorted : sorted.slice(0, INITIAL_ROWS);
   const hidden = sorted.length - visible.length;
@@ -50,18 +109,6 @@ export default function SpeakerTable({ rows }: { rows: SpeakerRow[] }) {
           placeholder="Search debater or school"
           aria-label="Search debater or school"
         />
-        <div className="segmented" role="group" aria-label="Sort by">
-          {(['adjusted', 'raw'] as const).map((k) => (
-            <button
-              key={k}
-              type="button"
-              data-active={sort === k}
-              onClick={() => setSort(k)}
-            >
-              {k === 'adjusted' ? 'Adjusted' : 'Raw'}
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className="tablewrap">
@@ -72,29 +119,30 @@ export default function SpeakerTable({ rows }: { rows: SpeakerRow[] }) {
               <th>School</th>
               <th>Debater</th>
               <th>Ballots</th>
-              <th>Adjusted</th>
-              <th>Raw</th>
+              <SortHeader label="Z-score" active={sort === 'z'} direction={direction} onClick={() => toggle('z')} />
+              <SortHeader label="Raw" active={sort === 'raw'} direction={direction} onClick={() => toggle('raw')} />
             </tr>
           </thead>
           <tbody>
-            {visible.map((s, i) => (
-              <tr key={`${s.name}-${s.school ?? ''}-${i}`}>
-                <td className="rank">{sort === 'adjusted' ? s.rank : rawRank.get(s)}</td>
-                <td>
-                  {s.school ?? '—'}
-                  {s.region ? <span className="region"> · {s.region}</span> : null}
-                </td>
-                <td>{s.name}</td>
-                <td className="region">{s.ballots}</td>
-                <td className="pts">
-                  {Number(s.meanDisplay).toFixed(2)}
-                  {s.marginDisplay === null ? null : (
-                    <span className="margin"> ± {Number(s.marginDisplay).toFixed(2)}</span>
-                  )}
-                </td>
-                <td>{s.meanRaw === null ? '—' : Number(s.meanRaw).toFixed(2)}</td>
-              </tr>
-            ))}
+            {visible.map((s, i) => {
+              const m = marginZ(s);
+              return (
+                <tr key={`${s.name}-${s.school ?? ''}-${i}`}>
+                  <td className="rank">{positions.get(s)}</td>
+                  <td className="school" title={s.school ?? undefined}>
+                    {s.school ?? '—'}
+                    {s.region ? <span className="region"> · {s.region}</span> : null}
+                  </td>
+                  <td>{s.name}</td>
+                  <td className="region">{s.ballots}</td>
+                  <td className="pts">
+                    {Number(s.meanZ) > 0 ? '+' : ''}{Number(s.meanZ).toFixed(2)}
+                    {m === null ? null : <span className="margin"> ± {m.toFixed(2)}</span>}
+                  </td>
+                  <td>{s.meanRaw === null ? '—' : Number(s.meanRaw).toFixed(2)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
