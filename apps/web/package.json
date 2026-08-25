@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@parli-pulse/db": "*",
+    "@parli-pulse/rating": "*",
     "@parli-pulse/rules": "*",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
