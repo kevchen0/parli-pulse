@@ -7,3 +7,4 @@ export * from './schools.ts';
 export * from './school-aliases.ts';
 export * from './event-selection.ts';
 export * from './manual-results.ts';
+export * from './tabroom-client.ts';
