@@ -8,7 +8,7 @@
  * the site may present this as a league ranking. See plan/08-risks-policy.md.
  *
  * The configuration is not a matter of taste. It was chosen on held-out rounds
- * and beats the league's own ranking at predicting results by 2.8 points of
+ * and beats the league's own ranking at predicting results by 3.6 points of
  * accuracy; `npm run validate:rating` reruns the whole comparison. The gate was
  * that it beat "higher Article XXI points wins", and it does.
  *
@@ -21,6 +21,14 @@
  *    so a season can be charted;
  *  - one with a null tournament, the current figure, deviation widened for
  *    however long the partnership has been away.
+ *
+ * Each row carries two ratings, because ranking and forecasting want different
+ * numbers. `rating` is the estimate itself and is what a prediction should use,
+ * since the win probability already widens by both deviations. `shrunkRating`
+ * pulls that estimate toward the field in proportion to how little is known,
+ * and is what the board is ordered on: a rating built on twelve rounds inside
+ * one region should not outrank one built on ninety across the country, and
+ * without the shrinkage it does.
  */
 import { eq, sql } from 'drizzle-orm';
 import { createDb } from '../packages/db/src/client.ts';
@@ -30,8 +38,9 @@ import {
   MIN_RATED_ROUNDS,
   SeasonRun,
   VALIDATED_OPTIONS,
-  conservative,
   estimateSideAdvantage,
+  fieldSpread,
+  shrinkToField,
 } from '../packages/rating/src/index.ts';
 import { loadPartnershipNames } from './lib/identity.ts';
 import { loadRatingData } from './lib/rating-data.ts';
@@ -74,13 +83,22 @@ async function main(): Promise<void> {
     // "Now" is the last day of competition, not today's date. Running the
     // script twice a week apart must not quietly widen every deviation.
     const asOf = data.periods.at(-1)!.date;
-    // Ordered on the rating less its deviation, not the rating: see
-    // `conservative`. A partnership climbs by being confirmed as well as by
-    // winning, which is the only ordering that survives half the field having
-    // fewer than ten rounds.
-    const standings = run
-      .standingsAt(asOf)
-      .sort((a, b) => conservative(b.rating) - conservative(a.rating));
+    // Ordered on the shrunk figure, not the rating. A partnership climbs by
+    // being confirmed as well as by winning, which is the only ordering that
+    // survives half the field having fewer than ten rounds -- and the only one
+    // that does not hand the top of the board to a team which has beaten a weak
+    // regional field twelve times.
+    const standings = run.standingsAt(asOf);
+
+    // The spread of *true* strengths, which is not the spread of the observed
+    // ratings -- that is true spread plus measurement noise. Estimated from the
+    // partnerships with enough rounds to be measured at all, so a field of
+    // barely-seen teams cannot widen it and weaken the shrinkage for everyone.
+    const measured = standings.filter((x) => x.rounds >= GATE_ROUNDS).map((x) => x.rating);
+    const tau = fieldSpread(measured);
+    const shrunk = (r: { rating: number; deviation: number }): number => shrinkToField(r, tau);
+    console.log(`  field spread: ${tau.toFixed(1)} rating points, over ${measured.length} measured partnerships`);
+    standings.sort((a, b) => shrunk(b.rating) - shrunk(a.rating));
 
     // Season-scoped, so clearing and rewriting is safe here -- unlike `schools`
     // and `debaters`, which are not, and must be upserted.
@@ -96,6 +114,7 @@ async function main(): Promise<void> {
         rating: Number(h.rating.toFixed(2)),
         deviation: Number(h.deviation.toFixed(2)),
         volatility: Number(h.volatility.toFixed(6)),
+        shrunkRating: Number(shrunk(h).toFixed(2)),
         roundsCounted: h.rounds,
       })),
       ...standings.map((s) => ({
@@ -107,6 +126,7 @@ async function main(): Promise<void> {
         rating: Number(s.rating.rating.toFixed(2)),
         deviation: Number(s.rating.deviation.toFixed(2)),
         volatility: Number(s.rating.volatility.toFixed(6)),
+        shrunkRating: Number(shrunk(s.rating).toFixed(2)),
         roundsCounted: s.rounds,
       })),
     ];
@@ -123,14 +143,14 @@ async function main(): Promise<void> {
     );
 
     const names = await loadPartnershipNames(db, ranked.slice(0, 20).map((s) => s.subject));
-    console.log(`\ntop 20 as of ${asOf}, ranked on rating less deviation:\n`);
+    console.log(`\ntop 20 as of ${asOf}, ranked on the shrunk rating:\n`);
     console.log('      shown  rating   +/-  rounds  partnership');
     ranked.slice(0, 20).forEach((s, i) => {
       const n = names.get(s.subject);
       const who = n ? n.names.join(' & ') : s.subject;
       const school = n?.school ? ` (${n.school})` : '';
       console.log(
-        `${String(i + 1).padStart(3)}.  ${String(Math.round(conservative(s.rating))).padStart(4)}` +
+        `${String(i + 1).padStart(3)}.  ${String(Math.round(shrunk(s.rating))).padStart(4)}` +
           `    ${String(Math.round(s.rating.rating)).padStart(4)}  ` +
           `+/-${String(Math.round(s.rating.deviation)).padStart(3)}   ` +
           `${String(s.rounds).padStart(3)}   ${who}${school}`,

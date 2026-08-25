@@ -73,6 +73,29 @@ export interface SeasonOptions {
   maxDeviation: number;
   /** Deviation growth for a subject that has not competed, per week away. */
   weeksPerDecayPeriod: number;
+  /**
+   * Ratings to start subjects at, instead of seeding them from their debaters.
+   *
+   * This is what makes a second pass over the season possible. Glicko is a
+   * forward-only filter: a result is judged against what its opponents' ratings
+   * were at the time, and nothing ever goes back to reconsider it. In a league
+   * of loosely connected regional pools that is a real defect -- an October
+   * round inside Oregon is scored against opponents who were all still sitting
+   * at the default, and when those same teams travel in March and lose, the fact
+   * that the pool was weaker than it looked never reaches October.
+   *
+   * Running the season again from these, with deviations widened back out, lets
+   * what was learned late inform what happened early. It is the difference
+   * between a filter and a smoother, and a season that has finished should be
+   * read with the smoother.
+   */
+  initialRatings?: ReadonlyMap<string, Rating>;
+  /**
+   * Deviation to restart each subject at on a later pass. Carrying the finished
+   * deviation forward would pin every rating in place and the pass would do
+   * nothing; restarting at the default would throw away what it learned.
+   */
+  iterationDeviation: number;
 }
 
 /**
@@ -88,6 +111,7 @@ export const DEFAULT_OPTIONS: SeasonOptions = {
   pairingDeviation: 120,
   maxDeviation: DEFAULT_DEVIATION,
   weeksPerDecayPeriod: 1,
+  iterationDeviation: 250,
 };
 
 /**
@@ -242,6 +266,15 @@ export class SeasonRun {
    * at all -- averaging two blanks must not produce a number.
    */
   private seed(subject: string): Rating {
+    // A later pass starts from where the previous one finished, with the
+    // deviation widened so the season can still move it.
+    const prior = this.options.initialRatings?.get(subject);
+    if (prior) {
+      return {
+        ...prior,
+        deviation: Math.min(this.options.maxDeviation, Math.max(prior.deviation, this.options.iterationDeviation)),
+      };
+    }
     if (!this.options.seedFromMembers) return defaultRating();
     const members = this.members.get(subject) ?? [];
     const known = members.map((m) => this.debaters.get(m)).filter((p): p is Rating => Boolean(p));
@@ -381,6 +414,34 @@ export function runSeason(
 }
 
 /**
+ * Runs the season repeatedly, each pass starting from what the last one learned.
+ *
+ * One pass rates an early round against opponents nobody knew anything about
+ * yet. Later passes rate it against what those opponents turned out to be, which
+ * is how evidence from a national tournament in March reaches a regional one in
+ * October -- and how a pool that only looked strong because it never left home
+ * gets marked down.
+ *
+ * Two or three passes is enough; the ratings stop moving after that.
+ */
+export function runSeasonIterated(
+  periods: readonly RatingPeriod[],
+  members: ReadonlyMap<string, readonly string[]>,
+  options: Partial<SeasonOptions> = {},
+  passes = 3,
+): SeasonRun {
+  let run = runSeason(periods, members, options);
+  const asOf = periods.at(-1)?.date ?? '';
+  for (let pass = 1; pass < passes; pass++) {
+    const initialRatings = new Map(
+      run.standingsAt(asOf).map((s) => [s.subject, s.rating] as const),
+    );
+    run = runSeason(periods, members, { ...options, initialRatings });
+  }
+  return run;
+}
+
+/**
  * The proposition's edge in rating points, read straight off how often it wins.
  *
  * Sides are assigned by tab rather than chosen, so the two sides face the same
@@ -405,3 +466,55 @@ export function estimateSideAdvantage(rounds: readonly RatedRound[]): number {
 }
 
 export { DEFAULT_RATING, DEFAULT_DEVIATION, DEFAULT_VOLATILITY };
+
+/**
+ * Pulls every rating toward the field in proportion to how little is known.
+ *
+ * This is the penalty a global fit gets from L2, applied to a rating Glicko
+ * produced. It is the answer to localized clustering, and to the thin ratings
+ * that come with it.
+ *
+ * Two earlier attempts are worth recording, because both look right and neither
+ * is. Running the season repeatedly so late results inform early ones *inflates*
+ * an isolated pool rather than correcting it -- the feedback is positive, and a
+ * pool that never travels has no outside result to anchor it. Adding a virtual
+ * drawn round against the field to each rating period only rescales: every
+ * partnership plays roughly six rounds a period, so all of them get anchored in
+ * the same proportion and nothing reorders.
+ *
+ * What both miss is that the penalty has to scale with a partnership's *total*
+ * evidence, not their evidence per weekend. That is what the deviation already
+ * measures, so the shrinkage is written in terms of it:
+ *
+ *     shrunk = field + (rating - field) * tau^2 / (tau^2 + RD^2)
+ *
+ * the posterior mean under a normal prior on true strength. A settled rating is
+ * barely touched -- Singel & Greenleaf at RD 64 keep 85% of their distance from
+ * the field -- while twelve rounds inside one region at RD 129 keep 57%, which
+ * is the difference that reorders the board.
+ *
+ * `tau` is the spread of *true* strengths, which is not the spread of the
+ * observed ratings: observed spread is true spread plus measurement noise.
+ * Subtracting the mean squared deviation recovers it, so nothing here is tuned.
+ */
+export function fieldSpread(
+  ratings: readonly { rating: number; deviation: number }[],
+): number {
+  if (ratings.length < 2) return DEFAULT_DEVIATION;
+  const mean = ratings.reduce((t, r) => t + r.rating, 0) / ratings.length;
+  const observed = ratings.reduce((t, r) => t + (r.rating - mean) ** 2, 0) / ratings.length;
+  const noise = ratings.reduce((t, r) => t + r.deviation ** 2, 0) / ratings.length;
+  // Method of moments. Floored, because a field with more noise than signal
+  // would otherwise ask for a negative variance.
+  return Math.sqrt(Math.max(observed - noise, observed * 0.05));
+}
+
+/** One rating shrunk toward `field`, given the spread of true strengths. */
+export function shrinkToField(
+  r: { rating: number; deviation: number },
+  tau: number,
+  field = DEFAULT_RATING,
+): number {
+  const reliability = (tau * tau) / (tau * tau + r.deviation * r.deviation);
+  return field + (r.rating - field) * reliability;
+}

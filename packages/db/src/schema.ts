@@ -425,6 +425,15 @@ export const ratings = pgTable('ratings', {
   rating: doublePrecision('rating').notNull(),
   deviation: doublePrecision('deviation').notNull(),
   volatility: doublePrecision('volatility').notNull(),
+  /**
+   * The rating pulled toward the field in proportion to its deviation.
+   *
+   * What the public board is ordered on. The raw rating above is the better
+   * forecaster and the worse ranker: it lets a partnership that has beaten a
+   * weak regional field on twelve rounds outrank one that has beaten a national
+   * field on ninety. See packages/rating `shrinkToField`.
+   */
+  shrunkRating: doublePrecision('shrunk_rating'),
   roundsCounted: integer('rounds_counted').notNull().default(0),
   computedAt: timestamp('computed_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [index('ratings_subject_idx').on(t.subjectKind, t.subjectId)]);

@@ -204,24 +204,6 @@ export function update(
 }
 
 /**
- * The rating a competitor has earned rather than the one they might have.
- *
- * A board ordered on the rating itself puts whoever has been luckiest on top:
- * on 2025-26 a twelve-round partnership at plus or minus 144 outranked a
- * ninety-two-round one at plus or minus 70, which is a statement about how
- * little is known, not about who is better. Subtracting the deviation asks
- * instead how good a team has actually shown itself to be, so a rating rises as
- * much by being confirmed as by being high.
- *
- * This is a ranking choice, not a prediction one. Predictions use the rating
- * itself, through `winProbability`, because for a prediction the uncertainty
- * belongs in the width of the answer rather than in the estimate.
- */
-export function conservative(r: Pick<Rating, 'rating' | 'deviation'>, deviations = 1): number {
-  return r.rating - deviations * r.deviation;
-}
-
-/**
  * Probability `a` beats `b`, with `advantage` in rating points to `a`.
  *
  * Both deviations widen the result toward a coin flip, which is the point: an

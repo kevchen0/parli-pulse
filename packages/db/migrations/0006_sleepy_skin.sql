@@ -1,0 +1,1 @@
+ALTER TABLE "ratings" ADD COLUMN "shrunk_rating" double precision;
