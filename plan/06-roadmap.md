@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** phases 0-3 are complete and deployed. Phase 4 is in progress.
+**Status:** phases 0-4 are complete and deployed. Phase 5 is next.
 
 The 2026-27 season's first points-eligible tournament is Harvard, Sept 5-6
 (August tournaments are excluded by XXI.1.H). Before then, run the seasonal
@@ -44,19 +44,19 @@ The gate was never 100% — `manual_adj` bakes human judgement into the league's
 own figures. It was that every mismatch be explained, and they are, in
 [09-data-quality.md](09-data-quality.md). Most are not ours to fix.
 
+### Phase 4 — Speaker points
+Judge-normalized speaker standings at `/rankings/speakers`, sortable by z-score
+or raw average, with a 95% interval on each figure.
+
+27,013 open-division ballots normalized; 387 debaters clear the 20-ballot
+threshold, holding 15,410 ballots between them. Method in `packages/speaks`:
+scales from a config table rather than inferred, judge baselines from a median
+and interquartile spread so one punitive ballot cannot move everyone else, and
+both centre and spread shrunk toward the field by sample size.
+
 ---
 
 ## Next
-
-### Phase 4 — Speaker points *(in progress)*
-Sentinel filtering, per-judge z-scores with shrinkage, display rescaling, then
-speaker leaderboards and per-tournament speaker tabs.
-
-Everything needed is loaded: 32,267 scores, 95% already attributed to a
-specific debater, with the scale config known (25-30 default, NYPDL 23-30,
-YFL 1 at 0-100). See [05-metrics.md](05-metrics.md) for the method and
-[08-risks-policy.md](08-risks-policy.md) for why punitive scores are used but
-never surfaced.
 
 ### Phase 5 — Glicko-2
 Implement, tune on 2025-26, validate on held-out late-season rounds. Must beat
