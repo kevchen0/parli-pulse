@@ -128,6 +128,20 @@ export const LEGACY_SHEET_PATH = 'data/raw/sheet/rankings.zip';
 export const sheetPathFor = (season: string): string =>
   `data/raw/sheet/rankings-${season}.zip`;
 
+/**
+ * The workbook a season should actually read.
+ *
+ * Season-scoped, falling back to the unsuffixed filename only for 2025-26,
+ * whose cache predates seasons having one each. Callers used to hardcode the
+ * unsuffixed path, which read 2025-26's sheet whatever season they were given.
+ * `exists` is injected so this stays free of a filesystem import.
+ */
+export function resolveSheetPath(season: string, exists: (p: string) => boolean): string {
+  const own = sheetPathFor(season);
+  if (exists(own)) return own;
+  return season === '2025-26' ? LEGACY_SHEET_PATH : own;
+}
+
 export interface OfficialTournament {
   row: number;
   name: string;

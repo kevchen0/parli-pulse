@@ -23,10 +23,9 @@ import {
   normalizeTournament,
   partitionElimRounds,
   indexHeaders,
-  LEGACY_SHEET_PATH,
   parseTournamentsTab,
   parseWorkbook,
-  sheetPathFor,
+  resolveSheetPath,
   type NormalizedEvent,
 } from '../packages/ingest/src/index.ts';
 import { openEventFilter } from '../packages/ingest/src/event-selection.ts';
@@ -40,10 +39,7 @@ const RAW_DIR = 'data/raw/tabroom';
  * every year, so a shared filename would let one season's fetch overwrite
  * another season's ground truth.
  */
-const SHEET =
-  existsSync(sheetPathFor(SEASON)) || SEASON !== '2025-26'
-    ? sheetPathFor(SEASON)
-    : LEGACY_SHEET_PATH;
+const SHEET = resolveSheetPath(SEASON, existsSync);
 
 /** Postgres caps bound parameters per statement; insert in slices. */
 async function insertAll<T extends Record<string, unknown>>(
