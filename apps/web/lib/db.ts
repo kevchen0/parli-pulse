@@ -915,20 +915,30 @@ export async function getDebaterProfile(
            count(*) filter (where b.won) as "ballotsWon",
            bool_or(b.is_bye) as bye,
            max(o.entry_id) as "opponentEntry",
-           max(o.ballots) as "opponentBallots",
-           max(o.won) as "opponentWon",
+           -- The largest panel this round gave any of its sections, and the
+           -- tournament's category. A walkover shows up as a section that drew
+           -- fewer ballots than its siblings; qualifiers are excluded because
+           -- their points come from XXI.4.C rather than from a bracket.
+           max(rm.round_max) as "roundMaxBallots",
+           max(rm.category) as category,
            avg(ss.display) as speaks,
            avg(ss.raw) as "rawSpeaks",
            min(ro.id) as "roundId"
     from ${t.ballots} b
     join ${t.rounds} ro on ro.id = b.round_id
-    -- The other side of the section, aggregated the same way as this one. A
-    -- walkover is a section *nobody* won, so the opponent's tally is needed to
-    -- tell one from an ordinary loss.
+    join ${t.events} ev on ev.id = ro.event_id
+    join ${t.tournaments} tour on tour.id = ev.tournament_id
+    cross join lateral (
+      select max(x.n) as round_max, tour.category as category
+      from (
+        select count(*) as n
+        from ${t.ballots} bx
+        where bx.round_id = b.round_id and bx.section_id is not null
+        group by bx.section_id, bx.entry_id
+      ) x
+    ) rm
     left join lateral (
-      select b2.entry_id,
-             count(*) as ballots,
-             count(*) filter (where b2.won) as won
+      select b2.entry_id
       from ${t.ballots} b2
       where b2.section_id = b.section_id and b2.entry_id <> b.entry_id
       group by b2.entry_id
@@ -950,7 +960,7 @@ export async function getDebaterProfile(
     entryId: string; label: string; kind: string; elimLevel: string | null;
     isConsolation: boolean; side: number | null; ballots: number; ballotsWon: number;
     bye: boolean; opponentEntry: string | null;
-    opponentBallots: number | null; opponentWon: number | null;
+    roundMaxBallots: number | null; category: string | null;
     speaks: number | null; rawSpeaks: number | null;
   }[];
 
@@ -1058,12 +1068,11 @@ export async function getDebaterProfile(
         bye: r.bye,
         kind: r.kind,
         roundLevel: r.elimLevel,
+        category: r.category,
         mySchool: schoolOfEntry.get(r.entryId) ?? null,
         theirSchool: opponent?.schoolId ?? null,
-        myBallots: Number(r.ballots),
-        myWon: Number(r.ballotsWon),
-        theirBallots: r.opponentBallots === null ? 0 : Number(r.opponentBallots),
-        theirWon: r.opponentWon === null ? 0 : Number(r.opponentWon),
+        ballots: Number(r.ballots),
+        roundMaxBallots: r.roundMaxBallots === null ? 0 : Number(r.roundMaxBallots),
         reached: reachedOfEntry.get(r.entryId) ?? null,
       }),
       speaks: r.speaks === null ? null : Number(r.speaks),

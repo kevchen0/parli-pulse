@@ -117,34 +117,40 @@ const ELIM_STAGE_ORDER = [
  * Whether an elim round was a walkover, and which side of it this entry was on.
  *
  * Two teams from one school meeting in elims usually means they do not debate:
- * one advances and the other steps aside, which XXI.5.C prices at -2 and +2.
- * The signature is a same-school section that **nobody won** -- not merely a
- * same-school section. On 2025-26 there are 91 of the latter and only 4 of the
- * former: the other 87 carry a real decision, several of them 2-1, and calling
- * a debated octafinal a concession would contradict the ballots.
+ * one advances and the other stands down, which XXI.5.C prices at -2 and +2.
+ *
+ * The signature is a **short panel** -- fewer ballots than the same round gave
+ * its other sections. A walkover still gets a token ballot recording who went
+ * through, so "nobody won" misses most of them; and two teammates meeting is
+ * not enough on its own, because some closeouts really are debated. On 2025-26
+ * this reproduces the league's own `walkover_adjustment` for 1,525 of 1,541
+ * matched entries, measured by `npm run check:walkovers`.
+ *
+ * State qualifiers are excluded. Their points come from XXI.4.C rather than
+ * from a bracket, and the league records no walkover there even when the
+ * bracket shows one.
  *
  * Direction comes from how far the entry went afterwards, because the ballots
- * cannot say: in every one of the four, both entries carry a losing ballot and
- * only the bracket records who advanced. Where the round's own stage is
- * unrecorded there is nothing to compare against, and the round is reported as
- * a walkover without a direction rather than guessed at -- pattern F.
+ * cannot say. Where the round's own stage is unrecorded there is nothing to
+ * compare against, and the round is reported as a walkover without a direction
+ * rather than guessed at -- pattern F.
  */
 export function walkoverDirection(r: {
   bye: boolean;
   kind: string;
   roundLevel: string | null;
+  category: string | null;
   mySchool: string | null;
   theirSchool: string | null;
-  myBallots: number;
-  myWon: number;
-  theirBallots: number;
-  theirWon: number;
+  ballots: number;
+  /** The largest panel this round gave any of its sections. */
+  roundMaxBallots: number;
   reached: string | null;
 }): 'advanced' | 'conceded' | 'unknown' | null {
   if (r.bye || r.kind !== 'elim') return null;
+  if (r.category === 'CHSSA' || r.category === 'OSAA') return null;
   if (!r.mySchool || !r.theirSchool || r.mySchool !== r.theirSchool) return null;
-  const majority = (won: number, total: number) => total > 0 && won * 2 > total;
-  if (majority(r.myWon, r.myBallots) || majority(r.theirWon, r.theirBallots)) return null;
+  if (!(r.ballots < r.roundMaxBallots)) return null;
 
   const here = r.roundLevel ? ELIM_STAGE_ORDER.indexOf(r.roundLevel) : -1;
   const got = r.reached ? ELIM_STAGE_ORDER.indexOf(r.reached) : -1;

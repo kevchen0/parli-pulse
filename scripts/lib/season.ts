@@ -71,8 +71,29 @@ export interface EntryCase {
   hybrid: boolean;
   ourBase: number | null;
   theirBase: number | null;
+  /**
+   * Prelim-count adjustment plus break penalty, which is the shape the sheet
+   * reports them in: its `prelim/break percentage adj` is one column. Kept for
+   * the comparison against `theirAdj`; the pieces below are what gets stored.
+   */
   ourAdj: number;
   theirAdj: number | null;
+  /** XXI.2.E, on its own. */
+  ourPrelimAdj: number;
+  /** XXI.2.D, on its own. */
+  ourBreakPenalty: number;
+  /**
+   * XXI.5.C, as the league recorded it.
+   *
+   * Read from the sheet's `walkover_adjustment` rather than derived: a
+   * walkover leaves three different shapes in Tabroom -- a short panel, a
+   * fully-balloted finals closeout, and at Nueva no section at all -- so
+   * nothing in the round data identifies them reliably. It is cumulative per
+   * entry per tournament: -4 is two walkovers, -7 two walkovers and a finals
+   * closeout.
+   */
+  ourWalkover: number;
+  ourFloor: string | null;
 }
 
 export interface SeasonResult {
@@ -130,6 +151,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
           broke: false, hybrid: row.hybrid,
           ourBase: manual.points, theirBase: row.basePoints,
           ourAdj: 0, theirAdj: row.breakPrelimAdjustment,
+          ourPrelimAdj: 0, ourBreakPenalty: 0, ourWalkover: 0, ourFloor: null,
         });
       }
       continue;
@@ -249,6 +271,10 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         theirBase: row.basePoints,
         ourAdj: sb.prelimCountAdjustment + sb.breakPenalty,
         theirAdj: row.breakPrelimAdjustment,
+        ourPrelimAdj: sb.prelimCountAdjustment,
+        ourBreakPenalty: sb.breakPenalty,
+        ourWalkover: sb.walkoverAdjustment,
+        ourFloor: sb.floorApplied ?? null,
       });
     }
     for (const i of result.unmatched) {
@@ -300,6 +326,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         broke: false,
         hybrid: row.hybrid,
         ourBase: fallback.points,
+        ourPrelimAdj: 0, ourBreakPenalty: 0, ourWalkover: 0, ourFloor: null,
         theirBase: row.basePoints,
         ourAdj: 0,
         theirAdj: row.breakPrelimAdjustment,

@@ -246,9 +246,17 @@ async function main(): Promise<void> {
         const c = matched;
         if (c) {
           rows.entryResults.push({
+            // Each adjustment in its own column, which is the whole point of
+            // the table's shape: a backtest mismatch should name the rule that
+            // diverged rather than a single opaque total. These were being
+            // written as zeros with the prelim adjustment and break penalty
+            // summed into one, so the stored points were right and nothing
+            // could say *why*.
             entryId, points: c.ours, basePoints: c.ourBase,
-            prelimCountAdjustment: 0, breakPenalty: c.ourAdj, walkoverAdjustment: 0,
-            floorApplied: null,
+            prelimCountAdjustment: c.ourPrelimAdj,
+            breakPenalty: c.ourBreakPenalty,
+            walkoverAdjustment: c.ourWalkover,
+            floorApplied: c.ourFloor,
             excludedReason: linked.length === 2 ? null : 'teamSize',
             countsTowardToc: true,
           });
@@ -356,8 +364,11 @@ async function main(): Promise<void> {
         }
         rows.entryResults.push({
           entryId: c.entryId, points: c.ours, basePoints: c.ourBase,
-          prelimCountAdjustment: 0, breakPenalty: 0, walkoverAdjustment: 0,
-          floorApplied: null, excludedReason: surnames.length === 2 ? null : 'teamSize',
+          prelimCountAdjustment: c.ourPrelimAdj,
+          breakPenalty: c.ourBreakPenalty,
+          walkoverAdjustment: c.ourWalkover,
+          floorApplied: c.ourFloor,
+          excludedReason: surnames.length === 2 ? null : 'teamSize',
           countsTowardToc: true,
         });
       }

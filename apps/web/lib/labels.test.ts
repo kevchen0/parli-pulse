@@ -103,32 +103,38 @@ describe('compareRounds', () => {
 });
 
 describe('walkoverDirection', () => {
+  // A walkover section drew one ballot where its siblings drew three.
   const base = {
     bye: false,
     kind: 'elim',
     roundLevel: 'semi',
+    category: 'Regular',
     mySchool: 'sch_stuyvesant',
     theirSchool: 'sch_stuyvesant',
-    myBallots: 1,
-    myWon: 0,
-    theirBallots: 1,
-    theirWon: 0,
+    ballots: 1,
+    roundMaxBallots: 3,
     reached: 'semi',
   };
 
   it('reads the direction from how far the entry went afterwards', () => {
-    // The ballots cannot say: in all four 2025-26 walkovers both entries carry
-    // a losing ballot and only the bracket records who advanced.
+    // The ballots cannot say: a walkover still records a token win for
+    // whoever went through, so the bracket is the only witness.
     expect(walkoverDirection({ ...base, reached: 'first' })).toBe('advanced');
     expect(walkoverDirection({ ...base, reached: 'second' })).toBe('advanced');
     expect(walkoverDirection({ ...base, reached: 'semi' })).toBe('conceded');
   });
 
-  it('is not a walkover when somebody won the section', () => {
-    // 87 same-school elim sections in 2025-26 carry a real decision, several
-    // of them 2-1. Two teammates meeting is not by itself a walkover.
-    expect(walkoverDirection({ ...base, myBallots: 3, myWon: 2, theirBallots: 3, theirWon: 1 })).toBeNull();
-    expect(walkoverDirection({ ...base, myBallots: 3, myWon: 1, theirBallots: 3, theirWon: 2 })).toBeNull();
+  it('needs a short panel, not merely two teams from one school', () => {
+    // Same-school elims are sometimes genuinely debated -- Harvard's
+    // octafinal went 2-1 -- and those draw the round's full panel.
+    expect(walkoverDirection({ ...base, ballots: 3, roundMaxBallots: 3 })).toBeNull();
+  });
+
+  it('ignores state qualifiers, whose points do not come from a bracket', () => {
+    // XXI.4.C scores these on qual/alt, and the league records no walkover
+    // there even where the bracket shows one.
+    expect(walkoverDirection({ ...base, category: 'CHSSA' })).toBeNull();
+    expect(walkoverDirection({ ...base, category: 'OSAA' })).toBeNull();
   });
 
   it('is not a walkover across schools, in a prelim, or on a bye', () => {
@@ -138,8 +144,7 @@ describe('walkoverDirection', () => {
   });
 
   it('will not guess a direction it cannot read', () => {
-    // One of the four sits in a round with no recorded stage. Pattern F: name
-    // the gap rather than infer a winner.
+    // Pattern F: name the gap rather than infer who advanced.
     expect(walkoverDirection({ ...base, roundLevel: null, reached: null })).toBe('unknown');
     expect(walkoverDirection({ ...base, reached: null })).toBe('unknown');
   });
