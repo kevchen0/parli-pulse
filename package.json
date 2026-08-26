@@ -23,6 +23,7 @@
     "compare": "node --env-file-if-exists=.env scripts/compare-top.ts",
     "diagnose": "node --env-file-if-exists=.env scripts/diagnose.ts",
     "diagnostics": "node --env-file-if-exists=.env scripts/build-diagnostics.ts",
+    "mark-ingest": "node --env-file-if-exists=.env scripts/mark-ingest.ts",
     "speaks": "node --env-file-if-exists=.env scripts/speaks.ts",
     "rate": "node --env-file-if-exists=.env scripts/rate.ts",
     "validate:rating": "node --env-file-if-exists=.env scripts/validate-rating.ts"

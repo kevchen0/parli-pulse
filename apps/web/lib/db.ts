@@ -595,3 +595,44 @@ export async function getSeasons(): Promise<SeasonSummary[]> {
     lastResultOn: r.lastResultOn ?? null,
   }));
 }
+
+/**
+ * When the pipeline last finished for a season, and whether that is worrying.
+ *
+ * The ingest runs nightly, so a gap beyond a day and a half means a run failed.
+ * Nothing else on the site would show it: a failure leaves every table exactly
+ * as it was, serving figures that look current.
+ */
+export interface Freshness {
+  finishedAt: Date | null;
+  tournaments: number;
+  source: string | null;
+  /** Hours since the last successful run, or null if there has never been one. */
+  ageHours: number | null;
+  /** Past the point where a nightly run should have replaced it. */
+  stale: boolean;
+}
+
+/** A nightly job plus room for a slow run and a clock difference. */
+const STALE_AFTER_HOURS = 36;
+
+export async function getFreshness(season: SeasonId): Promise<Freshness> {
+  const { db } = handle();
+  const rows = (await db.execute(sql`
+    select finished_at as "finishedAt", tournaments, source
+    from ${t.ingestRuns} where season_id = ${season}
+  `)).rows as unknown as { finishedAt: string; tournaments: number; source: string }[];
+
+  const row = rows[0];
+  if (!row) return { finishedAt: null, tournaments: 0, source: null, ageHours: null, stale: false };
+
+  const finishedAt = new Date(row.finishedAt);
+  const ageHours = (Date.now() - finishedAt.getTime()) / 3_600_000;
+  return {
+    finishedAt,
+    tournaments: Number(row.tournaments ?? 0),
+    source: row.source ?? null,
+    ageHours,
+    stale: ageHours > STALE_AFTER_HOURS,
+  };
+}

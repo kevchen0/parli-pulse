@@ -58,6 +58,7 @@ sheet and the nightly workflow runs the whole chain. See below.
 | `npm run speaks` | judge-normalized speaker points |
 | `npm run rate` | Glicko-2 partnership ratings with the field prior |
 | `npm run diagnostics` | the reconciliation the site displays |
+| `npm run mark-ingest` | records that the pipeline finished; the site reads it |
 | `npm run validate:rating` | the held-out comparison against the league ranking |
 | `npm run backtest` | fields, per-entry, partnerships |
 | `npm run compare` / `npm run diagnose` | top-N accuracy, cause attribution |
@@ -65,7 +66,7 @@ sheet and the nightly workflow runs the whole chain. See below.
 | `npm run dev --workspace @parli-pulse/web` | the site locally |
 
 **Order matters:** `fetch` → `load` → `rollup` → `speaks` → `rate` →
-`diagnostics`. `rollup` decides who is one person and who is two, and
+`diagnostics` → `mark-ingest`. `rollup` decides who is one person and who is two, and
 everything after it groups by the identities it settles.
 
 ## How the live season works
@@ -81,7 +82,10 @@ where the sheet finds 95. It is reported as a lookahead only. See
 [02-findings.md](02-findings.md).
 
 `.github/workflows/ingest.yml` runs the chain at 09:10 UTC nightly, and by hand
-from the Actions tab. Three credentials, each scoped to its job: `parli_ingest`
+from the Actions tab. The last step records the run, and the site shows how
+fresh its data is — quietly when the ingest is working, and with a warning past
+36 hours, which is the only place a failed run is visible: nothing else changes,
+so stale figures otherwise look current. Three credentials, each scoped to its job: `parli_ingest`
 (GitHub secret, read/write), `parli_web` (Vercel, read-only), and the owner role,
 which stays on the maintainer's laptop because only it can run migrations.
 

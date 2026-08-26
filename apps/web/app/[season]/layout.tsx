@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
-import { dbReady, getSeasons } from '@/lib/db';
+import { dbReady, getFreshness, getSeasons } from '@/lib/db';
 import { currentSeason, isSeasonId, seasonStatus } from '@/lib/season';
 import SeasonNav from './nav';
 import SeasonPicker from './season-picker';
+import FreshnessLine from './freshness';
 
 export const revalidate = 300;
 
@@ -30,7 +31,9 @@ export default async function SeasonLayout({
   if (!isSeasonId(season)) notFound();
 
   const current = currentSeason();
-  const loaded = dbReady() ? await getSeasons() : [];
+  const [loaded, freshness] = dbReady()
+    ? await Promise.all([getSeasons(), getFreshness(season)])
+    : [[], null];
   // The current season belongs in the picker whether or not anything has been
   // loaded for it: "open, nothing published yet" is a state, not an absence.
   const ids = [...new Set([...loaded.map((s) => s.id), current])].sort().reverse();
@@ -56,6 +59,7 @@ export default async function SeasonLayout({
           {status === 'upcoming' && 'Not yet open'}
         </p>
       </div>
+      {freshness && <FreshnessLine freshness={freshness} />}
       <SeasonNav season={season} />
       <main className="wrap">{children}</main>
     </>

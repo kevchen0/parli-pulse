@@ -65,9 +65,6 @@ with their answers, so nobody re-investigates them.
     A tournament can be rescored inside the 30-day correction window. The fetch
     picks it up, but a reader who quoted the earlier number is not told it moved.
     Worth a visible "changed since" marker, or worth deciding it does not matter.
-19. **Nothing watches the nightly run.** A failure leaves the site quietly stale
-    and colours a square nobody looks at. An email, a commit to a status file, or
-    a banner reading the last successful run — cheapest first.
 20. **Does the provisional marker come off correctly?** Points are marked amber
     until the league's sheet carries the tournament. That transition has never
     been observed, because no season has been live since the marker existed.

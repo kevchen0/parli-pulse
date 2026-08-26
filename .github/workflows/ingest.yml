@@ -82,6 +82,12 @@ jobs:
       - name: Diagnostics
         run: npm run diagnostics
 
+      # Last, so the timestamp only moves when everything above it worked. The
+      # site reads this to say how fresh its data is, and to say so loudly when
+      # it is not.
+      - name: Record the run
+        run: npm run mark-ingest
+
       # A rules change or a failed fetch should reach someone, not just colour a
       # square in the Actions tab.
       - name: Report failure

@@ -19,6 +19,7 @@
   --bad: #93362d;
   /* Qualification marks. Gold and silver read as standings rather than as
      status, which is what they are. */
+  --warn-soft: #f5eeda;
   --gold: #8a6a12;
   --silver: #77808a;
   --pending: #a8760a;
@@ -43,6 +44,7 @@
     --good: #6db694;
     --warn: #c4a04c;
     --bad: #d8776a;
+    --warn-soft: #322a12;
     --gold: #d3ab48;
     --silver: #98a2ae;
     --pending: #d8a03d;
@@ -726,3 +728,27 @@ abbr.tick.differs { color: var(--bad); }
 }
 @keyframes navspin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .navspinner { animation-duration: 2s; } }
+
+/* --- freshness ---
+   Quiet when the nightly ingest is working, loud when it has stopped. A failed
+   run leaves every table exactly as it was, so this is the only thing on the
+   site that would show it. */
+
+.freshness {
+  max-width: 62rem;
+  margin: 0.4rem auto 0;
+  padding: 0 1.25rem;
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+.freshness.stale {
+  margin: 0.6rem auto 0;
+  padding: 0.5rem 0.85rem;
+  max-width: calc(62rem - 2.5rem);
+  font-size: 0.8125rem;
+  color: var(--text);
+  background: var(--warn-soft);
+  border-left: 3px solid var(--warn);
+  border-radius: var(--radius);
+}
+.freshness.stale b { font-weight: 600; }

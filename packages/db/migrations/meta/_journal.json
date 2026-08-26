@@ -57,6 +57,13 @@
       "when": 1787699851261,
       "tag": "0007_fresh_vision",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787774215894,
+      "tag": "0008_special_mathemanic",
+      "breakpoints": true
     }
   ]
 }

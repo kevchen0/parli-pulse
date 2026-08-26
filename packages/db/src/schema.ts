@@ -445,6 +445,24 @@ export const ratings = pgTable('ratings', {
 }, (t) => [index('ratings_subject_idx').on(t.subjectKind, t.subjectId)]);
 
 /**
+ * When the pipeline last finished, per season.
+ *
+ * Written by the final step of the ingest, so a row exists only if every step
+ * before it succeeded — a failure part-way leaves the previous timestamp in
+ * place and the site can see that its data has stopped moving. That is the
+ * whole point: a failed run otherwise leaves the site quietly stale, serving
+ * figures that look current, and colours a square in a tab nobody opens.
+ */
+export const ingestRuns = pgTable('ingest_runs', {
+  seasonId: text('season_id').primaryKey().references(() => seasons.id),
+  finishedAt: timestamp('finished_at', { withTimezone: true }).notNull().defaultNow(),
+  /** Tournaments the season held when the run finished, for a sanity check. */
+  tournaments: integer('tournaments').notNull().default(0),
+  /** Where it ran, so a local run is distinguishable from the scheduled one. */
+  source: text('source').notNull().default('local'),
+});
+
+/**
  * Judge aggregates. Sparse by nature -- most judges never sit on a panel --
  * so every rate is stored beside the sample it came from and shrunk toward the
  * pool before display.
