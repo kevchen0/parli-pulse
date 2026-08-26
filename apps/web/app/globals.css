@@ -671,3 +671,61 @@ abbr.tick.differs { color: var(--bad); }
 /* The sortable tables page in state, so their jump is a bare input beside the
    numbers rather than a form. */
 .pagerjumpinline { margin-left: 0.4rem; font: inherit; font-size: 0.8125rem; }
+
+/* --- loading states ---
+   A skeleton rather than a spinner in empty space: the page keeps its shape, so
+   nothing jumps when the rows arrive, and the reader can see what is coming. */
+
+.skeleton { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.skelrow { display: flex; gap: 1rem; align-items: center; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--border); }
+.skelrow:last-child { border-bottom: none; }
+.skelhead { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem; }
+
+.skelcell { display: block; height: 0.7rem; border-radius: 2px; background: var(--sunk); }
+.skelcell.rank { width: 1.5rem; flex: none; }
+.skelcell.wide { width: 30%; }
+.skelcell.mid { width: 22%; }
+.skelcell.num { width: 2.5rem; margin-left: auto; flex: none; }
+.skelcell.title { height: 1.6rem; width: 9rem; }
+.skelcell.lede { height: 0.8rem; width: min(34rem, 90%); }
+
+/* The shimmer says "working", which a static block does not. Held back from
+   anyone who has asked for less movement. */
+@media (prefers-reduced-motion: no-preference) {
+  .skelcell {
+    background: linear-gradient(90deg, var(--sunk) 25%, var(--border) 50%, var(--sunk) 75%);
+    background-size: 200% 100%;
+    animation: skelshimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes skelshimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* A link that has been clicked and is waiting on the server. */
+.pagerpages a[data-pending],
+.sections a[data-pending],
+.subsections a[data-pending] { opacity: 0.55; }
+.navspinner {
+  display: inline-block;
+  width: 0.7em; height: 0.7em;
+  margin-left: 0.35em;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: navspin 0.6s linear infinite;
+  vertical-align: -0.05em;
+}
+@keyframes navspin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .navspinner { animation-duration: 2s; } }

@@ -1,7 +1,9 @@
 import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
 import { dbReady, getSummary, getTeams, type TeamRow } from '@/lib/db';
 import { seasonHref } from '@/lib/season';
+import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
+import TableSkeleton from '@/app/table-skeleton';
 
 export const revalidate = 300;
 
@@ -22,6 +24,14 @@ function tocStanding(team: TeamRow): 'bid' | 'atLarge' | null {
   return team.partnersQualified === 1 ? 'atLarge' : null;
 }
 
+/**
+ * The shell renders at once; the table suspends.
+ *
+ * The Suspense key carries the search parameters, so changing a page or a search
+ * remounts the boundary and the skeleton appears immediately. Without the key
+ * the boundary is already resolved and React keeps showing the previous rows
+ * until the new ones arrive -- which is a click that looks like it did nothing.
+ */
 export default async function TeamsPage({
   params,
   searchParams,
@@ -31,6 +41,29 @@ export default async function TeamsPage({
 }) {
   const { season } = await params;
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
+  const sp = await searchParams;
+  return (
+    <>
+      <h1>Teams</h1>
+      <p className="lede">
+        Points scored under the Article XXI rules, computed from published Tabroom results.
+      </p>
+      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton />}>
+        <TeamsTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
+      </Suspense>
+    </>
+  );
+}
+
+async function TeamsTable({
+  season,
+  query,
+  pageParam,
+}: {
+  season: string;
+  query: string;
+  pageParam: string | undefined;
+}) {
   const [teams, summary] = await Promise.all([getTeams(season), getSummary(season)]);
   if (teams.length === 0) {
     return (
@@ -40,8 +73,6 @@ export default async function TeamsPage({
     );
   }
 
-  const sp = await searchParams;
-  const query = (sp.q ?? '').trim();
   const needle = query.toLowerCase();
   const matches = needle
     ? teams.filter(
@@ -52,17 +83,13 @@ export default async function TeamsPage({
       )
     : teams;
   const totalPages = pageCount(matches.length);
-  const page = clampPage(sp.page, totalPages);
+  const page = clampPage(pageParam, totalPages);
   const shown = matches.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const bids = teams.filter((x) => x.partnersQualified >= 2).length;
   const unresolved = teams.filter((x) => x.reconciliation !== 'agrees').length;
 
   return (
     <>
-      <h1>Teams</h1>
-      <p className="lede">
-        Points scored under the Article XXI rules, computed from published Tabroom results.
-      </p>
       <p className="meta">
         <span><b>{teams.length}</b> partnerships ranked</span>
         <span><b>{summary.tournaments}</b> tournaments</span>

@@ -1,6 +1,8 @@
 import { dbReady, getSchools } from '@/lib/db';
 import { seasonHref } from '@/lib/season';
+import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
+import TableSkeleton from '@/app/table-skeleton';
 
 export const revalidate = 300;
 
@@ -12,10 +14,27 @@ export default async function SchoolsPage({
   searchParams: Promise<{ page?: string; q?: string }>;
 }) {
   const { season } = await params;
+  const sp = await searchParams;
+  return (
+    <>
+      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton />}>
+        <SchoolsTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
+      </Suspense>
+    </>
+  );
+}
+
+async function SchoolsTable({
+  season,
+  query,
+  pageParam,
+}: {
+  season: string;
+  query: string;
+  pageParam: string | undefined;
+}) {
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
   const schools = await getSchools(season);
-  const sp = await searchParams;
-  const query = (sp.q ?? '').trim();
   const needle = query.toLowerCase();
   const matches = needle
     ? schools.filter(
@@ -23,13 +42,12 @@ export default async function SchoolsPage({
       )
     : schools;
   const totalPages = pageCount(matches.length);
-  const page = clampPage(sp.page, totalPages);
+  const page = clampPage(pageParam, totalPages);
   const shown = matches.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   if (schools.length === 0) return <p className="empty">No standings yet.</p>;
 
   return (
     <>
-      <h1>Schools</h1>
       <p className="meta">
         <span><b>{schools.length}</b> member schools</span>
         <span>Hybrid partnerships count half to each school</span>

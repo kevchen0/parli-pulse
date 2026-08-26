@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import NavLink from './nav-link';
 
 /** Rows per page across every ranking table. */
 export const PAGE_SIZE = 50;
@@ -135,14 +136,14 @@ export default function Pager({
               …
             </span>
           ) : (
-            <Link
+            <NavLink
               key={p}
               href={href(p)}
               data-current={p === page || undefined}
               aria-current={p === page ? 'page' : undefined}
             >
               {p}
-            </Link>
+            </NavLink>
           ),
         )}
         {page < total && (

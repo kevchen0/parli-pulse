@@ -1,7 +1,9 @@
 import { dbReady, getDebaters } from '@/lib/db';
 import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
 import { seasonHref } from '@/lib/season';
+import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
+import TableSkeleton from '@/app/table-skeleton';
 
 export const revalidate = 300;
 
@@ -13,13 +15,31 @@ export default async function DebatersPage({
   searchParams: Promise<{ page?: string; q?: string }>;
 }) {
   const { season } = await params;
+  const sp = await searchParams;
+  return (
+    <>
+      <h1>Debaters</h1>
+      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton />}>
+        <DebatersTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
+      </Suspense>
+    </>
+  );
+}
+
+async function DebatersTable({
+  season,
+  query,
+  pageParam,
+}: {
+  season: string;
+  query: string;
+  pageParam: string | undefined;
+}) {
   if (!dbReady()) return <p className="empty">Database not connected.</p>;
   const debaters = await getDebaters(season);
   if (debaters.length === 0) return <p className="empty">No standings yet.</p>;
 
   const qualified = debaters.filter((d) => d.autoQualified).length;
-  const sp = await searchParams;
-  const query = (sp.q ?? '').trim();
   const needle = query.toLowerCase();
   const matches = needle
     ? debaters.filter(
@@ -29,11 +49,10 @@ export default async function DebatersPage({
       )
     : debaters;
   const totalPages = pageCount(matches.length);
-  const page = clampPage(sp.page, totalPages);
+  const page = clampPage(pageParam, totalPages);
   const shown = matches.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   return (
     <>
-      <h1>Debaters</h1>
       <p className="meta">
         <span><b>{debaters.length}</b> debaters with Article XXI points</span>
         <span>

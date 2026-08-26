@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import NavLink from '@/app/nav-link';
 import { SEASON_NAV, seasonHref, type SeasonId } from '@/lib/season';
 
 /**
@@ -26,14 +26,14 @@ export default function SeasonNav({ season }: { season: SeasonId }) {
     <>
       <nav className="sections" aria-label="Sections">
         {SEASON_NAV.map((item) => (
-          <Link
+          <NavLink
             key={item.path}
             href={seasonHref(season, item.path)}
             data-current={item === open || undefined}
             aria-current={item === open ? 'page' : undefined}
           >
             {item.label}
-          </Link>
+          </NavLink>
         ))}
       </nav>
 
@@ -43,14 +43,14 @@ export default function SeasonNav({ season }: { season: SeasonId }) {
             const full = `/${season}${child.path}`;
             const current = pathname === full;
             return (
-              <Link
+              <NavLink
                 key={child.path}
                 href={seasonHref(season, child.path)}
                 data-current={current || undefined}
                 aria-current={current ? 'page' : undefined}
               >
                 {child.label}
-              </Link>
+              </NavLink>
             );
           })}
         </nav>
