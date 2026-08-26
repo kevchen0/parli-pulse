@@ -1,6 +1,7 @@
 import {
   FORFEITS_EXCLUDED_FROM_FIELD_SIZE,
   REQUIRED_TEAM_SIZE,
+  WALKOVER_ADJUSTMENTS,
   elimLevelFromSectionCount,
   type ElimLevel,
 } from '@parli-pulse/rules';
@@ -510,6 +511,26 @@ export interface EntryPerformance {
   /** Elim sections where this team faced a same-school opponent with no result. */
   sameSchoolWalkovers: number;
   /**
+   * XXI.5.C, derived from the bracket: -2 for each teammate walked over, +2 for
+   * each time this team stood down, and -3 for a finals closeout.
+   *
+   * The signature is a same-school elim section that drew a **short panel** --
+   * fewer ballots than the same round gave its other sections. Two things it is
+   * deliberately not:
+   *
+   *  - not "same school", because teammates do sometimes debate. Harvard's
+   *    octafinal between two Menlo-Atherton teams went 2-1 on a full panel and
+   *    the league records no adjustment for it;
+   *  - not "no result entered", because a walkover still carries a token ballot
+   *    naming whoever went through. That test finds 4 of roughly 47.
+   *
+   * Reproduces the league's own column for 1,525 of 1,541 matched entries;
+   * `npm run check:walkovers` reruns it. Eleven of the sixteen residuals are
+   * closeouts Tabroom holds no section for at all -- when a final or semi is
+   * conceded, some tournaments never create the round.
+   */
+  walkoverAdjustment: number;
+  /**
    * Prelim ballots won, for XXI.4.A's ballot-counted schedule. Not the same as
    * `wins`: panelled prelims award several ballots per round.
    */
@@ -539,7 +560,8 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
     if (!p) {
       p = {
         entryId, wins: 0, losses: 0, elimLevel: null, wonFinal: false,
-        sameSchoolWalkovers: 0, prelimBallotsWon: 0, prelimBallotsTotal: 0,
+        sameSchoolWalkovers: 0, walkoverAdjustment: 0,
+        prelimBallotsWon: 0, prelimBallotsTotal: 0,
         elimWins: 0,
       };
       out.set(entryId, p);
@@ -675,14 +697,34 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
   for (const r of ordered) {
     const level = elimLevelFromSectionCount(r.sections.length);
     if (!level) continue;
+    // The largest panel this round gave any of its sections, per side. A
+    // walkover section is the one that drew fewer.
+    const panelPerSide = (sec: (typeof r.sections)[number], entryId: string): number =>
+      sec.ballots.filter((b) => b.entryId === entryId).length;
+    const roundMaxBallots = Math.max(
+      0,
+      ...r.sections.flatMap((sec) => sec.entryIds.map((e) => panelPerSide(sec, e))),
+    );
+
     for (const s of r.sections) {
       const schools = new Set(
         s.entryIds.map((e) => event.entries.get(e)?.schoolId).filter((x): x is string => !!x),
       );
-      const walkover = s.entryIds.length === 2 && schools.size === 1 && s.unscored;
+      const sameSchoolPair = s.entryIds.length === 2 && schools.size === 1;
+      const walkover = sameSchoolPair && s.unscored;
       for (const entryId of s.entryIds) {
         const p = get(entryId);
         if (walkover) p.sameSchoolWalkovers++;
+        if (sameSchoolPair && panelPerSide(s, entryId) < roundMaxBallots) {
+          // Who advanced is not in the ballots -- both sides of a walkover
+          // routinely carry a losing one -- so it is read off the bracket:
+          // rounds are visited deepest-first, so an entry that already holds an
+          // elim level here is one that went further than this round.
+          const advanced = p.elimLevel !== null;
+          if (level === 'first') p.walkoverAdjustment += WALKOVER_ADJUSTMENTS.finalsCloseout;
+          else p.walkoverAdjustment +=
+            advanced ? WALKOVER_ADJUSTMENTS.walkingOver : WALKOVER_ADJUSTMENTS.beingWalkedOver;
+        }
         // Rounds are visited deepest-first, so the first assignment wins.
         if (p.elimLevel === null) {
           // A round is won on a majority of its ballots. Testing whether any

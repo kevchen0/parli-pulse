@@ -109,12 +109,89 @@ export interface SeasonResult {
   officialEntries: OfficialEntry[];
 }
 
+/**
+ * XXI.3.B's floor: the record of the lowest-seeded team that broke.
+ *
+ * The sheet publishes this as `Breaking Record` and Tabroom never states it, so
+ * computing our own means reading it off the entries that actually appear in an
+ * elim: among those, the worst prelim record. Teams with a losing record are
+ * excluded because the floor is defined over breaking teams with a *winning*
+ * record, and a bracket sometimes reaches below .500 to fill itself.
+ */
+function lowestBreakingRecord(
+  perfs: readonly { elimLevel: ElimLevel | null; wins: number; losses: number }[],
+): { wins: number; losses: number } | undefined {
+  const broke = perfs.filter((p) => p.elimLevel !== null && p.wins > p.losses);
+  if (broke.length === 0) return undefined;
+  // Fewest wins, then most losses: the last team in.
+  return broke.reduce((worst, p) =>
+    p.wins < worst.wins || (p.wins === worst.wins && p.losses > worst.losses)
+      ? { wins: p.wins, losses: p.losses }
+      : worst,
+  { wins: broke[0]!.wins, losses: broke[0]!.losses });
+}
+
 const parseRecord = (s: string): { wins: number; losses: number } | undefined => {
   const m = s.match(/^(\d+)\s*-\s*(\d+)$/);
   return m ? { wins: Number(m[1]), losses: Number(m[2]) } : undefined;
 };
 
-export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonResult {
+/**
+ * Where the inputs to scoring come from.
+ *
+ * `sheet` takes the league's published field sizes, break percentage, prelim
+ * count and walkover adjustment wherever it has them, falling back to ours.
+ * That is right for a *backtest* -- it isolates the points rules, so a mismatch
+ * can never be a field-size mismatch in disguise -- and wrong for the live
+ * pipeline, which wants figures it can compute for a tournament the league has
+ * not written up yet. Both used one function until this flag existed.
+ *
+ * `tabroom` computes every one of them from the payload. Discovery still comes
+ * from the sheet: its `Results` column decides which tournaments exist, and the
+ * `Entry` tab decides which teams the league scores. Neither is a number.
+ */
+export type InputSource = 'sheet' | 'tabroom';
+
+/**
+ * Which inputs to take from the sheet, so one can be moved at a time.
+ *
+ * Switching all of them at once says the accuracy changed and not which input
+ * did it. Each of these is separately measurable, and they are not equally
+ * hard: field sizes are arithmetic over the payload, while the breaking record
+ * is a rule about which team was last in.
+ */
+export interface InputSources {
+  fields: InputSource;
+  breakingRecord: InputSource;
+  walkover: InputSource;
+}
+
+export const ALL_SHEET: InputSources = {
+  fields: 'sheet', breakingRecord: 'sheet', walkover: 'sheet',
+};
+export const ALL_TABROOM: InputSources = {
+  fields: 'tabroom', breakingRecord: 'tabroom', walkover: 'tabroom',
+};
+
+export interface SeasonOptions {
+  /** A single source for everything, or one per input. */
+  source?: InputSource | Partial<InputSources>;
+}
+
+const resolveSources = (source: SeasonOptions['source']): InputSources =>
+  source === undefined ? ALL_SHEET
+    : source === 'sheet' ? ALL_SHEET
+    : source === 'tabroom' ? ALL_TABROOM
+    : { ...ALL_SHEET, ...source };
+
+export function computeSeason(
+  zipPath = 'data/raw/sheet/rankings.zip',
+  options: SeasonOptions = {},
+): SeasonResult {
+  const sources = resolveSources(options.source);
+  /** The sheet's figure, or undefined when we are computing our own. */
+  const fromSheet = <T>(v: T | null | undefined): T | undefined =>
+    sources.fields === 'sheet' ? (v ?? undefined) : undefined;
   const workbook = parseWorkbook(new Uint8Array(readFileSync(zipPath)));
   const officialTournaments = parseTournamentsTab(workbook.get('Tournaments')!);
   const officialEntries = parseEntryTab(workbook.get('Entry')!);
@@ -164,25 +241,51 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
     const opens = t.events.filter((e) => selectOpen(e) && !computeFieldStats(e).phantom);
     if (!opens.length) { skippedTournaments.push(off.name); continue; }
 
-    // Use the sheet's published field figures so a points mismatch is never
-    // just a field-size mismatch wearing a disguise.
+    // Under `sheet` these prefer the league's published figures, so a points
+    // mismatch is never just a field-size mismatch wearing a disguise. Under
+    // `tabroom` every one is computed from the payload.
     const stats = opens.map(computeFieldStats);
-    const openField = off.openField ?? stats.reduce((a, s) => a + s.fieldSize, 0);
-    const afs = off.afs ?? openField;
-    const elimField = off.openElimField ?? stats.reduce((a, s) => a + s.elimField, 0);
-    const breakPct = off.breakPct ?? (openField ? (100 * elimField) / openField : 0);
-    const prelimCount = off.prelimCount ?? Math.max(...stats.map((s) => s.prelimCount));
-    const ctx = { afs, breakPct, prelimCount, breakingRecord: parseRecord(off.breakingRecord) };
+    // Computed once and reused: the breaking record below needs them, and so
+    // does the per-entry loop.
+    const perfByEvent = opens.map((ev) => computeEntryPerformances(ev));
+    const perfs = perfByEvent.flatMap((m) => [...m.values()]);
+    const openField = fromSheet(off.openField) ?? stats.reduce((a, s) => a + s.fieldSize, 0);
+    // XXI.2.B -- AFS is the open field *plus* the novice/JV field, both with
+    // XXI.2.A's forfeit exclusion applied. Falling back to the open field alone
+    // reads Berkeley as 104 where the league has 141, which is not a rounding
+    // difference but a different row of the elim points table.
+    //
+    // XXI.6.C: where a tournament runs several open divisions each counts on
+    // its own and novice/JV is not added to any of them.
+    const njvField = opens.length > 1
+      ? 0
+      : t.events
+        .filter((e) => e.isParli && (e.division === 'jv' || e.division === 'novice'))
+        .map(computeFieldStats)
+        .filter((f) => !f.phantom)
+        .reduce((a, f) => a + f.fieldSize, 0);
+    const afs = fromSheet(off.afs) ?? openField + njvField;
+    const elimField = fromSheet(off.openElimField) ?? stats.reduce((a, s) => a + s.elimField, 0);
+    const breakPct = fromSheet(off.breakPct) ?? (openField ? (100 * elimField) / openField : 0);
+    const prelimCount = fromSheet(off.prelimCount) ?? Math.max(...stats.map((s) => s.prelimCount));
+    // XXI.3.B's floor needs the lowest-seeded breaking record, which the sheet
+    // publishes and Tabroom does not state. Derived from the entries that broke.
+    const breakingRecord = (sources.breakingRecord === 'sheet'
+      ? parseRecord(off.breakingRecord)
+      : undefined) ?? lowestBreakingRecord(perfs);
+    const ctx = { afs, breakPct, prelimCount, breakingRecord };
 
     interface Mine {
       wins: number; losses: number; elimLevel: ElimLevel | null;
       size: boolean; prelimBallotsWon: number; elimWins: number;
+      /** XXI.5.C derived from the bracket; used when the source is `tabroom`. */
+      walkover: number;
     }
     const byEntry = new Map<string, Mine>();
     const candidates: EntryCandidate[] = [];
 
-    for (const ev of opens) {
-      const perf = computeEntryPerformances(ev);
+    for (const [evIndex, ev] of opens.entries()) {
+      const perf = perfByEvent[evIndex]!;
       for (const [entryId, entry] of ev.entries) {
         const people = entry.studentIds
           .map((sid) => students.get(sid))
@@ -204,6 +307,7 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
           size: entry.eligibleTeamSize,
           prelimBallotsWon: p.prelimBallotsWon,
           elimWins: p.elimWins,
+          walkover: p.walkoverAdjustment,
         });
         candidates.push({ entryId, schoolName: entry.schoolName, people: resolved });
       }
@@ -232,6 +336,9 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
         ? ({ qual: 8, alt: 4 } as Record<string, number>)[row.result.toLowerCase()]
         : undefined;
       const isToc = /NPDL-TOC/i.test(off.name);
+      const walkover = sources.walkover === 'sheet'
+        ? (row.walkoverAdjustment ?? 0)
+        : mine.walkover;
       const sb = isQualifier !== undefined
         ? { points: isQualifier, basePoints: isQualifier, prelimCountAdjustment: 0, breakPenalty: 0,
             walkoverAdjustment: 0, floorApplied: 'none' as const, excluded: null, broke: false }
@@ -241,11 +348,11 @@ export function computeSeason(zipPath = 'data/raw/sheet/rankings.zip'): SeasonRe
               broke: mine.elimLevel !== null,
               elimWins: mine.elimWins,
               champion: mine.elimLevel === 'first',
-              walkoverAdjustment: row.walkoverAdjustment ?? 0,
+              walkoverAdjustment: walkover,
             }, breakPct)
           : scoreEntry({
               wins: mine.wins, losses: mine.losses, elimLevel: mine.elimLevel,
-              eligibleTeamSize: mine.size, walkoverAdjustment: row.walkoverAdjustment ?? 0,
+              eligibleTeamSize: mine.size, walkoverAdjustment: walkover,
             }, ctx);
 
       cases.push({

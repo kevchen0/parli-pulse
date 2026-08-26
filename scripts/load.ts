@@ -81,7 +81,15 @@ async function main(): Promise<void> {
 
     // Scoring and sheet matching share the engine used by the backtests, so
     // what lands in the database is exactly what the reports measure.
-    const season = computeSeason(SHEET);
+    // `SOURCE=tabroom` scores from the payload alone -- field sizes, breaking
+    // record and walkovers all computed rather than read from the sheet.
+    // Discovery is the sheet's either way. Still opt-in: on 2025-26 it agrees
+    // with the league on 91.4% of entries against 97.7%, and the gap is 98
+    // entries in a handful of tournaments rather than anything systemic.
+    // `npm run compare:sources` is the measurement.
+    const source = process.env.SOURCE === 'tabroom' ? 'tabroom' : 'sheet';
+    const season = computeSeason(SHEET, { source });
+    console.log(`  scoring inputs: ${source}`);
     const caseByEntry = new Map(season.cases.map((c) => [c.entryId, c]));
 
     await db.insert(t.seasons).values({
