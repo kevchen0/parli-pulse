@@ -5,7 +5,7 @@ Kept current — an unlisted gap will be mistaken for an ingestion bug and
 re-debugged from scratch.
 
 Current standing accuracy: per-entry **96%** (1504/1564); the league's top 100
-teams **88% exact**, 95% within 2 points; schools 48% exact. Points are computed from Tabroom, not read from the league's figures — the sheet supplies which tournaments and teams exist, and nothing numeric. `SOURCE=sheet` scores the old way and reaches 98%, which is the measure of what independence costs rather than a better engine.
+teams **91% exact**, 97% within 2 points; schools 52% exact. Points are computed from Tabroom, not read from the league's figures — the sheet supplies which tournaments and teams exist, and nothing numeric. `SOURCE=sheet` scores the old way and reaches 98%, which is the measure of what independence costs rather than a better engine.
 
 ---
 
@@ -32,10 +32,21 @@ condition rather than a bug.
 
 | Tournament | Problem | Effect |
 |---|---|---|
-| Ridge Debates | Published 4 of 28 teams | 24 results missing; Ridge school total −54 |
+| Ridge Debates | Published 4 of 28 teams | **Resolved 2026-08-26** — all 28 hand-entered |
 
-Nothing recovers this: the results exist in no public source. Only the
-tournament can supply them.
+`INCOMPLETE_TOURNAMENTS` is no longer decorative: a tournament listed there is
+scored as though it had no payload at all, so every row comes from the hand
+entry. Partial data is worse than none — Ridge's four visible teams gave an AFS
+of 4, so they scored zero while the other twenty-four scored nothing, and the
+four looked scoreable the whole time.
+
+The rounds still load, so the rating and speaker figures keep whatever evidence
+the payload holds; only the points are hand-entered.
+
+**A surname-only entry cannot always name a person.** Brooklyn Tech's
+"Korneeva & Zhang" is one of two Zhangs at that school and nothing in the data
+says which, so the record stays unattached rather than being attributed on a
+tiebreak. The school total is right; no debater's page claims the result.
 
 ## 3. Tournaments sharing one Tabroom id
 

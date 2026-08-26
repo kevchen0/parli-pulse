@@ -22,7 +22,7 @@ import {
   type MatchTier,
 } from '../../packages/ingest/src/matching.ts';
 import { fieldEventFilter, openEventFilter } from '../../packages/ingest/src/event-selection.ts';
-import { MANUAL_RESULTS } from '../../packages/ingest/src/manual-results.ts';
+import { INCOMPLETE_TOURNAMENTS, MANUAL_RESULTS } from '../../packages/ingest/src/manual-results.ts';
 import {
   parseEntryTab,
   parseTournamentsTab,
@@ -217,7 +217,18 @@ export function computeSeason(
     const sheetRows = officialEntries.filter((e) => e.tournament === off.name);
     if (!sheetRows.length) continue;
     const path = off.tournId ? `data/raw/tabroom/${off.tournId}.json` : '';
-    if (!path || !existsSync(path)) {
+    // A tournament flagged incomplete is scored as though it had no payload at
+    // all. Ridge Debates published four of twenty-eight teams, which is worse
+    // than publishing none: the field size, the break percentage and every
+    // band are unknowable from it, so its four visible teams scored zero on an
+    // AFS of four while the other twenty-four scored nothing at all. Partial
+    // data that looks scoreable is the thing to guard against.
+    //
+    // The rounds still load, so the rating and speaker figures keep whatever
+    // real evidence the payload holds; only the points come from the hand
+    // entry.
+    const incomplete = INCOMPLETE_TOURNAMENTS.some((t) => t.tournament === off.name);
+    if (!path || !existsSync(path) || incomplete) {
       // No Tabroom data at all. Tournaments that run on another platform are
       // still scoreable from the hand-entered table; anything else is a gap.
       skippedTournaments.push(off.name);

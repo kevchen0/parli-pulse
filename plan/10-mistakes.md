@@ -334,6 +334,32 @@ output looked wrong, because a list is always in *some* order.
 **Rule:** a table nobody has re-run is a table nobody has tested. The pipeline
 is described as rebuilding a season; the only proof of that is rebuilding one.
 
+43. **A pairwise guard defeated by a transitive merge.** Identity resolution is
+    union-find over compatible pairs, and `conflicts` correctly says two records
+    naming different first names are different people. But union-find is
+    transitive and the guard is pairwise: Brooklyn Tech has both Angela and
+    Kristina Zhang, a record carrying only the surname matches each of them on
+    school-plus-surname and conflicts with neither, and unioning both puts two
+    real people in one component. The Angela/Kristina check that would have
+    stopped it is never consulted, because they were never the pair being
+    joined. *Found by hand-entering Ridge Debates, whose surname-only rows
+    created exactly such a bridge -- and by reading the merge afterwards rather
+    than trusting the count.*
+
+    **The first fix was wrong and worth recording.** Making the guard check
+    across whole components rather than pairs sounds obviously right and split
+    Harry Yin in two: he holds two Tabroom records, both fully named, never at
+    the same tournament, and something else in their components blocked the
+    join. The correct fix is narrower and needs no component tracking -- where a
+    group already holds two people we can tell apart, a record with no first
+    name has two candidates and no way to choose, so it attaches to neither.
+
+**Rule:** a guard that runs per pair does not survive an algorithm that merges
+transitively -- and when the obvious generalisation of a guard starts refusing
+merges that were right, the guard is not the thing that needed generalising.
+Diff the identities, not the count: 288 merges and 286 merges look equally
+plausible and one of them had two people in one.
+
 ---
 
 ## What actually caught these

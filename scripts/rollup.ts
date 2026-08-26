@@ -157,13 +157,26 @@ async function resolveIdentities(
   };
   for (const p of people) parent.set(p.id, p.id);
 
+  const named = (p: (typeof people)[number]): boolean => Boolean(letters(p.first));
+
   for (const [, group] of groups) {
     if (group.length < 2) continue;
+    // Does this group hold two people we can already tell apart? Brooklyn Tech
+    // has both Angela and Kristina Zhang, so its `school|...|zhang` group does.
+    // A record carrying no first name then has two candidates and no way to
+    // choose between them, and attaching it to either is a coin flip that puts
+    // a real result on a real person's page. Leave it standing alone: an
+    // unattributed result is a gap, a misattributed one is a false statement.
+    // Named records in the group still merge with each other normally.
+    const ambiguous = group.some((a, i) =>
+      group.slice(i + 1).some((b) => named(a) && named(b) && conflicts(a, b)),
+    );
     for (let i = 0; i < group.length; i++) {
       for (let j = i + 1; j < group.length; j++) {
         const a = group[i]!;
         const b = group[j]!;
         if (find(a.id) === find(b.id)) continue;
+        if (ambiguous && (!named(a) || !named(b))) continue;
         if (conflicts(a, b)) continue;
         union(a.id, b.id);
       }
