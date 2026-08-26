@@ -7,6 +7,8 @@ type SortKey = 'shown' | 'rating' | 'rounds';
 type Direction = 'desc' | 'asc';
 
 import { PAGE_SIZE, pageNumbers } from '@/app/pager';
+import { displayName } from '@/lib/names';
+import DebaterLink from '@/app/debater-link';
 
 /**
  * The rating a partnership has established, as opposed to the one it might
@@ -35,7 +37,7 @@ function compare(a: RatingRow, b: RatingRow, key: SortKey, dir: Direction): numb
   if (primary !== 0) return dir === 'desc' ? primary : -primary;
   if (a.deviation !== b.deviation) return Number(a.deviation) - Number(b.deviation);
   if (a.rounds !== b.rounds) return b.rounds - a.rounds;
-  return a.debater1.localeCompare(b.debater1);
+  return displayName(a.debater1).localeCompare(displayName(b.debater1));
 }
 
 function SortHeader({
@@ -79,7 +81,7 @@ function SortHeader({
   );
 }
 
-export default function RatingTable({ rows }: { rows: RatingRow[] }) {
+export default function RatingTable({ rows, season }: { rows: RatingRow[]; season: string }) {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortKey>('shown');
   const [direction, setDirection] = useState<Direction>('desc');
@@ -97,8 +99,8 @@ export default function RatingTable({ rows }: { rows: RatingRow[] }) {
     const filtered = needle
       ? rows.filter(
           (r) =>
-            r.debater1.toLowerCase().includes(needle) ||
-            r.debater2.toLowerCase().includes(needle) ||
+            displayName(r.debater1).toLowerCase().includes(needle) ||
+            displayName(r.debater2).toLowerCase().includes(needle) ||
             (r.school ?? '').toLowerCase().includes(needle),
         )
       : rows;
@@ -155,7 +157,11 @@ export default function RatingTable({ rows }: { rows: RatingRow[] }) {
                   {r.school ?? '—'}
                   {r.region ? <span className="region"> · {r.region}</span> : null}
                 </td>
-                <td>{r.debater1} &amp; {r.debater2}</td>
+                <td>
+                  <DebaterLink season={season} id={r.subjectId.split('|')[0]!} name={r.debater1} />
+                  {' & '}
+                  <DebaterLink season={season} id={r.subjectId.split('|')[1]!} name={r.debater2} />
+                </td>
                 <td className="region">{r.rounds}</td>
                 <td className="pts">{Math.round(shown(r))}</td>
                 <td>

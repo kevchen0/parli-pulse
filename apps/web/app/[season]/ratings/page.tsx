@@ -34,7 +34,7 @@ export default async function RatingsPage(
         <span className="methodlink"><Link href={seasonHref(season, '/method/ratings')}>How this is calculated &rarr;</Link></span>
       </p>
 
-      <RatingTable rows={ratings} />
+      <RatingTable rows={ratings} season={season} />
 
       <ol className="footnotes">
         <li id="fn1">

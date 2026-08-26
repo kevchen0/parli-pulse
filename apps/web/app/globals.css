@@ -752,3 +752,91 @@ abbr.tick.differs { color: var(--bad); }
   border-radius: var(--radius);
 }
 .freshness.stale b { font-weight: 600; }
+
+/* --- debater profile ---
+   A page about one person rather than a table of many, so it opens with the
+   three figures the site holds about them and then explains the first of the
+   three. The season table is the argument: every tournament, with the five the
+   rules count marked, adding to the total in the foot. A reader who adds the
+   column up must get the number in the footer, which is why the weights come
+   from the same function the total does. */
+
+.crumb { margin: 0 0 0.4rem; font-size: 0.8125rem; color: var(--muted); }
+.crumb a { color: var(--muted); text-decoration: none; }
+.crumb a:hover { color: var(--accent); text-decoration: underline; }
+
+.lede.subject { margin-bottom: 1.5rem; }
+
+.figures {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  margin: 0 0 1.5rem;
+}
+.figure {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 0.8rem 0.9rem;
+}
+.figure h3 { margin: 0; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-family: var(--f-body); font-weight: 600; }
+.figure h3 a { color: inherit; text-decoration: none; }
+.figure h3 a:hover { color: var(--accent); }
+.fval { margin: 0.3rem 0 0.1rem; font-size: 1.6rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.fnote { margin: 0; font-size: 0.8125rem; color: var(--muted); }
+
+.aqnote {
+  border-left: 3px solid var(--gold);
+  padding: 0.5rem 0.8rem;
+  background: var(--warn-soft);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+/* The counting five. A tint rather than bold, because bold already means a
+   term being defined everywhere else on the site. */
+tbody tr.pick td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+td.weight { color: var(--muted); font-size: 0.8125rem; }
+td.rec { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.faint { color: var(--faint); }
+
+tfoot td {
+  border-top: 1px solid var(--border-firm);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+tfoot td.total { font-size: 0.9375rem; font-weight: 600; color: var(--text); }
+
+/* Round detail is collapsed by default: fifteen tournaments of eight rounds is
+   a hundred and twenty rows, which buries the season table above it. */
+.rounds {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  margin-bottom: 0.4rem;
+}
+.rounds > summary {
+  cursor: pointer;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  align-items: baseline;
+  font-size: 0.875rem;
+}
+.rounds > summary:hover { color: var(--accent); }
+.rounds > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.rtitle { font-weight: 600; }
+.rmeta { color: var(--muted); font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+.rounds .inset { margin: 0 0.55rem 0.55rem; }
+.rounds .tablewrap { border-radius: var(--radius); }
+p.note.inset { margin: 0 0.8rem 0.7rem; }
+
+.outcome { font-weight: 600; }
+.outcome.win { color: var(--good); }
+.outcome.loss { color: var(--bad); }
+.outcome.none { color: var(--muted); font-weight: 400; }
+
+/* A partner's name is one thing to read, not two lines of one. The tournament
+   column absorbs the width instead, since it is the one that can wrap. */
+td.with { white-space: nowrap; }

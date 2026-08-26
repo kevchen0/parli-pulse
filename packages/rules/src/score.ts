@@ -146,10 +146,47 @@ export function scoreEntry(
  * they differ only in which results are pooled.
  */
 export function weightedTotal(pointsPerTournament: readonly number[]): number {
-  const best = [...pointsPerTournament].sort((a, b) => b - a).slice(0, DIMINISHING_RETURNS_WEIGHTS.length);
-  const total = best.reduce((sum, p, i) => sum + p * DIMINISHING_RETURNS_WEIGHTS[i]!, 0);
+  const total = weightedBreakdown(pointsPerTournament)
+    .reduce((sum, r) => sum + r.contribution, 0);
   // Weights carry one decimal; avoid binary-float dust like 32.499999999999996.
   return Math.round(total * 1e6) / 1e6;
+}
+
+/** One result's place in the XXI.7.A weighting. */
+export interface WeightedResult {
+  /** Where the result sat in the input array. */
+  index: number;
+  points: number;
+  /** The weight it drew, or 0 for a result outside the best five. */
+  weight: number;
+  /** What it contributed to the total: `points * weight`. */
+  contribution: number;
+}
+
+/**
+ * The same best-five weighting, with each result's weight kept.
+ *
+ * `weightedTotal` is defined in terms of this rather than beside it. A profile
+ * page has to show a reader which of their tournaments counted and at what
+ * weight, and a second implementation of the sort-and-slice would be pattern G
+ * from plan/10-mistakes.md -- the failure mode there is not that the copy is
+ * wrong on the day it is written, it is that only one of the two gets fixed.
+ *
+ * Ties are resolved by input order, which is what `sort` already did. Two
+ * results at the same points draw different weights and the choice between them
+ * is arbitrary, but it must at least be *stable*: an unordered query feeding an
+ * order-sensitive rule is mistake 30, and a breakdown that reshuffles between
+ * two renders of the same page is the same bug wearing a different hat.
+ */
+export function weightedBreakdown(pointsPerTournament: readonly number[]): WeightedResult[] {
+  const ranked = pointsPerTournament
+    .map((points, index) => ({ index, points }))
+    .sort((a, b) => b.points - a.points || a.index - b.index);
+  const out = ranked.map(({ index, points }, place) => {
+    const weight = DIMINISHING_RETURNS_WEIGHTS[place] ?? 0;
+    return { index, points, weight, contribution: points * weight };
+  });
+  return out.sort((a, b) => a.index - b.index);
 }
 
 

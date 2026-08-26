@@ -4,6 +4,8 @@ import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
 import TableSkeleton, { DEBATER_COLUMNS } from '@/app/table-skeleton';
+import { displayName } from '@/lib/names';
+import DebaterLink from '@/app/debater-link';
 
 export const revalidate = 300;
 
@@ -44,7 +46,7 @@ async function DebatersTable({
   const matches = needle
     ? debaters.filter(
         (d) =>
-          d.name.toLowerCase().includes(needle) ||
+          displayName(d.name).toLowerCase().includes(needle) ||
           (d.school ?? '').toLowerCase().includes(needle),
       )
     : debaters;
@@ -76,14 +78,14 @@ async function DebatersTable({
           </thead>
           <tbody>
             {shown.map((d, i) => (
-              <tr key={`${d.name}-${i}`}>
+              <tr key={`${d.id}-${i}`}>
                 <td className="rank">{d.rank}</td>
                 <td>
                   {d.school ?? '—'}
                   {d.region ? <span className="region"> · {d.region}</span> : null}
                 </td>
                 <td>
-                  {d.name}
+                  <DebaterLink season={season} id={d.id} name={d.name} />
                   {d.autoQualified ? (
                     <abbr className="aq" title="Autoqualified as an individual (XXII.1.A)">
                       {' '}AQ

@@ -7,6 +7,8 @@ type SortKey = 'z' | 'raw';
 type Direction = 'desc' | 'asc';
 
 import { PAGE_SIZE, pageNumbers } from '@/app/pager';
+import { displayName } from '@/lib/names';
+import DebaterLink from '@/app/debater-link';
 
 /** Half-width of the 95% interval on the mean, in z units. */
 const marginZ = (r: SpeakerRow): number | null =>
@@ -36,7 +38,7 @@ function compare(a: SpeakerRow, b: SpeakerRow, key: SortKey, dir: Direction): nu
   const mb = marginZ(b);
   if (ma !== null && mb !== null && ma !== mb) return ma - mb;
   if (a.ballots !== b.ballots) return b.ballots - a.ballots;
-  return a.name.localeCompare(b.name);
+  return displayName(a.name).localeCompare(displayName(b.name));
 }
 
 function SortHeader({
@@ -79,7 +81,7 @@ function SortHeader({
   );
 }
 
-export default function SpeakerTable({ rows }: { rows: SpeakerRow[] }) {
+export default function SpeakerTable({ rows, season }: { rows: SpeakerRow[]; season: string }) {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortKey>('z');
   const [direction, setDirection] = useState<Direction>('desc');
@@ -97,7 +99,7 @@ export default function SpeakerTable({ rows }: { rows: SpeakerRow[] }) {
     const filtered = needle
       ? rows.filter(
           (r) =>
-            r.name.toLowerCase().includes(needle) ||
+            displayName(r.name).toLowerCase().includes(needle) ||
             (r.school ?? '').toLowerCase().includes(needle),
         )
       : rows;
@@ -144,13 +146,13 @@ export default function SpeakerTable({ rows }: { rows: SpeakerRow[] }) {
             {visible.map((s, i) => {
               const m = marginZ(s);
               return (
-                <tr key={`${s.name}-${s.school ?? ''}-${i}`}>
+                <tr key={`${s.id}-${i}`}>
                   <td className="rank">{positions.get(s)}</td>
                   <td className="school" title={s.school ?? undefined}>
                     {s.school ?? '—'}
                     {s.region ? <span className="region"> · {s.region}</span> : null}
                   </td>
-                  <td>{s.name}</td>
+                  <td><DebaterLink season={season} id={s.id} name={s.name} /></td>
                   <td className="region">{s.ballots}</td>
                   <td className="pts">
                     {Number(s.meanZ) > 0 ? '+' : ''}{Number(s.meanZ).toFixed(2)}

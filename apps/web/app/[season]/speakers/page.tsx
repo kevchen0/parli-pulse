@@ -29,7 +29,7 @@ export default async function SpeakersPage(
         </span>
       </p>
 
-      <SpeakerTable rows={speakers} />
+      <SpeakerTable rows={speakers} season={season} />
 
       <ol className="footnotes">
         <li id="fn1">

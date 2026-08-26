@@ -4,6 +4,8 @@ import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
 import TableSkeleton, { TEAM_COLUMNS } from '@/app/table-skeleton';
+import { displayName } from '@/lib/names';
+import DebaterLink from '@/app/debater-link';
 
 export const revalidate = 300;
 
@@ -77,8 +79,8 @@ async function TeamsTable({
   const matches = needle
     ? teams.filter(
         (x) =>
-          x.debater1.toLowerCase().includes(needle) ||
-          x.debater2.toLowerCase().includes(needle) ||
+          displayName(x.debater1).toLowerCase().includes(needle) ||
+          displayName(x.debater2).toLowerCase().includes(needle) ||
           (x.school ?? '').toLowerCase().includes(needle),
       )
     : teams;
@@ -124,14 +126,16 @@ async function TeamsTable({
             {shown.map((t, i) => {
               const standing = tocStanding(t);
               return (
-                <tr key={`${t.debater1}-${t.debater2}-${i}`}>
+                <tr key={`${t.debater1 ?? 'withheld'}-${t.debater2 ?? 'withheld'}-${i}`}>
                   <td className="rank">{t.rank}</td>
                   <td>
                     {t.school ?? '—'}
                     {t.region ? <span className="region"> · {t.region}</span> : null}
                   </td>
                   <td>
-                    {t.debater1} &amp; {t.debater2}
+                    <DebaterLink season={season} id={t.debater1Id} name={t.debater1} />
+                    {' & '}
+                    <DebaterLink season={season} id={t.debater2Id} name={t.debater2} />
                     {standing === 'bid' && (
                       <abbr className="aq" title="Both partners autoqualified (XXII.1.A, XXII.1.E)">
                         {' '}AQ

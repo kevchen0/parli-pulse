@@ -96,6 +96,18 @@ export function seasonHref(season: SeasonId, path: SeasonPath, hash = ''): never
 }
 
 /**
+ * A link to a debater's page.
+ *
+ * Separate from `seasonHref` because the id is only known at request time and
+ * `typedRoutes` cannot check it. Any of a debater's Tabroom ids resolves; the
+ * page redirects to the canonical one, so a link built from whichever id a
+ * table happened to hold still lands somewhere stable.
+ */
+export function debaterHref(season: SeasonId, id: string): never {
+  return `/${season}/debater/${encodeURIComponent(id)}` as never;
+}
+
+/**
  * The site's navigation, as data.
  *
  * Grouped by whose numbers they are, because that is the distinction the whole

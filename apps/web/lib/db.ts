@@ -1,8 +1,10 @@
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { MIN_RATED_ROUNDS, fieldSpread } from '@parli-pulse/rating';
+import { weightedBreakdown } from '@parli-pulse/rules';
 import { createDb } from '@parli-pulse/db';
 import * as t from '@parli-pulse/db';
 import type { SeasonId } from './season';
+import { compareRounds } from './labels';
 
 /**
  * One pool per server instance. Next re-evaluates modules on each request in
@@ -21,13 +23,34 @@ const handle = (): ReturnType<typeof createDb> => {
 
 export const dbReady = (): boolean => Boolean(process.env.DATABASE_URL);
 
+/**
+ * A debater's display name, or null where a removal request is honoured.
+ *
+ * One fragment rather than the expression repeated at each call site: it was
+ * already written out five times, and a suppression check that has to be
+ * remembered five times is a suppression check that will be missed once. The
+ * alias is the table alias the surrounding query uses; it is always a literal
+ * in this file, never anything a reader supplies.
+ *
+ * Null rather than a placeholder string so the caller cannot render it by
+ * accident -- see apps/web/lib/names.ts.
+ */
+const debaterName = (alias: string) =>
+  sql.raw(
+    `case when ${alias}.suppressed then null` +
+      ` else coalesce(${alias}.first_name || ' ', '') || ${alias}.last_name end`,
+  );
+
 export interface TeamRow {
   rank: number | null;
   points: number;
   school: string | null;
   region: string | null;
-  debater1: string;
-  debater2: string;
+  /** Null where the debater has asked not to be named. */
+  debater1: string | null;
+  debater2: string | null;
+  debater1Id: string;
+  debater2Id: string;
   tournaments: number;
   /**
    * How many of the two partners autoqualified individually (XXII.1.A).
@@ -61,9 +84,10 @@ export async function getTeams(season: SeasonId, limit = 5000): Promise<TeamRow[
   const d1 = t.debaters;
   const rows = await db.execute(sql`
     select ts.rank, ts.points, ts.tournaments_counted as tournaments,
+           ts.debater1_id as "debater1Id", ts.debater2_id as "debater2Id",
            coalesce(s.short_name, s.name) as school, s.region,
-           coalesce(a.first_name || ' ', '') || a.last_name as debater1,
-           coalesce(b.first_name || ' ', '') || b.last_name as debater2,
+           ${debaterName('a')} as debater1,
+           ${debaterName('b')} as debater2,
            (coalesce(qa.auto_qualified, false)::int
             + coalesce(qb.auto_qualified, false)::int) as "partnersQualified",
            sd.official_points as "officialPoints",
@@ -93,9 +117,12 @@ export async function getTeams(season: SeasonId, limit = 5000): Promise<TeamRow[
 }
 
 export interface DebaterRow {
+  /** Canonical debater id, for the link to their page. */
+  id: string;
   rank: number | null;
   points: number;
-  name: string;
+  /** Null where the debater has asked not to be named. */
+  name: string | null;
   school: string | null;
   region: string | null;
   autoQualified: boolean;
@@ -145,7 +172,8 @@ export async function getDebaters(season: SeasonId, limit = 5000): Promise<Debat
         select debater2_id as debater_id, state, gap from team_state
       ) x group by debater_id
     )
-    select ds.rank, ds.points, ds.auto_qualified as "autoQualified",
+    select ds.debater_id as id,
+           ds.rank, ds.points, ds.auto_qualified as "autoQualified",
            coalesce(pd.exposure, 0) as exposure,
            case
              when pd.any_differs and coalesce(pd.exposure, 0) >= 0.01 * ds.points
@@ -153,7 +181,7 @@ export async function getDebaters(season: SeasonId, limit = 5000): Promise<Debat
              when pd.any_pending then 'pending'
              else 'agrees'
            end as reconciliation,
-           coalesce(d.first_name || ' ', '') || d.last_name as name,
+           ${debaterName('d')} as name,
            coalesce(s.short_name, s.name) as school, s.region
     from ${t.debaterSeasonTotals} ds
     join ${t.debaters} d on d.id = ds.debater_id
@@ -216,8 +244,11 @@ export async function getSchools(season: SeasonId): Promise<SchoolRow[]> {
 }
 
 export interface SpeakerRow {
+  /** Canonical debater id, for the link to their page. */
+  id: string;
   rank: number | null;
-  name: string;
+  /** Null where the debater has asked not to be named. */
+  name: string | null;
   school: string | null;
   region: string | null;
   ballots: number;
@@ -234,10 +265,11 @@ export interface SpeakerRow {
 export async function getSpeakers(season: SeasonId, limit = 5000): Promise<SpeakerRow[]> {
   const { db } = handle();
   const rows = await db.execute(sql`
-    select st.rank, st.ballots, st.mean_z as "meanZ", st.mean_display as "meanDisplay",
+    select st.debater_id as id,
+           st.rank, st.ballots, st.mean_z as "meanZ", st.mean_display as "meanDisplay",
            st.margin_display as "marginDisplay", st.mean_raw as "meanRaw",
            st.sd_z as "sdZ",
-           coalesce(d.first_name || ' ', '') || d.last_name as name,
+           ${debaterName('d')} as name,
            coalesce(s.short_name, s.name) as school, s.region
     from ${t.debaterSpeakerTotals} st
     join ${t.debaters} d on d.id = st.debater_id
@@ -407,8 +439,9 @@ export async function getSummary(season: SeasonId): Promise<Summary> {
 
 export interface RatingRow {
   subjectId: string;
-  debater1: string;
-  debater2: string;
+  /** Null where the debater has asked not to be named. */
+  debater1: string | null;
+  debater2: string | null;
   school: string | null;
   region: string | null;
   rating: number;
@@ -436,8 +469,8 @@ export async function getRatings(season: SeasonId, limit = 5000): Promise<Rating
   const rows = await db.execute(sql`
     select r.subject_id as "subjectId", r.rating, r.deviation,
            r.shrunk_rating as shrunk, r.rounds_counted as rounds,
-           coalesce(a.first_name || ' ', '') || a.last_name as debater1,
-           coalesce(b.first_name || ' ', '') || b.last_name as debater2,
+           ${debaterName('a')} as debater1,
+           ${debaterName('b')} as debater2,
            coalesce(s.short_name, s.name) as school, s.region,
            ts.rank as "pointsRank", ts.points
     from ${t.ratings} r
@@ -634,5 +667,365 @@ export async function getFreshness(season: SeasonId): Promise<Freshness> {
     source: row.source ?? null,
     ageHours,
     stale: ageHours > STALE_AFTER_HOURS,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Debater profiles
+// ---------------------------------------------------------------------------
+
+/** A name that may have been withheld: `null` means a removal request. */
+export interface Named {
+  id: string;
+  name: string | null;
+}
+
+export interface ProfileRound {
+  /** Tabroom's own label -- "1", "Finals", "Octafinals". */
+  label: string;
+  kind: string;
+  elimLevel: string | null;
+  isConsolation: boolean;
+  /** 1 or 2 as Tabroom records it; null where it did not. */
+  side: number | null;
+  /**
+   * Ballots won and ballots cast **on this entry's side** of the section.
+   *
+   * Never the section total: Tabroom writes one ballot per judge per entry, so
+   * a three-judge round holds six rows and reading the sum as the panel size
+   * turns every ordinary round into a tie. That is pattern A in
+   * plan/10-mistakes.md, which has now been made three times in three places.
+   */
+  ballotsWon: number;
+  ballots: number;
+  /** A round advanced without debating. Not a win and not a loss. */
+  bye: boolean;
+  /** Null where the section holds no opposing entry -- a bye, or an unentered room. */
+  opponent: { names: (string | null)[]; school: string | null } | null;
+  /** This debater's own speaker score, judge-normalized and raw. */
+  speaks: number | null;
+  rawSpeaks: number | null;
+}
+
+export interface ProfileTournament {
+  tournamentId: string;
+  name: string;
+  startsOn: string | null;
+  entryId: string;
+  /** Null where the tournament produced no scored result for this entry. */
+  points: number | null;
+  /** Why the result scores nothing, where it does not. */
+  excludedReason: string | null;
+  /** The XXI.7.A weight this result drew: 0 for anything outside the best five. */
+  weight: number;
+  contribution: number;
+  prelimWins: number;
+  prelimLosses: number;
+  elimLevel: string | null;
+  wonFinal: boolean;
+  school: string | null;
+  /** Who they debated with. Null where the entry names nobody else. */
+  partner: Named | null;
+  rounds: ProfileRound[];
+}
+
+export interface ProfilePartnership {
+  subjectId: string;
+  partner: Named | null;
+  rating: number;
+  deviation: number;
+  shrunk: number;
+  rounds: number;
+  /** Whether it clears the round gate and appears on the ratings board. */
+  ranked: boolean;
+}
+
+export interface DebaterProfile {
+  /** The canonical id. Other ids for the same person redirect to it. */
+  id: string;
+  name: string;
+  school: string | null;
+  region: string | null;
+  points: number | null;
+  rank: number | null;
+  autoQualified: boolean;
+  speaker: {
+    rank: number | null;
+    ballots: number;
+    meanDisplay: number;
+    marginDisplay: number | null;
+    meanRaw: number | null;
+  } | null;
+  tournaments: ProfileTournament[];
+  partnerships: ProfilePartnership[];
+}
+
+/**
+ * The canonical id for a debater, or null if no such debater exists.
+ *
+ * A person can hold several Tabroom student ids -- a club or independent
+ * registration issues a new one -- and `debaters.canonical_id` records the
+ * merge. Any of them addresses the profile; the page redirects to the
+ * canonical one so a shared link is stable and the same season is not indexed
+ * under three URLs.
+ */
+export async function resolveDebaterId(id: string): Promise<string | null> {
+  const { db } = handle();
+  const rows = (await db.execute(sql`
+    with target as (
+      select coalesce(canonical_id, id) as canonical from ${t.debaters} where id = ${id}
+    )
+    select target.canonical,
+           -- Suppression is a fact about the person, not about one of their
+           -- registrations. Asking only the record that was linked would leave
+           -- a page reachable through whichever id the flag was not set on.
+           bool_or(d.suppressed) as suppressed
+    from target
+    join ${t.debaters} d on coalesce(d.canonical_id, d.id) = target.canonical
+    group by target.canonical
+  `)).rows as unknown as { canonical: string; suppressed: boolean }[];
+  const row = rows[0];
+  if (!row) return null;
+  // A withheld debater has no page. Their results still count everywhere the
+  // rules require -- see apps/web/lib/names.ts -- but there is no version of
+  // this page that is not about the person who asked not to have one.
+  if (row.suppressed) return null;
+  return row.canonical;
+}
+
+/**
+ * Everything a debater's page shows, for one season.
+ *
+ * Assembled from four queries rather than one join: a debater has tens of
+ * results and hundreds of rounds, and a single query would multiply the two.
+ *
+ * The tournament list is deliberately built on the **same** filter `rollup`
+ * applies -- scored results with no `excluded_reason`, pooled across every
+ * registration the canonical id covers. The weights then come from
+ * `weightedBreakdown`, which is what `weightedTotal` itself is built on. Both
+ * choices are there so the figures on the page add up to the total beside
+ * them: a breakdown computed a second way is pattern G from
+ * plan/10-mistakes.md, and here it would be visibly wrong to any reader who
+ * added up the column.
+ */
+export async function getDebaterProfile(
+  season: SeasonId,
+  canonicalId: string,
+): Promise<DebaterProfile | null> {
+  const { db } = handle();
+
+  const identity = (await db.execute(sql`
+    select ${debaterName('d')} as name,
+           coalesce(s.short_name, s.name) as school, s.region,
+           ds.points, ds.rank, coalesce(ds.auto_qualified, false) as "autoQualified",
+           st.rank as "speakerRank", st.ballots, st.mean_display as "meanDisplay",
+           st.margin_display as "marginDisplay", st.mean_raw as "meanRaw"
+    from ${t.debaters} d
+    left join ${t.schools} s on s.id = d.school_id
+    left join ${t.debaterSeasonTotals} ds
+      on ds.debater_id = d.id and ds.season_id = ${season}
+    left join ${t.debaterSpeakerTotals} st
+      on st.debater_id = d.id and st.season_id = ${season}
+    where d.id = ${canonicalId}
+  `)).rows as unknown as {
+    name: string | null; school: string | null; region: string | null;
+    points: number | null; rank: number | null; autoQualified: boolean;
+    speakerRank: number | null; ballots: number | null; meanDisplay: number | null;
+    marginDisplay: number | null; meanRaw: number | null;
+  }[];
+  const me = identity[0];
+  // `name` is null only when suppressed, which resolveDebaterId already
+  // refuses. Checked again rather than assumed: this is the one place a
+  // withheld name could reach a page title.
+  if (!me || me.name === null) return null;
+
+  const entries = (await db.execute(sql`
+    select en.id as "entryId", tr.id as "tournamentId", tr.name, tr.starts_on as "startsOn",
+           er.points, er.excluded_reason as "excludedReason",
+           en.prelim_wins as "prelimWins", en.prelim_losses as "prelimLosses",
+           en.elim_level as "elimLevel", en.won_final as "wonFinal",
+           coalesce(sc.short_name, sc.name) as school,
+           p.id as "partnerId", p.name as "partnerName"
+    from ${t.entryDebaters} ed
+    join ${t.debaters} d on d.id = ed.debater_id
+    join ${t.entries} en on en.id = ed.entry_id
+    join ${t.events} ev on ev.id = en.event_id
+    join ${t.tournaments} tr on tr.id = ev.tournament_id
+    left join ${t.entryResults} er on er.entry_id = en.id
+    left join ${t.schools} sc on sc.id = en.school_id
+    -- The other person on the entry, by canonical identity so a partner who
+    -- competed under two registrations is one partner.
+    left join lateral (
+      select coalesce(pd.canonical_id, pd.id) as id, ${debaterName('pd')} as name
+      from ${t.entryDebaters} ped
+      join ${t.debaters} pd on pd.id = ped.debater_id
+      where ped.entry_id = en.id
+        and coalesce(pd.canonical_id, pd.id) <> ${canonicalId}
+      order by pd.last_name, pd.id
+      limit 1
+    ) p on true
+    where coalesce(d.canonical_id, d.id) = ${canonicalId}
+      and tr.season_id = ${season}
+    order by tr.starts_on nulls last, tr.id
+  `)).rows as unknown as {
+    entryId: string; tournamentId: string; name: string; startsOn: string | null;
+    points: number | null; excludedReason: string | null;
+    prelimWins: number; prelimLosses: number; elimLevel: string | null; wonFinal: boolean;
+    school: string | null; partnerId: string | null; partnerName: string | null;
+  }[];
+  if (entries.length === 0 && me.points === null) return null;
+
+  const rounds = entries.length === 0 ? [] : (await db.execute(sql`
+    select b.entry_id as "entryId", ro.name as label, ro.kind::text as kind,
+           ro.elim_level::text as "elimLevel", ro.is_consolation as "isConsolation",
+           max(b.side) as side,
+           count(*) as ballots,
+           count(*) filter (where b.won) as "ballotsWon",
+           bool_or(b.is_bye) as bye,
+           max(o.entry_id) as "opponentEntry",
+           avg(ss.display) as speaks,
+           avg(ss.raw) as "rawSpeaks",
+           min(ro.id) as "roundId"
+    from ${t.ballots} b
+    join ${t.rounds} ro on ro.id = b.round_id
+    left join lateral (
+      select b2.entry_id from ${t.ballots} b2
+      where b2.section_id = b.section_id and b2.entry_id <> b.entry_id
+      limit 1
+    ) o on true
+    -- This debater's own speaks, not the entry's: the partner's scores belong
+    -- on the partner's page.
+    left join ${t.speakerScores} ss on ss.ballot_id = b.id
+      and ss.debater_id in (
+        select id from ${t.debaters} where coalesce(canonical_id, id) = ${canonicalId}
+      )
+      and not ss.excluded
+    where b.entry_id in ${entries.map((e) => e.entryId)}
+      and b.section_id is not null
+    group by b.entry_id, ro.id, ro.name, ro.kind, ro.elim_level, ro.is_consolation
+    order by b.entry_id, min(ro.id)
+  `)).rows as unknown as {
+    entryId: string; label: string; kind: string; elimLevel: string | null;
+    isConsolation: boolean; side: number | null; ballots: number; ballotsWon: number;
+    bye: boolean; opponentEntry: string | null; speaks: number | null; rawSpeaks: number | null;
+  }[];
+
+  const opponentIds = [...new Set(rounds.map((r) => r.opponentEntry).filter((v): v is string => Boolean(v)))];
+  const opponents = new Map<string, { names: (string | null)[]; school: string | null }>();
+  if (opponentIds.length > 0) {
+    const rows = (await db.execute(sql`
+      select en.id as "entryId", coalesce(sc.short_name, sc.name) as school,
+             ${debaterName('d')} as name
+      from ${t.entries} en
+      left join ${t.schools} sc on sc.id = en.school_id
+      left join ${t.entryDebaters} ed on ed.entry_id = en.id
+      left join ${t.debaters} d on d.id = ed.debater_id
+      where en.id in ${opponentIds}
+      order by en.id, d.last_name nulls last, d.id
+    `)).rows as unknown as { entryId: string; school: string | null; name: string | null }[];
+    for (const r of rows) {
+      const found = opponents.get(r.entryId) ?? { names: [], school: r.school };
+      // A merged debater can hold two rows on one entry; the same name twice
+      // would read as a four-person team.
+      if (!found.names.includes(r.name) || r.name === null) found.names.push(r.name);
+      opponents.set(r.entryId, found);
+    }
+  }
+
+  const partnerships = (await db.execute(sql`
+    select r.subject_id as "subjectId", r.rating, r.deviation,
+           r.shrunk_rating as shrunk, r.rounds_counted as rounds,
+           p.id as "partnerId", p.name as "partnerName"
+    from ${t.ratings} r
+    left join lateral (
+      select d.id, ${debaterName('d')} as name from ${t.debaters} d
+      where d.id in (split_part(r.subject_id, '|', 1), split_part(r.subject_id, '|', 2))
+        and d.id <> ${canonicalId}
+      limit 1
+    ) p on true
+    where r.season_id = ${season}
+      and r.subject_kind = 'partnership'
+      and r.tournament_id is null
+      and ${canonicalId} in (split_part(r.subject_id, '|', 1), split_part(r.subject_id, '|', 2))
+    order by r.shrunk_rating desc nulls last
+  `)).rows as unknown as {
+    subjectId: string; rating: number; deviation: number; shrunk: number;
+    rounds: number; partnerId: string | null; partnerName: string | null;
+  }[];
+
+  // Only the results rollup counts get a weight, and they must be presented in
+  // the same order they were weighted in.
+  const scored = entries.filter((e) => e.points !== null && e.excludedReason === null);
+  const weights = new Map<string, { weight: number; contribution: number }>();
+  weightedBreakdown(scored.map((e) => e.points as number)).forEach((w) => {
+    weights.set(scored[w.index]!.entryId, { weight: w.weight, contribution: w.contribution });
+  });
+
+  const roundsByEntry = new Map<string, ProfileRound[]>();
+  for (const r of rounds) {
+    const list = roundsByEntry.get(r.entryId) ?? [];
+    list.push({
+      label: r.label,
+      kind: r.kind,
+      elimLevel: r.elimLevel,
+      isConsolation: r.isConsolation,
+      side: r.side === null ? null : Number(r.side),
+      ballots: Number(r.ballots),
+      ballotsWon: Number(r.ballotsWon),
+      bye: r.bye,
+      opponent: r.opponentEntry ? opponents.get(r.opponentEntry) ?? null : null,
+      speaks: r.speaks === null ? null : Number(r.speaks),
+      rawSpeaks: r.rawSpeaks === null ? null : Number(r.rawSpeaks),
+    });
+    roundsByEntry.set(r.entryId, list);
+  }
+  // Ordered here rather than in the query: the round id is the order rounds
+  // were *created*, and several tournaments built their elim brackets before
+  // their prelims. See compareRounds.
+  for (const list of roundsByEntry.values()) list.sort(compareRounds);
+
+  return {
+    id: canonicalId,
+    name: me.name,
+    school: me.school,
+    region: me.region,
+    points: me.points === null ? null : Number(me.points),
+    rank: me.rank,
+    autoQualified: me.autoQualified,
+    speaker: me.ballots
+      ? {
+          rank: me.speakerRank,
+          ballots: Number(me.ballots),
+          meanDisplay: Number(me.meanDisplay),
+          marginDisplay: me.marginDisplay === null ? null : Number(me.marginDisplay),
+          meanRaw: me.meanRaw === null ? null : Number(me.meanRaw),
+        }
+      : null,
+    tournaments: entries.map((e) => ({
+      tournamentId: e.tournamentId,
+      name: e.name,
+      startsOn: e.startsOn,
+      entryId: e.entryId,
+      points: e.points === null ? null : Number(e.points),
+      excludedReason: e.excludedReason,
+      weight: weights.get(e.entryId)?.weight ?? 0,
+      contribution: weights.get(e.entryId)?.contribution ?? 0,
+      prelimWins: Number(e.prelimWins),
+      prelimLosses: Number(e.prelimLosses),
+      elimLevel: e.elimLevel,
+      wonFinal: e.wonFinal,
+      school: e.school,
+      partner: e.partnerId ? { id: e.partnerId, name: e.partnerName } : null,
+      rounds: roundsByEntry.get(e.entryId) ?? [],
+    })),
+    partnerships: partnerships.map((p) => ({
+      subjectId: p.subjectId,
+      partner: p.partnerId ? { id: p.partnerId, name: p.partnerName } : null,
+      rating: Number(p.rating),
+      deviation: Number(p.deviation),
+      shrunk: Number(p.shrunk),
+      rounds: Number(p.rounds),
+      ranked: Number(p.rounds) >= MIN_RATED_ROUNDS,
+    })),
   };
 }
