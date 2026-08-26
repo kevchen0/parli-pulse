@@ -97,11 +97,23 @@ penalty; **27 of them applied 0** to their entries. El Cerrito alone applied
 −1. Our 11 follows XXI.3.A; their 10 looks like a slip. *(A 0% break does not
 itself trigger a penalty — that hypothesis was tested and rejected.)*
 
-**Prelim count disagreements.** UCLA published **six** preliminary rounds to
-Tabroom (rounds 1-6, twelve sections each); the league recorded five. Teams we
-read as 3-3 the league records as 3-2, which is the difference between nothing
-and four points, and it affects six results. Whether a round was dropped, or a
-hidden elim (XXI.6.A) was counted as a prelim, needs the Reporting Director.
+**Prelim count disagreements — UCLA, and we keep our number.** UCLA published
+**six** preliminary rounds to Tabroom (rounds 1-6, twelve sections each); the
+league recorded five. Teams we read as 3-3 the league records as 3-2, which is
+the difference between nothing and four points. **Decided 2026-08-26: ours
+stands.** Six rounds are in the payload with twelve sections each; there is no
+reading of the data that makes them five. This is an accepted divergence rather
+than a gap to close, and it accounts for 10 of the entries where scoring from
+Tabroom alone disagrees with the sheet. Still worth raising with the Reporting
+Director, because a dropped round or a hidden elim (XXI.6.A) would explain it.
+
+**Finals closeouts between different schools.** Clackamas Holiday Edge has an
+unplayed final between West Linn and Beaverton, and the league recorded -3 for
+both. XXI.5.C provides for closeouts *within* a school only, so the derivation
+does not reproduce this and the two entries sit in the disagreement queue. Read
+literally the league applied a same-school adjustment to two different schools;
+the alternative reading is that an unplayed final is treated as a shared title
+however it arose, which the rules text does not say.
 
 **Tournaments publishing no rounds at all.** Ryan Rutledge has zero rounds in
 its payload. Records come from tab's own summary, so prelim results are right,

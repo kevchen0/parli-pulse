@@ -1,127 +1,73 @@
 /**
- * Can XXI.5.C be derived from Tabroom alone?
+ * Does XXI.5.C derived from Tabroom match what the league recorded?
  *
- * The engine currently reads `walkover_adjustment` off the league's sheet,
- * which means the one adjustment we do not compute is also the one we cannot
- * check -- and it leaves a live season unable to score a closeout until the
- * league writes the tournament up. This measures a derivation against the
- * sheet, so the cost of switching over is a number rather than a guess.
+ * The engine used to read `walkover_adjustment` off the sheet, which made the
+ * one adjustment we did not compute also the one we could not check -- and left
+ * a live season unable to score a closeout until the league wrote the
+ * tournament up. It is derived now, in `computeEntryPerformances`; this scores
+ * that derivation against the column it replaced.
  *
- * The rule under test, from XXI.5.C:
+ * The rule, and the two things it deliberately is not:
  *
  *   A same-school elim pairing that drew a **short panel** -- fewer ballots
  *   than the same round gave its other sections -- was not debated. Whoever
- *   advanced takes -2 for walking over a teammate; whoever stood down takes
- *   +2 for being walked over.
+ *   advanced takes -2 for walking over a teammate, whoever stood down takes +2.
+ *   Where two same-school teams win the semifinals and no final is ever
+ *   published, they closed out and share the title: -3 each.
  *
- * Two qualifiers, both measured rather than assumed:
+ *   - Not "same school". Harvard's octafinal between two Menlo-Atherton teams
+ *     went 2-1 on a full panel and the league records no adjustment for it.
+ *   - Not "no result entered". A walkover still carries a token ballot naming
+ *     whoever went through, so that test finds 4 of roughly 47.
  *
- *   - Same school is not enough on its own. Harvard's octafinal between two
- *     Menlo-Atherton teams went 2-1 on a full panel, and the league records no
- *     adjustment for it. Teammates do sometimes debate.
- *   - "Nobody won" is not the signature either. A walkover still carries a
- *     token ballot naming whoever went through, so that test finds 4 of ~47.
- *
- * State qualifiers are excluded: XXI.4.C scores them on qual/alt rather than
- * from a bracket, and the league records no walkover there even where the
- * bracket shows one.
+ * State qualifiers are excluded: XXI.4.C scores them on qual/alt, not a
+ * bracket, and the league records no walkover there even where one is visible.
  *
  * Run: npm run check:walkovers
  */
-import { sql } from 'drizzle-orm';
-import { createDb } from '../packages/db/src/client.ts';
+import { existsSync } from 'node:fs';
 import { computeSeason } from './lib/season.ts';
 import { resolveSheetPath } from '../packages/ingest/src/sheet.ts';
-import { existsSync } from 'node:fs';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 
-/** Elim stages from the widest bracket to the final. */
-const STAGES = ['tripleOcto', 'doubleOcto', 'octo', 'quarter', 'semi', 'second', 'first'];
-
-const WALK_OVER = -2;
-const WALKED_OVER = 2;
-
-interface Section {
-  entryId: string;
-  roundLevel: string | null;
-  reached: string | null;
-  category: string | null;
-  ballots: number;
-  roundMaxBallots: number;
-}
-
-/** The adjustment this section implies for this entry, or 0 for a real round. */
-export function deriveWalkover(s: Section): number {
-  if (s.category === 'CHSSA' || s.category === 'OSAA') return 0;
-  if (!(s.ballots < s.roundMaxBallots)) return 0;
-  const here = s.roundLevel ? STAGES.indexOf(s.roundLevel) : -1;
-  const got = s.reached ? STAGES.indexOf(s.reached) : -1;
-  if (here < 0 || got < 0) return 0;
-  return got > here ? WALK_OVER : WALKED_OVER;
-}
-
-async function main(): Promise<void> {
+function main(): void {
   const path = resolveSheetPath(SEASON, existsSync);
-  const season = computeSeason(path);
 
-  // Truth: what the league recorded, tied to our entries by the same matcher
-  // the rest of the pipeline uses. Never a fresh match key -- see pattern B.
-  const truth = new Map<string, number>();
+  // Both runs through the one implementation, rather than a second copy of the
+  // rule written in SQL. That copy existed for a day and was already stale:
+  // it could not see the finals-closeout case at all. Pattern G.
+  const theirs = computeSeason(path, { source: { walkover: 'sheet' } });
+  const ours = computeSeason(path, { source: { walkover: 'tabroom' } });
+
+  const sheet = new Map<string, number>();
   const label = new Map<string, string>();
-  for (const c of season.cases) {
+  for (const c of theirs.cases) {
     if (c.provenance !== 'tabroom') continue;
-    truth.set(c.entryId, c.ourWalkover ?? 0);
+    sheet.set(c.entryId, c.ourWalkover);
     label.set(c.entryId, `${c.tournament} | ${c.team}`);
   }
-
-  const { db, close } = createDb();
-  const rows = (await db.execute(sql`
-    with side as (
-      select ro.id as round_id, ro.elim_level as round_level, b.section_id, b.entry_id,
-             en.school_id, en.elim_level as reached, tr.category,
-             count(*) as ballots
-      from ballots b
-      join rounds ro on ro.id = b.round_id
-      join events ev on ev.id = ro.event_id
-      join tournaments tr on tr.id = ev.tournament_id
-      join entries en on en.id = b.entry_id
-      where ro.kind = 'elim' and b.section_id is not null and tr.season_id = ${SEASON}
-      group by ro.id, ro.elim_level, b.section_id, b.entry_id, en.school_id,
-               en.elim_level, tr.category
-    ),
-    round_norm as (select round_id, max(ballots) as round_max from side group by round_id)
-    select a.entry_id as "entryId", a.round_level as "roundLevel", a.reached,
-           a.category, a.ballots, n.round_max as "roundMaxBallots"
-    from side a
-    join side b on b.section_id = a.section_id and b.entry_id <> a.entry_id
-    join round_norm n on n.round_id = a.round_id
-    where a.school_id is not null and a.school_id = b.school_id
-    order by a.entry_id, a.round_id
-  `)).rows as unknown as Section[];
-
   const derived = new Map<string, number>();
-  for (const s of rows) {
-    const adj = deriveWalkover({ ...s, ballots: Number(s.ballots), roundMaxBallots: Number(s.roundMaxBallots) });
-    if (adj) derived.set(s.entryId, (derived.get(s.entryId) ?? 0) + adj);
+  for (const c of ours.cases) {
+    if (c.provenance === 'tabroom') derived.set(c.entryId, c.ourWalkover);
   }
 
   let exact = 0;
   const wrong: { sheet: number; ours: number; who: string }[] = [];
-  for (const [id, sheet] of truth) {
-    const ours = derived.get(id) ?? 0;
-    if (ours === sheet) exact++;
-    else wrong.push({ sheet, ours, who: label.get(id) ?? id });
+  for (const [id, theirValue] of sheet) {
+    const ourValue = derived.get(id) ?? 0;
+    if (ourValue === theirValue) exact++;
+    else wrong.push({ sheet: theirValue, ours: ourValue, who: label.get(id) ?? id });
   }
 
-  const pct = ((100 * exact) / truth.size).toFixed(1);
+  const withAdj = [...sheet.values()].filter(Boolean).length;
   console.log(`\nXXI.5.C derived from Tabroom, against the league's own column`);
-  console.log(`  season            ${SEASON}`);
-  console.log(`  matched entries   ${truth.size}`);
-  console.log(`  with an adjustment in the sheet   ${[...truth.values()].filter(Boolean).length}`);
-  console.log(`  derived            ${derived.size}`);
-  console.log(`  exact              ${exact}/${truth.size}  (${pct}%)`);
-  console.log(`  disagreements      ${wrong.length}\n`);
+  console.log(`  season                          ${SEASON}`);
+  console.log(`  matched entries                 ${sheet.size}`);
+  console.log(`  carrying an adjustment: sheet   ${withAdj}`);
+  console.log(`                          ours    ${[...derived.values()].filter(Boolean).length}`);
+  console.log(`  exact                           ${exact}/${sheet.size}  (${((100 * exact) / sheet.size).toFixed(1)}%)`);
+  console.log(`  disagreements                   ${wrong.length}\n`);
 
   if (wrong.length) {
     console.log('  sheet  ours  entry');
@@ -129,13 +75,13 @@ async function main(): Promise<void> {
       console.log(`  ${String(w.sheet).padStart(5)} ${String(w.ours).padStart(5)}  ${w.who}`);
     }
     console.log(
-      '\n  Most of these are rounds Tabroom does not hold at all: when a final or\n' +
-      '  a semi is closed out, some tournaments never create the round, so there\n' +
-      '  is no section to read. That is a gap in the source rather than a rule we\n' +
-      '  have wrong, and it is the reason this cannot reach 100%.\n',
+      '\n  What is left is mostly rounds Tabroom does not hold. Nueva played two\n' +
+      '  same-school semifinals and published no semifinal round at all, so there\n' +
+      '  is nothing to read. Clackamas is the opposite: the league recorded -3 for\n' +
+      '  an unplayed final between two *different* schools, which XXI.5.C does not\n' +
+      '  provide for and this deliberately does not reproduce.\n',
     );
   }
-  await close();
 }
 
-await main();
+main();

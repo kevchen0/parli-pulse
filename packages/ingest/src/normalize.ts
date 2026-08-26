@@ -716,11 +716,18 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
         const p = get(entryId);
         if (walkover) p.sameSchoolWalkovers++;
         if (sameSchoolPair && panelPerSide(s, entryId) < roundMaxBallots) {
-          // Who advanced is not in the ballots -- both sides of a walkover
-          // routinely carry a losing one -- so it is read off the bracket:
-          // rounds are visited deepest-first, so an entry that already holds an
-          // elim level here is one that went further than this round.
-          const advanced = p.elimLevel !== null;
+          // Who advanced, from the bracket first and the ballots second.
+          //
+          // Rounds are visited deepest-first, so an entry already holding an
+          // elim level went further than this round. That is the reliable
+          // signal, but it says nothing at the *deepest published* round, where
+          // nobody has a level yet -- and the deepest round is exactly where a
+          // walkover is most likely, because a closed-out final is often never
+          // created. There the token ballot decides: a walkover still records
+          // who went through, even though both sides sometimes carry a loss.
+          const wonHere = s.ballots.filter((b) => b.entryId === entryId && b.won === true).length;
+          const votedHere = s.ballots.filter((b) => b.entryId === entryId && b.won !== null).length;
+          const advanced = p.elimLevel !== null || (votedHere > 0 && wonHere * 2 > votedHere);
           if (level === 'first') p.walkoverAdjustment += WALKOVER_ADJUSTMENTS.finalsCloseout;
           else p.walkoverAdjustment +=
             advanced ? WALKOVER_ADJUSTMENTS.walkingOver : WALKOVER_ADJUSTMENTS.beingWalkedOver;
@@ -745,6 +752,8 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
   // level, so promote it when that level has no round at all. Guarded on the
   // level being genuinely absent, so a team that simply lost a published round
   // is never promoted.
+  /** Entries lifted to co-champion because no final was published. */
+  const promotedToFinal = new Set<string>();
   const publishedLevels = new Set(
     main.map((r) => elimLevelFromSectionCount(r.sections.length)).filter((l): l is ElimLevel => l !== null),
   );
@@ -765,6 +774,33 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
     if (next && !publishedLevels.has(next)) {
       p.elimLevel = next;
       if (next === 'first') p.wonFinal = true;
+      if (next === 'first') promotedToFinal.add(entryId);
+    }
+  }
+
+  // XXI.5.C, the closeout that leaves no round behind.
+  //
+  // Two teams from one school win the semifinals and the final is never
+  // published, because it was never debated: they closed out and share the
+  // title. There is no section to read a short panel from -- the round does
+  // not exist -- so this is inferred from the shape above it, which is the
+  // only witness. Both are already promoted to co-champions by the block
+  // above; the closeout is what the league prices at -3 each.
+  //
+  // Gated on the promoted champions sharing a school, per XXI.5.C. Clackamas
+  // Holiday Edge has an unplayed final between West Linn and Beaverton and the
+  // league still recorded -3 for both, which the rules text does not provide
+  // for; that divergence stays in the disagreement queue rather than being
+  // reproduced here. See plan/09-data-quality.md.
+  if (promotedToFinal.size >= 2) {
+    const schools = new Set(
+      [...promotedToFinal].map((id) => event.entries.get(id)?.schoolId ?? `?${id}`),
+    );
+    if (schools.size === 1) {
+      for (const id of promotedToFinal) {
+        const p = out.get(id);
+        if (p) p.walkoverAdjustment += WALKOVER_ADJUSTMENTS.finalsCloseout;
+      }
     }
   }
 

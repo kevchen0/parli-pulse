@@ -128,16 +128,23 @@ single input that breaks it:
   excludes one more than the league did.
 - **NYPDL October and January** (28) — elim field off by one in the shared-pool
   partition, which moves break percentage across a XXI.2.D threshold.
-- **UCLA** (10) — the six-versus-five prelim disagreement in
-  [09-data-quality.md](09-data-quality.md). **Ours is arguably the right one**,
-  so this is not obviously a gap to close.
+- **UCLA** (10) — **settled: our number stands.** Six prelim rounds are in the
+  payload with twelve sections each and the league recorded five; there is no
+  reading of the data that makes them five. An accepted divergence, not a gap.
+  See [09-data-quality.md](09-data-quality.md).
 - **Ridge Debates** (4) — the tournament published four of twenty-eight teams.
   Nothing recovers it.
-- **The 16 walkovers** are irreducible: when a final or semi is conceded some
-  tournaments never create the round, so there is no section to read.
+- **The walkovers** are down to 10 from 16. Where two same-school teams win the
+  semifinals and no final is ever published, they closed out and share the
+  title — inferred from the shape above the missing round, which closed Harvard,
+  Apollo and most of the TOC. What is left is Nueva, which published no
+  semifinal round *at all* so there is nothing to read, Clackamas's
+  different-school closeout which XXI.5.C does not provide for, and four false
+  positives at Cal Parli.
 
-So of 86, roughly 30 are either defensible as ours or absent from the source.
-The real target is Q7's forfeit rule and the NYPDL partition, worth ~51.
+So of 80, roughly 25 are either defensible as ours or absent from the source.
+The real target is Q7's forfeit rule (Stanford, 23) and the NYPDL shared-pool
+partition (28), worth ~51 between them.
 
 `SOURCE=tabroom npm run load` scores this way today; the default is still the
 sheet, because 91.4% against 97.7% is a real regression to put in front of
