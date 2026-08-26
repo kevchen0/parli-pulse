@@ -47,29 +47,22 @@ elsewhere in the plan came to point at questions that no longer existed.
    season. No longer blocking, but still unidentified.
 
 ### Product and policy
-10. **Debater profile pages** — these are minors. What is shown, and is there
-   an opt-out? Partly answered: the public Privacy page now commits to showing
-   only what the league and Tabroom already publish, never contact details,
-   never anything identifying an Article XIV sanction, and removal on request
-   without a reason. A profile is a larger surface than a table row, so the
-   remaining question is what a *page* about one debater may hold — head-to-head
-   records, opponents named, a season chart — not whether names may appear.
-11. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.
-12. **Domain name.** Is `parli-pulse` the public name?
-13. **Public "report an error" form** feeding `manual_overrides`?
-14. **Independent or NPDL-affiliated?** The build stays independent-safe either
+10. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.
+11. **Domain name.** Is `parli-pulse` the public name?
+12. **Public "report an error" form** feeding `manual_overrides`?
+13. **Independent or NPDL-affiliated?** The build stays independent-safe either
    way, but it changes framing and whether the reconciliation report becomes a
    tool for the Reporting Director.
-15. **Historical archive** — how far back, and where do those sheets live?
+14. **Historical archive** — how far back, and where do those sheets live?
    Roughly 2019 was mentioned. Are they shaped consistently enough for one
    mirror renderer?
 
 ### Raised by the live season
-16. **What happens when the league revises a figure after we have published it?**
+15. **What happens when the league revises a figure after we have published it?**
    A tournament can be rescored inside the 30-day correction window. The fetch
    picks it up, but a reader who quoted the earlier number is not told it moved.
    Worth a visible "changed since" marker, or worth deciding it does not matter.
-17. **Does the provisional marker come off correctly?** Points are marked amber
+16. **Does the provisional marker come off correctly?** Points are marked amber
    until the league's sheet carries the tournament. That transition has never
    been observed, because no season has been live since the marker existed.
 
@@ -77,6 +70,15 @@ elsewhere in the plan came to point at questions that no longer existed.
 
 ## Answered
 
+- **What a debater profile page may hold** — results, partners, the best-five
+  weighting, speaker figures, partnership ratings, and rounds with the opponent
+  named. Settled deliberately, because naming opponents makes a page about one
+  minor also a page about every minor they met. What makes that acceptable is
+  that the exposure is now *revocable*: a suppressed debater reads as "Name
+  withheld" on other people's pages too, which was true of no page on the site
+  before — the flag existed and nothing read it. Nothing appears that the league
+  and Tabroom do not already publish, and there is still no surface anywhere
+  that identifies an Article XIV sanction.
 - **Should novice/JV rounds feed the rating?** Open only, matching XXI.1.A and
   the speaker points. Mixing divisions would place a team above opponents it
   could never meet, and the extra evidence would be evidence about a different

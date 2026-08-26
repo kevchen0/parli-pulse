@@ -128,12 +128,31 @@ a season must be given the season.
 ## Next
 
 ### Phase 6 — Profiles and depth
-Debater, team, school and tournament pages. Head-to-head records. The highest
-user value left: the rankings are a dead end with nothing to click into.
 
-Partly unblocked — [08-risks-policy.md](08-risks-policy.md) and the public
-Privacy page now state what may be shown — but a profile is a larger surface
-than a table row and the scope is worth deciding rather than inheriting.
+**Debater profiles are in.** `/<season>/debater/<id>` carries the three figures
+the site holds about a person, every tournament of their season with the five
+Article XXI counts marked and adding to the total in the foot, their
+partnerships' ratings, and every round with the opponent, the panel split and
+their own judge-normalized speaks. All four tables link into it. Any of a
+debater's Tabroom ids resolves and redirects to the canonical one, so a link
+survives an identity merge.
+
+The scope question in [07-open-questions.md](07-open-questions.md) was settled
+in favour of naming opponents. It is a real widening -- a page about one minor
+is now also a page about everyone they debated -- and it is bounded by the
+suppression work below, which is what makes a removal request reach the places
+a person is named on somebody else's page.
+
+**The removal path now exists.** `debaters.suppressed` had been written by the
+loader and read by nothing, so the Privacy page's "the name will not appear"
+was true of no page on the site. Names now resolve through one SQL fragment and
+one component: a withheld debater reads as "Name withheld" wherever they would
+be named, including as somebody else's partner or opponent, is not linked,
+cannot be found by search, and has no page. Their results still count toward
+school and partnership totals, as the rules require and as the Privacy page
+says.
+
+Still to come: team, school and tournament pages, and head-to-head.
 
 ### Phase 8 — Historical archive
 Static mirror of pre-2024 sheets, visually separated and never recomputed. See

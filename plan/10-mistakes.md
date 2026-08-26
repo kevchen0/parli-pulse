@@ -287,6 +287,40 @@ snapshot the season you are not touching first. Three of these four were
 invisible in the output and two were destructive; only a before-and-after diff
 of the untouched season showed them at all.
 
+### Found building the first profile page
+
+39. **A policy was written on the public site and implemented nowhere.** The
+    Privacy page committed to a removal path -- "the name will not appear" --
+    and `debaters.suppressed` was written by the loader as `false` and read by
+    no query, no page and no test. Nobody had asked to be removed, so nothing
+    was visibly wrong and nothing would have been until the first request
+    arrived, which is the worst possible moment to find out. The name expression
+    had been written out inline in five queries, which is the structural reason:
+    a check that has to be remembered five times gets missed once, and here it
+    was missed five times out of five.
+
+40. **A page that streams cannot answer with a status.** `[season]/loading.tsx`
+    opens a Suspense boundary over its whole subtree, so every page under it
+    flushes its shell before the page component runs. `notFound()` and
+    `redirect()` still rendered the right thing, and both had already gone out
+    as `200` -- a crawler was told every one of ~4,000 possible debater ids
+    existed, and a merged id resolved to its canonical one only for a reader
+    running JavaScript. Moving the boundary down to the four table segments that
+    wanted it fixed both. *Found by checking the status code rather than the
+    page, which looked entirely correct.*
+
+41. **Ordered rounds by the round id.** Tabroom allocates ids as rounds are
+    *created*, and several tournaments built their elim brackets before their
+    prelims -- so Harvard listed the octafinals, quarters and semis above round
+    one. Every number on the page was right and the sequence was fiction. The
+    round label cannot do the job either; they are bare integers that restart at
+    some tournaments and run on at others.
+
+**Rule:** a promise on the site is a feature with a test, or it is not a
+promise -- grep the flag, not the page. And an ordering is a claim like any
+other: it was read off an id that means creation order, and nothing about the
+output looked wrong, because a list is always in *some* order.
+
 ---
 
 ## What actually caught these
@@ -318,3 +352,7 @@ Ranked by yield:
 8. **Snapshotting the thing you are not changing.** Running the pipeline for an
    empty season should have touched nothing else. Diffing 2025-26 before and
    after is what exposed #35 and #36, neither of which changed anything visible.
+9. **Reading a page as a machine would.** #40 was invisible to every check that
+   looked at the rendered page, which was correct throughout. One `curl -w
+   '%{http_code}'` found it. The same habit would have found #39 years earlier:
+   the Privacy page said what it did, and nobody grepped for the column.

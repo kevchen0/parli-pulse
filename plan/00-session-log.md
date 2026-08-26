@@ -9,8 +9,9 @@ are about *which season* a script silently read.
 
 ## Where things stand
 
-Phases 0-7 complete. The site is live, the season is scored, and the pipeline
-runs itself nightly. **Phase 6 (profiles) is the substantial work left.**
+Phases 0-7 complete, and Phase 6 has started: **debater profiles are in**, and
+the rankings are no longer a dead end. Team, school and tournament pages and
+head-to-head are what remain of it.
 
 | | |
 |---|---|
@@ -22,13 +23,35 @@ runs itself nightly. **Phase 6 (profiles) is the substantial work left.**
 Loaded for 2025-26: 97 tournaments, 4,907 entries, 25,795 ballots, 799
 partnerships, 1,183 debaters with points, 47 member schools, 387 ranked
 speakers, 1,776 rated partnerships of which 387 clear the round gate, 830
-reconciliation rows, 35 open disagreements. 124 tests.
+reconciliation rows, 35 open disagreements. 140 tests.
 
 2026-27 is open and empty: the sheet lists 110 tournaments and none has a
 results link yet. That is the correct state until the league writes up Harvard
 (Sept 5-6).
 
 ## What shipped recently
+
+**Phase 6b — debater profiles.** `/<season>/debater/<id>`, linked from all four
+tables. The three figures the site holds about a person, every tournament of
+their season with the five Article XXI counts marked and adding to the total in
+the foot, their partnerships' ratings, and every round with the opponent, the
+panel split and their own speaks. Any of a debater's Tabroom ids resolves and
+redirects to the canonical one, so a link survives an identity merge.
+
+Naming opponents was a deliberate widening — a page about one minor is also a
+page about everyone they debated — and it is what made the next item a
+prerequisite rather than a nicety.
+
+**The removal path exists now.** `debaters.suppressed` had been written by the
+loader and read by nothing, so the Privacy page's "the name will not appear"
+was true of no page on the site. It is now one SQL fragment and one component: a
+withheld debater reads as "Name withheld" wherever they are named, including as
+somebody else's partner or opponent, is not linked, is not findable by search,
+and has no page. Their results still count toward school and partnership
+totals, which is both what the rules require and what stops a removal request
+being legible from the arithmetic. **Nobody has requested removal, so this has
+been exercised against a flag that is false for all 3,933 debaters** — see
+"Waiting on the user".
 
 **Phase 5 — Glicko-2 with a field prior.** Partnership ratings at
 `/<season>/ratings`, with the specification at `/<season>/method/ratings`. The
@@ -124,11 +147,11 @@ teams. The realistic ceiling without manual entry is about 88-89%.
 
 ## Next
 
-1. **Phase 6, profiles.** The highest user value left — the rankings are a dead
-   end with nothing to click into. Debater, team, school and tournament pages,
-   head-to-head records. The minors question is now partly answered by the
-   Privacy page, but a profile is a larger surface than a table row and the
-   scope is worth deciding deliberately.
+1. **Finish Phase 6.** Team, school and tournament pages, and head-to-head.
+   The debater page is the template: identity resolved above the streaming
+   boundary so it can answer with a real status, names through `DebaterLink`,
+   and any figure a reader can add up derived from the same function the stored
+   total is.
 2. **Watch the first real tournament.** Everything has been exercised against an
    empty season or a complete one. A season with exactly one tournament is a
    third case, and the dry run that found four bugs suggests untested cases here
@@ -142,7 +165,13 @@ teams. The realistic ceiling without manual entry is about 88-89%.
 
 None of it blocking:
 
-- What may appear on a debater profile page, beyond what Privacy already states.
+- **Verifying suppression against a real flag.** The removal path is built and
+  reviewed but has only ever run with `suppressed = false` on every row, because
+  setting it true means writing to the live database the deployed site reads.
+  Worth doing once, deliberately: flag one debater, check they read as withheld
+  on the four tables and as an opponent on somebody else's page, that their own
+  page 404s, and that school and partnership totals do not move. Then set it
+  back.
 - Whether a partnership follows the people or the registration. Both the
   standings and the rating currently follow the people.
 - Manual entry for Ridge Debates, worth −54 to Ridge's school total.

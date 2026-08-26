@@ -45,7 +45,8 @@ judge-normalized speaker points that exist nowhere today.
 
 ## Status
 
-Phases 0-7 complete; Phase 6 (profiles) is the substantial work left. Per-entry
+Phases 0-7 complete, and Phase 6 has started — debater profiles are in, so the
+rankings can be clicked into; team, school and tournament pages remain. Per-entry
 Article XXI agreement is 98%, partnership season totals 87.1% exact, and the
 league's top 100 92% exact. The Glicko-2 rating beats the league's own ranking
 at predicting held-out rounds, 63.4% against 59.8%. The season ingests itself

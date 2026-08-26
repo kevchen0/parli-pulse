@@ -40,6 +40,19 @@ the one you left.
 E is analytics only — the security headers are in `next.config.mjs` and TLS
 never needed anything. What remains is in *Still to be specified* below.
 
+**Phase F, profiles, has started.** Debater pages at `/<season>/debater/<id>`,
+linked from all four tables. Two things they forced that were not on this list:
+
+- **The loading boundary moved down.** It sat at `[season]/`, which put a
+  Suspense boundary over every page under a season — and a page that streams has
+  already sent its status, so a profile could not answer 404 for a debater who
+  does not exist. It now sits in each of the four table segments that wanted it.
+- **Suppression became real.** The Privacy page under Phase C promised a removal
+  path and `debaters.suppressed` was read by nothing. A profile is the wrong
+  place to discover that, so it was built first: one SQL fragment, one
+  component, and a name that is withheld everywhere it appears rather than only
+  on its own page.
+
 ## Phase A — Information architecture
 
 The structure has to encode the one distinction the whole project rests on:
