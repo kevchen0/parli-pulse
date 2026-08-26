@@ -855,13 +855,21 @@ export async function getDebaterProfile(
     left join ${t.schools} sc on sc.id = en.school_id
     -- The other person on the entry, by canonical identity so a partner who
     -- competed under two registrations is one partner.
+    --
+    -- The name comes from the canonical record pc, not from the registration
+    -- pd that happens to sit on this entry. A record recovered from an entry
+    -- label carries a surname and no first name, so reading the name off the
+    -- row would print the same partner as "Lucas Miller" at fourteen
+    -- tournaments and "Miller" at the fifteenth -- one link, two names, and a
+    -- reader with no way to tell it is one person.
     left join lateral (
-      select coalesce(pd.canonical_id, pd.id) as id, ${debaterName('pd')} as name
+      select pc.id, ${debaterName('pc')} as name
       from ${t.entryDebaters} ped
       join ${t.debaters} pd on pd.id = ped.debater_id
+      join ${t.debaters} pc on pc.id = coalesce(pd.canonical_id, pd.id)
       where ped.entry_id = en.id
         and coalesce(pd.canonical_id, pd.id) <> ${canonicalId}
-      order by pd.last_name, pd.id
+      order by pc.last_name, pc.id
       limit 1
     ) p on true
     where coalesce(d.canonical_id, d.id) = ${canonicalId}
@@ -915,13 +923,16 @@ export async function getDebaterProfile(
   if (opponentIds.length > 0) {
     const rows = (await db.execute(sql`
       select en.id as "entryId", coalesce(sc.short_name, sc.name) as school,
-             ${debaterName('d')} as name
+             ${debaterName('dc')} as name
       from ${t.entries} en
       left join ${t.schools} sc on sc.id = en.school_id
       left join ${t.entryDebaters} ed on ed.entry_id = en.id
       left join ${t.debaters} d on d.id = ed.debater_id
+      -- Named from the canonical record, as above: an opponent recovered from
+      -- a label would otherwise appear under a bare surname.
+      left join ${t.debaters} dc on dc.id = coalesce(d.canonical_id, d.id)
       where en.id in ${opponentIds}
-      order by en.id, d.last_name nulls last, d.id
+      order by en.id, dc.last_name nulls last, dc.id
     `)).rows as unknown as { entryId: string; school: string | null; name: string | null }[];
     for (const r of rows) {
       const found = opponents.get(r.entryId) ?? { names: [], school: r.school };
