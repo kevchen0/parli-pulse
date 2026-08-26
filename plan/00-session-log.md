@@ -85,7 +85,7 @@ sheet and the nightly workflow runs the whole chain. See below.
 | `npm run validate:rating` | the held-out comparison against the league ranking |
 | `npm run backtest` | fields, per-entry, partnerships |
 | `npm run compare` / `npm run diagnose` | top-N accuracy, cause attribution |
-| `npm test` | 124 tests: rules, matcher, speaks, rating, Tabroom client |
+| `npm test` | 140 tests: rules, matcher, speaks, rating, Tabroom client, site labels |
 | `npm run dev --workspace @parli-pulse/web` | the site locally |
 
 **Order matters:** `fetch` → `load` → `rollup` → `speaks` → `rate` →
