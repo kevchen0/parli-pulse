@@ -649,9 +649,11 @@ abbr.tick.differs { color: var(--bad); }
 
 /* The gap in the pager takes a page number instead of stating that pages are
    missing: with eight hundred rows, the gap is exactly where a reader acts. */
-.pagerjump { display: inline-flex; }
-.pagerjump input {
-  width: 3.2rem;
+.pagerjump { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8125rem; }
+.pagerjump label { color: var(--faint); }
+.pagerjump input,
+.pagerjumpinline {
+  width: 3.4rem;
   font: inherit;
   font-size: 0.8125rem;
   text-align: center;
@@ -662,5 +664,10 @@ abbr.tick.differs { color: var(--bad); }
   border-radius: var(--radius);
   font-variant-numeric: tabular-nums;
 }
-.pagerjump input::placeholder { color: var(--faint); }
-.pagerjump input:focus { border-style: solid; outline: 2px solid var(--accent); outline-offset: 1px; }
+.pagerjump input::placeholder,
+.pagerjumpinline::placeholder { color: var(--faint); }
+.pagerjump input:focus,
+.pagerjumpinline:focus { border-style: solid; outline: 2px solid var(--accent); outline-offset: 1px; }
+/* The sortable tables page in state, so their jump is a bare input beside the
+   numbers rather than a form. */
+.pagerjumpinline { margin-left: 0.4rem; font: inherit; font-size: 0.8125rem; }

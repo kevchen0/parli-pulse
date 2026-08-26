@@ -57,12 +57,17 @@ export function TableSearch({
 }) {
   return (
     <form className="tablesearch" method="get" action={action} role="search">
+      {/* autoComplete off: the browser would otherwise remember every search
+          and offer them back on the next visit. Those are other people's names,
+          and a shared school computer should not hand the last person's search
+          to the next one. */}
       <input
         type="search"
         name="q"
         defaultValue={query}
         placeholder={placeholder}
         aria-label={placeholder}
+        autoComplete="off"
       />
       <button type="submit">Search</button>
       {query ? (
@@ -117,20 +122,9 @@ export default function Pager({
         )}
         {pageNumbers(page, total).map((p, i) =>
           p === '…' ? (
-            // The gap is where a reader with eight hundred rows actually needs
-            // to act, so it takes a page number rather than stating that some
-            // pages are missing. A GET form, so it works without JavaScript.
-            <form key={`jump-${i}`} className="pagerjump" method="get" action={basePath}>
-              {query ? <input type="hidden" name="q" value={query} /> : null}
-              <input
-                type="number"
-                name="page"
-                min={1}
-                max={total}
-                placeholder="…"
-                aria-label={`Go to a page between 1 and ${total}`}
-              />
-            </form>
+            <span key={`gap-${i}`} className="pagergap" aria-hidden>
+              …
+            </span>
           ) : (
             <Link
               key={p}
@@ -148,6 +142,22 @@ export default function Pager({
           </Link>
         )}
       </span>
+      {/* One jump box, in a fixed place. Putting it in the gaps meant two of
+          them on a middle page -- 1 … 5 6 7 8 9 … 16 has two -- and an input
+          that moved as you paged. */}
+      <form className="pagerjump" method="get" action={basePath}>
+        {query ? <input type="hidden" name="q" value={query} /> : null}
+        <label htmlFor="jump-page">Go to</label>
+        <input
+          id="jump-page"
+          type="number"
+          name="page"
+          min={1}
+          max={total}
+          placeholder={String(total)}
+          aria-label={`Go to a page between 1 and ${total}`}
+        />
+      </form>
     </nav>
   );
 }

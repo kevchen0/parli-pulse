@@ -202,6 +202,21 @@ export default function RatingTable({ rows }: { rows: RatingRow[] }) {
               </button>
             )}
           </span>
+            {totalPages > 3 && (
+              <input
+                className="pagerjumpinline"
+                type="number"
+                min={1}
+                max={totalPages}
+                placeholder={String(totalPages)}
+                aria-label={`Go to a page between 1 and ${totalPages}`}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  if (Number.isFinite(n) && n >= 1 && n <= totalPages) setPage(n);
+                }}
+              />
+            )}
+
         </nav>
       )}
       {sorted.length === 0 ? <p className="empty">No partnerships match “{query}”.</p> : null}
