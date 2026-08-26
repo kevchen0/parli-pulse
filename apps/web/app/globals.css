@@ -676,16 +676,13 @@ abbr.tick.differs { color: var(--bad); }
    A skeleton rather than a spinner in empty space: the page keeps its shape, so
    nothing jumps when the rows arrive, and the reader can see what is coming. */
 
-.skeleton { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
-.skelrow { display: flex; gap: 1rem; align-items: center; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--border); }
-.skelrow:last-child { border-bottom: none; }
+/* The skeleton is a real .tablewrap table, so it inherits padding, borders and
+   column widths. Only the shimmer bar is styled here, sized to a line of text so
+   a placeholder row is exactly as tall as a real one. */
+.skeleton td .skelcell { height: 0.875rem; }
+.skeleton tbody tr:hover { background: none; }
+.skelcell { display: inline-block; height: 0.7rem; border-radius: 2px; background: var(--sunk); vertical-align: middle; }
 .skelhead { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem; }
-
-.skelcell { display: block; height: 0.7rem; border-radius: 2px; background: var(--sunk); }
-.skelcell.rank { width: 1.5rem; flex: none; }
-.skelcell.wide { width: 30%; }
-.skelcell.mid { width: 22%; }
-.skelcell.num { width: 2.5rem; margin-left: auto; flex: none; }
 .skelcell.title { height: 1.6rem; width: 9rem; }
 .skelcell.lede { height: 0.8rem; width: min(34rem, 90%); }
 

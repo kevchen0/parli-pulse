@@ -2,7 +2,7 @@ import { dbReady, getSchools } from '@/lib/db';
 import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
-import TableSkeleton from '@/app/table-skeleton';
+import TableSkeleton, { SCHOOL_COLUMNS } from '@/app/table-skeleton';
 
 export const revalidate = 300;
 
@@ -17,7 +17,8 @@ export default async function SchoolsPage({
   const sp = await searchParams;
   return (
     <>
-      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton />}>
+      <h1>Schools</h1>
+      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton columns={SCHOOL_COLUMNS} />}>
         <SchoolsTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
       </Suspense>
     </>

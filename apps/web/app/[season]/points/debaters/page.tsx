@@ -3,7 +3,7 @@ import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
 import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
-import TableSkeleton from '@/app/table-skeleton';
+import TableSkeleton, { DEBATER_COLUMNS } from '@/app/table-skeleton';
 
 export const revalidate = 300;
 
@@ -19,7 +19,7 @@ export default async function DebatersPage({
   return (
     <>
       <h1>Debaters</h1>
-      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton />}>
+      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton columns={DEBATER_COLUMNS} />}>
         <DebatersTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
       </Suspense>
     </>

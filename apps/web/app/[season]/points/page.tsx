@@ -3,7 +3,7 @@ import { dbReady, getSummary, getTeams, type TeamRow } from '@/lib/db';
 import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
-import TableSkeleton from '@/app/table-skeleton';
+import TableSkeleton, { TEAM_COLUMNS } from '@/app/table-skeleton';
 
 export const revalidate = 300;
 
@@ -48,7 +48,7 @@ export default async function TeamsPage({
       <p className="lede">
         Points scored under the Article XXI rules, computed from published Tabroom results.
       </p>
-      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton />}>
+      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton columns={TEAM_COLUMNS} />}>
         <TeamsTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
       </Suspense>
     </>
