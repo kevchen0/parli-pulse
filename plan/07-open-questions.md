@@ -65,110 +65,54 @@ elsewhere in the plan came to point at questions that no longer existed.
    `npm run check:rules`, which runs before every ingest. Probably an older
    season. No longer blocking, but still unidentified.
 
-### Computing from Tabroom alone
+### What the sheet still supplies
 
-The goal is points derived entirely from Tabroom, with the sheet kept for
-back-comparison. Today the sheet is load-bearing in the scoring path itself.
-Audited 2026-08-26; each item is a place the sheet's value is used, not merely
-compared against.
+Points are computed from Tabroom as of 2026-08-26 — `SOURCE=sheet` restores the
+old behaviour for the backtests. Agreement with the league is **96.1%** against
+**97.7%** when its own figures were fed back in, a trade taken deliberately: a
+check that reads its inputs from the thing it is checking is not a check.
 
-1. **Field sizes come from the sheet whenever it has them** — the single
-   biggest one, and now switchable per input (`InputSources` in
-   `scripts/lib/season.ts`). `scripts/lib/season.ts` reads
-   `off.openField ?? computed`, and the same for AFS, elim field, break
-   percentage, prelim count and breaking record. The sheet supplies them for
-   **86-88 of 110 tournaments**, so for most of the season the AFS band that
-   picks the points row is the league's number, not ours.
-   The comment above it explains why — "so a points mismatch is never just a
-   field-size mismatch wearing a disguise" — and that is the right call for a
-   *backtest*, where isolating one variable is the whole point. It is the wrong
-   default for the live pipeline, which uses the same function. The two want
-   different behaviour and currently share one.
-   [02-findings.md](02-findings.md) §2 validated our own field computation at
-   3/3 on hand-checked tournaments; what is unmeasured is how it does across
-   all 110, which is exactly what flipping the `??` would tell us.
-2. **Which entries get scored at all.** `computeSeason` iterates the sheet's
-   `Entry` rows and matches them to Tabroom entries, so a team in Tabroom with
-   no sheet row scores nothing. This is close to by design — the sheet decides
-   what exists — but it means a live tournament is invisible until written up.
-3. **Walkovers.** Derived during normalization now, from the rule
-   `npm run check:walkovers` validated — 1,525 of 1,541, with 11 of the 16
-   residuals being rounds Tabroom does not contain. Under `SOURCE=tabroom` the
-   engine uses ours; by default it still reads the sheet's column.
-4. **State qualifier results** (`qual` = 8, `alt` = 4) come from the sheet's
-   `result` column. Genuinely not in Tabroom — XXI.4.C outcomes are not a
+Six things still come from the sheet. **None of them is a computed figure**, and
+they are not all "discovery" — the list is worth keeping honest:
+
+1. **Which tournaments exist** — the `Results` column. Deliberate and measured:
+   the circuit calendar finds 44 where the sheet finds 95.
+2. **Which teams the league scores** — `computeSeason` walks the `Entry` tab and
+   matches its rows to Tabroom entries, so a team in Tabroom with no sheet row
+   scores nothing. Bigger than it sounds, and the reason a live tournament is
+   invisible until the league writes it up.
+3. **School attribution and partner spellings** — `school1`, `school2` and the
+   partner names are the sheet's, and the partnership key is built from them.
+   Tabroom carries its own school ids, but the league's is the one XXI.9 tables.
+4. **Tournament category** — `CHSSA` / `OSAA` / `NYPDL` / `Regular`, which
+   selects the scoring schedule and the speaker scale. A league classification;
+   nothing in a Tabroom payload states it.
+5. **State qualifier results** — `qual` = 8, `alt` = 4, read from the sheet's
+   `result` column. Genuinely absent from Tabroom: XXI.4.C outcomes are not a
    bracket position.
-5. **Prelim-only fallback scoring** (`sheet-record` provenance) scores a row
-   from the league's own recorded result where the matcher found no entry.
-   Weaker by construction, and already flagged as such in the provenance field.
-6. **Tournament discovery** — the `Results` column. Deliberate, measured, and
-   not up for revisiting: the circuit calendar finds 44 where the sheet finds
-   95.
+6. **The prelim-only fallback** (`sheet-record` provenance) scores a row from
+   the league's own recorded result where the matcher found no Tabroom entry.
+   Weaker by construction and already flagged as such in the provenance field.
 
-**Measured 2026-08-26** with `npm run compare:sources`, which ablates one input
-at a time so the answer names a cause rather than a direction:
+Items 5 and 6 are irreducible without another data source. Items 2 and 3 are the
+ones worth revisiting if full independence is ever the goal — they would mean
+scoring every open-division team in Tabroom rather than every team the league
+lists, which is a different product decision, not a parsing problem.
 
-| inputs | per-entry exact | vs baseline |
-|---|---|---|
-| everything from the sheet | **97.7%** | — |
-| our walkovers | 96.7% | −16 |
-| our breaking record | 97.3% | −6 |
-| our field sizes | 92.7% | −77 |
-| **everything ours** | **91.4%** | −98 |
-
-The first run of this scored 76.2%, and the difference was one line: our AFS
-fell back to the open field alone where XXI.2.B is open *plus* novice/JV. That
-read Berkeley as 104 against the league's 141 — a different row of the elim
-points table, not a rounding difference. Worth **+243 entries** on its own, and
-a good illustration of why the sheet-first default hid so much: the bug had
-been there the whole time and nothing could see it.
-
-Three of those were event classification rather than any rule, and closing them
-took it to **92.1%**. Singletary spelled it "Parlimentary", one letter short of
-the pattern, so its open division was not a parli event and its novice teams
-never reached the AFS. Stanford's "Parli - Middle School + Novice Combined" --
-thirty teams -- classified as middle school and so counted toward nothing.
-The Round Robin was scored against its own twelve-team field where the league
-scores it against the Nationals field it ran inside.
-
-What remains is 86 entries, and `compare:sources` now attributes each to the
-single input that breaks it:
+**Where the remaining 25 entries are.** `npm run compare:sources` attributes
+each to the single input that moves it:
 
 | cause | n | |
 |---|---|---|
-| field sizes | 64 | Stanford 23, NYPDL Oct 15, Jan 13, UCLA 10, Ridge 4 |
-| walkovers | 16 | closeouts Tabroom holds no section for |
+| field sizes | 13 | UCLA 10, Ridge Debates 4 |
+| walkovers | 6 | Cal Parli 4, Clackamas 2 |
 | breaking record | 5 | NYPDL February OL |
 | interaction | 1 | |
 
-- **Stanford** (23) — our AFS is 109 against 111, one point the wrong side of
-  the 92-109 band, so every breaking team reads a row too low. Both divisions
-  are short by exactly one team: this is Q7, the forfeit exclusion, and ours
-  excludes one more than the league did.
-- **NYPDL October and January** (28) — elim field off by one in the shared-pool
-  partition, which moves break percentage across a XXI.2.D threshold.
-- **UCLA** (10) — **settled: our number stands.** Six prelim rounds are in the
-  payload with twelve sections each and the league recorded five; there is no
-  reading of the data that makes them five. An accepted divergence, not a gap.
-  See [09-data-quality.md](09-data-quality.md).
-- **Ridge Debates** (4) — the tournament published four of twenty-eight teams.
-  Nothing recovers it.
-- **The walkovers** are down to 10 from 16. Where two same-school teams win the
-  semifinals and no final is ever published, they closed out and share the
-  title — inferred from the shape above the missing round, which closed Harvard,
-  Apollo and most of the TOC. What is left is Nueva, which published no
-  semifinal round *at all* so there is nothing to read, Clackamas's
-  different-school closeout which XXI.5.C does not provide for, and four false
-  positives at Cal Parli.
-
-So of 80, roughly 25 are either defensible as ours or absent from the source.
-The real target is Q7's forfeit rule (Stanford, 23) and the NYPDL shared-pool
-partition (28), worth ~51 between them.
-
-`SOURCE=tabroom npm run load` scores this way today; the default is still the
-sheet, because 91.4% against 97.7% is a real regression to put in front of
-readers. Closing Stanford, Singletary and the Round Robin is worth about half
-the gap and none of it needs a rule change — it is event classification.
+Sixteen of the twenty-five are not gaps to close: UCLA is settled in our favour,
+Ridge published four of twenty-eight teams, and Clackamas is a different-school
+closeout XXI.5.C does not provide for. The one genuinely open item is NYPDL
+February OL's breaking record.
 
 ### Product and policy
 10. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.

@@ -81,13 +81,18 @@ async function main(): Promise<void> {
 
     // Scoring and sheet matching share the engine used by the backtests, so
     // what lands in the database is exactly what the reports measure.
-    // `SOURCE=tabroom` scores from the payload alone -- field sizes, breaking
-    // record and walkovers all computed rather than read from the sheet.
-    // Discovery is the sheet's either way. Still opt-in: on 2025-26 it agrees
-    // with the league on 91.4% of entries against 97.7%, and the gap is 98
-    // entries in a handful of tournaments rather than anything systemic.
-    // `npm run compare:sources` is the measurement.
-    const source = process.env.SOURCE === 'tabroom' ? 'tabroom' : 'sheet';
+    // Scored from the payload: field sizes, breaking record and walkovers all
+    // computed rather than read from the league's own figures. On 2025-26 that
+    // agrees with the league on 96.1% of entries against 97.7% when its figures
+    // were fed back in -- a deliberate trade of 1.6 points for not depending on
+    // the thing we exist to check. Of the 25 that differ, 16 are entries where
+    // ours is the defensible figure or the round is absent from Tabroom.
+    //
+    // `SOURCE=sheet` restores the old behaviour, which is what the backtests
+    // want: taking the league's field sizes isolates the points rules, so a
+    // mismatch can never be a field-size mismatch in disguise.
+    // `npm run compare:sources` measures the difference, one input at a time.
+    const source = process.env.SOURCE === 'sheet' ? 'sheet' : 'tabroom';
     const season = computeSeason(SHEET, { source });
     console.log(`  scoring inputs: ${source}`);
     const caseByEntry = new Map(season.cases.map((c) => [c.entryId, c]));

@@ -59,6 +59,9 @@ for (const e of parseEntryTab(wb.get('Entry')!)) {
 // Ours, per partnership. Read from the database rather than recomputed, so
 // the breakdown always sums to the total the site displays -- otherwise the two
 // can disagree and the page contradicts itself.
+// Only provenance is taken from here -- which fallback scored a row, not what
+// it scored -- and that is the same under either input source, so this does not
+// need to follow `load`'s SOURCE.
 const season = computeSeason(SHEET);
 const provenanceByEntry = new Map(season.cases.map((c) => [c.entryId, c.provenance]));
 
