@@ -471,6 +471,65 @@ export function partitionElimRounds(rounds: NormalizedRound[]): {
   };
 }
 
+
+/**
+ * Walkovers in an elim round the tournament never published.
+ *
+ * See the call site for why this is gated as tightly as it is.
+ */
+function applyMissingRoundWalkovers(
+  event: NormalizedEvent,
+  main: NormalizedRound[],
+  out: Map<string, EntryPerformance>,
+): void {
+  // Widest first: each round's winners are the next round's entrants.
+  const ladder = [...main].sort((a, b) => b.sections.length - a.sections.length);
+  for (let i = 0; i + 1 < ladder.length; i++) {
+    const below = ladder[i]!;
+    const above = ladder[i + 1]!;
+    // A round is missing when the bracket more than halves between the two.
+    if (above.sections.length * 2 >= below.sections.length) continue;
+
+    const winners: string[] = [];
+    for (const sec of below.sections) {
+      for (const entryId of sec.entryIds) {
+        const mine = sec.ballots.filter((b) => b.entryId === entryId && b.won !== null);
+        if (mine.length > 0 && mine.filter((b) => b.won === true).length * 2 > mine.length) {
+          winners.push(entryId);
+        } else if (sec.entryIds.length === 1) {
+          winners.push(entryId);
+        }
+      }
+    }
+    const survivors = new Set(above.sections.flatMap((sec) => sec.entryIds));
+    // Exactly one round missing, and every entrant accounted for.
+    if (winners.length !== survivors.size * 2) continue;
+    if (![...survivors].every((e) => winners.includes(e))) continue;
+
+    const bySchool = new Map<string, string[]>();
+    for (const entryId of winners) {
+      const school = event.entries.get(entryId)?.schoolId;
+      if (!school) return;
+      const list = bySchool.get(school) ?? [];
+      list.push(entryId);
+      bySchool.set(school, list);
+    }
+    // Forced: pairs of two from one school, one of each pair through.
+    const forced = [...bySchool.values()].every(
+      (pair) => pair.length === 2 && pair.filter((e) => survivors.has(e)).length === 1,
+    );
+    if (!forced) continue;
+
+    for (const entryId of winners) {
+      const p = out.get(entryId);
+      if (!p) continue;
+      p.walkoverAdjustment += survivors.has(entryId)
+        ? WALKOVER_ADJUSTMENTS.walkingOver
+        : WALKOVER_ADJUSTMENTS.beingWalkedOver;
+    }
+  }
+}
+
 /**
  * Teams that broke and then debated no elim round at all.
  *
@@ -960,6 +1019,22 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
       }
     }
   }
+
+  // XXI.5.C where a whole round is missing from the middle of the bracket.
+  //
+  // Nueva published quarterfinals and a final and no semifinal, because its two
+  // semifinals were same-school closeouts and were never debated. The round is
+  // absent, so there is no section to read -- but the bracket brackets it: the
+  // teams that entered the missing round are the previous round's winners, and
+  // the teams that came out of it are the next round's entrants.
+  //
+  // Only applied when the reconstruction is *forced*: the entrants divide into
+  // same-school pairs of exactly two, and exactly one of each pair came out.
+  // Under that shape there is no other way to have paired them, so nothing is
+  // being guessed. Anything looser would be, and this is validated on a single
+  // tournament -- the only elim-ladder gap in the 2025-26 season -- which is
+  // not enough evidence for a rule that fires on shapes it has not seen.
+  applyMissingRoundWalkovers(event, main, out);
 
   // Resolve the championship round. Two failure modes matter and pull in
   // opposite directions: a closeout gives every finalist champion points, and

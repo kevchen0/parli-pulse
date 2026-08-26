@@ -193,6 +193,26 @@ Predicted from raw Tabroom data, then checked against the `Entry` tab:
 
 Nueva's champion then lands at 25 after a **−2 walkover adjustment**.
 
+### Nueva's missing semifinal, reconstructed
+
+Nueva published quarterfinals and a final and no semifinal, because both
+semifinals were same-school closeouts and were never debated. The round is
+absent from Tabroom entirely, but the bracket brackets it: the teams that
+entered it are the previous round's winners, and the teams that came out are the
+final's entrants. Here the four quarterfinal winners divide into two
+same-school pairs -- two Menlo-Atherton, two Mountain View -- with exactly one
+of each pair in the final, so there is only one way they could have been
+paired. Confirmed independently by seeds: the quarters were (1,9), (2,8), (3,7),
+(5,6), which is standard 1v8/2v7/3v6/4v5 over the surviving seeds, and the
+bracket halves put winner(1,9) against winner(5,6) and winner(2,8) against
+winner(3,7).
+
+**This is the only elim-ladder gap in the 2025-26 season**, so the rule is
+validated on exactly one tournament. It is therefore gated to fire only where
+the reconstruction is *forced* -- same-school pairs of exactly two, one of each
+through -- rather than wherever a round is missing. A looser version would be a
+story with one supporting example, which is [10-mistakes.md](10-mistakes.md) 32.
+
 ### Walkovers are probably auto-detectable (revises an earlier assumption)
 
 Both Nueva semifinals were same-school walkovers. The signature is visible:

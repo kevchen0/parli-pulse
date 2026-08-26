@@ -107,6 +107,16 @@ than a gap to close, and it accounts for 10 of the entries where scoring from
 Tabroom alone disagrees with the sheet. Still worth raising with the Reporting
 Director, because a dropped round or a hidden elim (XXI.6.A) would explain it.
 
+**Cal Parli's three one-ballot same-school elims — unresolvable.** Three
+same-school sections in its octafinals were each decided on a single ballot
+where the round's other sections had three. That is the walkover signature, and
+the league recorded no adjustment for any of them. Nothing in the payload
+separates the two readings: the round published no speaker points at all, so the
+test that works elsewhere -- a walkover section being the only one in its round
+without speaks -- says nothing here. Either the tab director assigned one judge
+to rounds that were genuinely debated, or the league's hand-entered walkover
+columns missed three. Four entries, left as a disagreement.
+
 **Finals closeouts between different schools.** Clackamas Holiday Edge has an
 unplayed final between West Linn and Beaverton, and the league recorded -3 for
 both. XXI.5.C provides for closeouts *within* a school only, so the derivation
