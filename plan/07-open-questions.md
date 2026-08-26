@@ -54,7 +54,8 @@ Audited 2026-08-26; each item is a place the sheet's value is used, not merely
 compared against.
 
 1. **Field sizes come from the sheet whenever it has them** — the single
-   biggest one. `scripts/lib/season.ts` reads
+   biggest one, and now switchable per input (`InputSources` in
+   `scripts/lib/season.ts`). `scripts/lib/season.ts` reads
    `off.openField ?? computed`, and the same for AFS, elim field, break
    percentage, prelim count and breaking record. The sheet supplies them for
    **86-88 of 110 tournaments**, so for most of the season the AFS band that
@@ -71,9 +72,10 @@ compared against.
    `Entry` rows and matches them to Tabroom entries, so a team in Tabroom with
    no sheet row scores nothing. This is close to by design — the sheet decides
    what exists — but it means a live tournament is invisible until written up.
-3. **Walkovers.** Now derivable: `npm run check:walkovers` reproduces the
-   league's column for 1,525 of 1,541 entries, with 11 of the 16 residuals
-   being rounds Tabroom does not contain. The engine still reads the sheet.
+3. **Walkovers.** Derived during normalization now, from the rule
+   `npm run check:walkovers` validated — 1,525 of 1,541, with 11 of the 16
+   residuals being rounds Tabroom does not contain. Under `SOURCE=tabroom` the
+   engine uses ours; by default it still reads the sheet's column.
 4. **State qualifier results** (`qual` = 8, `alt` = 4) come from the sheet's
    `result` column. Genuinely not in Tabroom — XXI.4.C outcomes are not a
    bracket position.
@@ -84,10 +86,42 @@ compared against.
    not up for revisiting: the circuit calendar finds 44 where the sheet finds
    95.
 
-Order to attack: **1 first**, since it is the one that silently changes points
-and the one with a measurable answer. Flip the fallback so Tabroom wins, run
-the backtest, and see what the 98% becomes. If it holds, the sheet has stopped
-being an input to anything except discovery and the two genuinely-absent cases.
+**Measured 2026-08-26** with `npm run compare:sources`, which ablates one input
+at a time so the answer names a cause rather than a direction:
+
+| inputs | per-entry exact | vs baseline |
+|---|---|---|
+| everything from the sheet | **97.7%** | — |
+| our walkovers | 96.7% | −16 |
+| our breaking record | 97.3% | −6 |
+| our field sizes | 92.7% | −77 |
+| **everything ours** | **91.4%** | −98 |
+
+The first run of this scored 76.2%, and the difference was one line: our AFS
+fell back to the open field alone where XXI.2.B is open *plus* novice/JV. That
+read Berkeley as 104 against the league's 141 — a different row of the elim
+points table, not a rounding difference. Worth **+243 entries** on its own, and
+a good illustration of why the sheet-first default hid so much: the bug had
+been there the whole time and nothing could see it.
+
+What is left is 98 entries across eight tournaments, each with its own cause:
+
+- **Stanford** (23) — the `Parli - Open` / `Parli - TOC` split, which is Q5
+  above, plus novice divisions we do not classify. Our N/JV reads 18 against 49.
+- **NPDL Round Robin** (6) — shares a payload with Nationals; the event split is
+  in `EVENT_OVERRIDES` but the field figures come out of the wrong half.
+- **Singletary** (6) — its novice event does not classify, so N/JV reads 0
+  against 9.
+- **UCLA** (10) — the known six-versus-five prelim disagreement in
+  [09-data-quality.md](09-data-quality.md). Ours is arguably right.
+- **NYPDL October / January / February** (33) — open and elim fields off by one
+  in the shared-pool partition.
+- **Cal Parli** (4) — every field figure matches, so this is a points rule.
+
+`SOURCE=tabroom npm run load` scores this way today; the default is still the
+sheet, because 91.4% against 97.7% is a real regression to put in front of
+readers. Closing Stanford, Singletary and the Round Robin is worth about half
+the gap and none of it needs a rule change — it is event classification.
 
 ### Product and policy
 10. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.

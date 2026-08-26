@@ -76,6 +76,8 @@ sheet and the nightly workflow runs the whole chain. See below.
 |---|---|
 | `npm run fetch` | refresh cached payloads from the sheet's Results column |
 | `npm run check:rules` | engine point tables against the published Board Code |
+| `npm run check:walkovers` | XXI.5.C derived from Tabroom against the league's column |
+| `npm run compare:sources` | what the sheet's inputs are worth, one input at a time |
 | `npm run load` | rebuild a season from cached payloads (`SEASON=` to pick) |
 | `npm run rollup` | identity merging, then team/debater/school standings |
 | `npm run speaks` | judge-normalized speaker points |
