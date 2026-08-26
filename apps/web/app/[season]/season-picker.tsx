@@ -1,7 +1,25 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { SeasonId } from '@/lib/season';
+
+/**
+ * Where changing the season lands.
+ *
+ * A debater's page is the same page in every season, so switching seasons on
+ * one should stay on that debater rather than dropping the reader on the points
+ * table -- their profile exists in the new season even before it has results,
+ * and says so. Every other page goes to Points, which is what this control did
+ * for all of them before profiles existed.
+ *
+ * Only the debater route is carried across, deliberately. A path is only worth
+ * preserving when it is certain to exist in the target season, and this control
+ * cannot ask the server before it navigates.
+ */
+export function seasonDestination(pathname: string | null, season: SeasonId): string {
+  const debater = pathname?.match(/^\/\d{4}-\d{2}\/debater\/([^/]+)\/?$/);
+  return debater ? `/${season}/debater/${debater[1]}` : `/${season}/points`;
+}
 
 /**
  * The season, as a labelled control rather than a row of year pills.
@@ -25,13 +43,14 @@ export default function SeasonPicker({
   statusOf: Record<SeasonId, string>;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <label className="seasonpicker">
       <span>Season</span>
       <select
         value={season}
-        onChange={(e) => router.push(`/${e.target.value}/points` as never)}
+        onChange={(e) => router.push(seasonDestination(pathname, e.target.value) as never)}
         aria-label="Choose a season"
       >
         {seasons.map((id) => (

@@ -95,6 +95,7 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
   if (!p) notFound();
 
   const counted = p.tournaments.filter((t) => t.weight > 0);
+  const empty = p.tournaments.length === 0;
   const best = p.partnerships.find((x) => x.ranked) ?? p.partnerships[0] ?? null;
 
   return (
@@ -150,6 +151,16 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
         />
       </div>
 
+      {empty && (
+        <p className="note aqnote nothing">
+          <b>Nothing yet for {seasonLabel(season)}.</b> This debater has no results in
+          this season. While a season is running that is the ordinary state until the
+          league writes up a tournament they attended, rather than a sign anything is
+          missing. The season control above stays on this debater, so it will take you to
+          a season they did compete in.
+        </p>
+      )}
+
       {p.autoQualified && (
         <p className="note aqnote">
           Cleared the {TOC_AUTOQUAL_POINTS}-point individual autoqualification line
@@ -158,6 +169,8 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
         </p>
       )}
 
+      {!empty && (
+      <>
       <h2>Season</h2>
       <p className="note">
         Every tournament, most recent first. Article XXI.7 counts the best{' '}
@@ -304,6 +317,8 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
       {p.tournaments.map((t) => (
         <TournamentRounds key={t.entryId} season={season} t={t} />
       ))}
+      </>
+      )}
     </>
   );
 }

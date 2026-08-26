@@ -900,7 +900,12 @@ export async function getDebaterProfile(
     school: string | null; schoolId: string | null;
     partnerId: string | null; partnerName: string | null;
   }[];
-  if (entries.length === 0 && me.points === null) return null;
+  // No early return for an empty season. A debater who exists but has not
+  // competed yet is not a missing page -- during a live season that is every
+  // debater until the league writes up the first tournament, and answering 404
+  // would tell a reader their link had rotted. The page says there is nothing
+  // yet instead. The only 404s are an id nobody holds and a withheld debater,
+  // both decided by `resolveDebaterId` before the response starts.
 
   const rounds = entries.length === 0 ? [] : (await db.execute(sql`
     select b.entry_id as "entryId", ro.name as label, ro.kind::text as kind,

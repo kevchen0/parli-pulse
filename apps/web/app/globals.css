@@ -852,3 +852,6 @@ abbr.noresult {
   cursor: help;
   white-space: nowrap;
 }
+
+/* An empty season is information, not a warning. */
+.aqnote.nothing { border-left-color: var(--border-firm); background: var(--sunk); }
