@@ -660,14 +660,14 @@ abbr.tick.differs { color: var(--bad); }
   padding: 0.22rem 0.25rem;
   color: var(--text);
   background: var(--surface);
-  border: 1px dashed var(--border-firm);
+  border: 1px solid var(--border-firm);
   border-radius: var(--radius);
   font-variant-numeric: tabular-nums;
 }
 .pagerjump input::placeholder,
 .pagerjumpinline::placeholder { color: var(--faint); }
 .pagerjump input:focus,
-.pagerjumpinline:focus { border-style: solid; outline: 2px solid var(--accent); outline-offset: 1px; }
+.pagerjumpinline:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 /* The sortable tables page in state, so their jump is a bare input beside the
    numbers rather than a form. */
 .pagerjumpinline { margin-left: 0.4rem; font: inherit; font-size: 0.8125rem; }

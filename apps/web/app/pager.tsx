@@ -8,11 +8,16 @@ export const PAGE_SIZE = 50;
  *
  * A run of every page number is unusable past about twenty; a bare
  * previous/next hides where you are in eight hundred rows. This keeps the first
- * and last page, a window around the current one, and an ellipsis for the gap —
- * so a reader can always get to the bottom of the table in one click, which on
- * a rankings page is where the interesting part often is.
+ * and last page and one page either side of the current — seven slots at the
+ * widest, `1 … 5 6 7 … 16` — so the row stays short enough to read at a glance
+ * and the bottom of the table is always one click away.
+ *
+ * A gap standing for a single page is replaced by that page: `1 … 3 4 5` hides
+ * exactly one number behind an ellipsis that is no shorter than the number
+ * itself, which is the sort of detail that makes a pager feel wrong without
+ * anyone being able to say why.
  */
-export function pageNumbers(current: number, total: number, span = 2): (number | '…')[] {
+export function pageNumbers(current: number, total: number, span = 1): (number | '…')[] {
   if (total <= 1) return [1];
   const wanted = new Set<number>([1, total]);
   for (let p = current - span; p <= current + span; p++) {
@@ -22,7 +27,11 @@ export function pageNumbers(current: number, total: number, span = 2): (number |
   const out: (number | '…')[] = [];
   let previous = 0;
   for (const p of sorted) {
-    if (previous && p - previous > 1) out.push('…');
+    if (previous) {
+      const missing = p - previous - 1;
+      if (missing === 1) out.push(previous + 1);
+      else if (missing > 1) out.push('…');
+    }
     out.push(p);
     previous = p;
   }
