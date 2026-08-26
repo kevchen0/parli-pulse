@@ -47,6 +47,11 @@ export interface TabroomRound {
   id?: TabroomId;
   /** Usually the round number, but tournaments do use labels. */
   name?: string | number;
+  /**
+   * A short label the tournament set: "Octos", "VF", "NQ". Mostly decorative,
+   * and at NYPDL the only reliable statement of which bracket a round is in.
+   */
+  label?: string | null;
   /** 'prelim' | 'highlow' | 'elim' | 'final' and other tab-specific values. */
   type?: string;
   protocol_name?: string;

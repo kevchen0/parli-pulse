@@ -271,6 +271,20 @@ the league records N/JV as 0 for NYPDL, which matches. And the novice bracket
 must be excluded from the elim field, or break percentage lands in the wrong
 XXI.2.D penalty band; this is what `partitionElimRounds` is for.
 
+**The tournament says which bracket a round is in, in `round.label`.** NYPDL
+writes `VO`/`VQ`/`VS`/`VF` for varsity and `NQ`/`NS`/`NF` for novice -- 15
+events in 2025-26 carry both families. Partitioning on that gets the open elim
+field exact for **15 of 17** NYPDL tournaments, and it is a statement rather
+than an inference, so it is tried before the shared-team walk. The walk stays as
+the fallback for everyone else, and for events whose labels are the ordinary
+decorative "Octos"/"Finals" -- those are not bracket statements and their first
+letters must not be read as one.
+
+The two misses are the same shape: a team that broke and appears in no open
+elim section at all, having conceded the whole bracket. Recovering it from the
+break line was tried and is much worse -- 74% against 94% -- because ties at
+the line count teams that did not break.
+
 ---
 
 ## 5. Speaker points

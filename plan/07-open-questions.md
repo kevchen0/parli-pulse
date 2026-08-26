@@ -34,8 +34,27 @@ elsewhere in the plan came to point at questions that no longer existed.
    nobody can derive. A few real examples would let the backtest classify
    these instead of leaving them unexplained.
 7. **Forfeit exclusion.** XXI.2.A read literally reproduces 62% of official
-   open fields; `dropped` OR three-plus missing reproduces 88%. Is the league's
-   practice "the team stopped competing" rather than a ballot count?
+   open fields. **Settled empirically 2026-08-26:** `dropped` OR *never scored a
+   prelim at all* reproduces **94%**, against 89% for the three-or-more
+   threshold it replaced. Swept across the 81 tournaments whose open field the
+   sheet publishes:
+
+   | rule | exact |
+   |---|---|
+   | literal, two or more missing | 26/81 (32%) |
+   | `dropped` only | 63/81 (78%) |
+   | `dropped` or three or more missing | 72/81 (89%) |
+   | `dropped` or four or more missing | 74/81 (91%) |
+   | `dropped` or more than half missing | 73/81 (90%) |
+   | **`dropped` or nothing scored** | **76/81 (94%)** |
+
+   A count of missing rounds has to mean different things at a four-round
+   tournament and a six-round one, which is why every threshold does worse than
+   the question "did this team compete at all". Two of the five remaining
+   misses are known gaps (Ridge, the Round Robin) and three are off by one.
+   It is still a divergence from the text and still worth confirming with the
+   Reporting Director — but it is now the best-measured reading rather than a
+   guess.
 8. **UCLA's prelim count.** Tabroom shows six preliminary rounds, the league
    recorded five, which is worth four points to six teams. Dropped round, or a
    hidden elim counted as a prelim?

@@ -77,6 +77,15 @@ export interface NormalizedSection {
 export interface NormalizedRound {
   roundId: string | null;
   name: string;
+  /**
+   * Tabroom's own short label for the round, where the tournament set one.
+   *
+   * Usually decorative -- "Finals", "Octos", "Quarters". At NYPDL it is load
+   * bearing: the shared pool's two brackets are labelled `VO`/`VQ`/`VS`/`VF`
+   * and `NQ`/`NS`/`NF`, which is the tournament stating outright which rounds
+   * belong to which bracket. See partitionElimRounds.
+   */
+  label: string;
   type: string;
   isPrelim: boolean;
   isElim: boolean;
@@ -207,6 +216,7 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         return {
           roundId: id(r.id),
           name: String(r.name ?? ''),
+          label: String(r.label ?? '').trim(),
           type: r.type ?? '',
           isPrelim: isPrelimRound(r),
           isElim: isElimRound(r),
@@ -374,12 +384,40 @@ export interface EventFieldStats {
  * walk backwards, keeping any round that shares a team with what we've already
  * kept. Everything left over is consolation.
  */
+/**
+ * The tournament's own statement of which bracket a round is in, where it made
+ * one: NYPDL labels its varsity rounds `VO`/`VQ`/`VS`/`VF` and its novice
+ * rounds `NQ`/`NS`/`NF`, and other tournaments write `Var1`/`Nov1` or
+ * `Novice Finals`.
+ *
+ * Only trusted when every elim round carries a label, all of them begin with V
+ * or N, and both letters appear. That is deliberately narrow: it fires on the
+ * 15 shared-pool events in 2025-26 and on nothing whose labels are the ordinary
+ * decorative "Octos"/"Finals", where the letters would mean nothing. A partition
+ * read off what the tab director wrote beats one inferred from bracket shape,
+ * which is why it is tried first.
+ */
+function partitionByLabel(elims: NormalizedRound[]): {
+  main: NormalizedRound[];
+  consolation: NormalizedRound[];
+} | null {
+  if (!elims.every((r) => r.label)) return null;
+  const varsity = (r: NormalizedRound): boolean => /^v/i.test(r.label);
+  const novice = (r: NormalizedRound): boolean => /^n/i.test(r.label);
+  if (!elims.every((r) => varsity(r) || novice(r))) return null;
+  if (!elims.some(varsity) || !elims.some(novice)) return null;
+  return { main: elims.filter(varsity), consolation: elims.filter(novice) };
+}
+
 export function partitionElimRounds(rounds: NormalizedRound[]): {
   main: NormalizedRound[];
   consolation: NormalizedRound[];
 } {
   const elims = rounds.filter((r) => r.isElim);
   if (elims.length <= 1) return { main: elims, consolation: [] };
+
+  const labelled = partitionByLabel(elims);
+  if (labelled) return labelled;
 
   const teamsOf = (r: NormalizedRound): Set<string> =>
     new Set(r.sections.flatMap((s) => s.entryIds));
@@ -428,13 +466,24 @@ export function computeFieldStats(event: NormalizedEvent): EventFieldStats {
   const scoredPrelims = new Map<string, number>();
   const prelimByes = new Map<string, number>();
   let anyScored = false;
+  /**
+   * Whether any *prelim* carries a result, which is the only thing forfeit
+   * exclusion can be measured against. `anyScored` is true when an elim was
+   * scored too, and several tournaments publish elim results without prelim
+   * ones -- at Bargain Belt that made every team look like it had never
+   * competed, and excluded the entire field.
+   */
+  let anyPrelimScored = false;
   for (const r of event.rounds) {
     for (const s of r.sections) {
       for (const b of s.ballots) {
         if (!b.entryId) continue;
         if (b.won !== null) {
           anyScored = true;
-          if (r.isPrelim) scoredPrelims.set(b.entryId, (scoredPrelims.get(b.entryId) ?? 0) + 1);
+          if (r.isPrelim) {
+            anyPrelimScored = true;
+            scoredPrelims.set(b.entryId, (scoredPrelims.get(b.entryId) ?? 0) + 1);
+          }
         } else if (r.isPrelim && s.isBye) {
           // Counted as a win in computeEntryPerformances; here it only needs to
           // not look like a forfeit.
@@ -454,24 +503,41 @@ export function computeFieldStats(event: NormalizedEvent): EventFieldStats {
   // and the league counted both in the field; the five it did exclude were
   // exactly the five Tabroom had flagged `dropped`.
   //
-  // Matching the league's actual behaviour needs two corrections:
+  // Matching the league's actual behaviour needs three corrections:
   //  - a bye also leaves no win/loss, and is not a forfeit;
   //  - the operative signal is a team that stopped competing, which Tabroom
-  //    records as `dropped`.
-  // `dropped` OR three-plus missing reproduces 88% of official open fields,
-  // against 62% for the literal reading. See plan/07-open-questions.md -- this
-  // divergence from the text is worth confirming with the Reporting Director.
-  const MISSING_PRELIM_THRESHOLD = 3;
+  //    records as `dropped`;
+  //  - the rest is a team that never competed at all -- no prelim of theirs was
+  //    ever scored. Not a count of missing rounds: an absolute threshold has to
+  //    mean different things at a four-round tournament and a six-round one,
+  //    and every threshold measured did worse.
+  //
+  // Swept against the 81 tournaments whose open field the sheet publishes:
+  //
+  //   literal, two or more missing        26/81  (32%)
+  //   dropped only                        63/81  (78%)
+  //   dropped or three or more missing    72/81  (89%)
+  //   dropped or four or more missing     74/81  (91%)
+  //   dropped or more than half missing   73/81  (90%)
+  //   dropped or nothing scored           76/81  (94%)
+  //
+  // Of the five it still misses, two are known gaps -- Ridge Debates published
+  // four of twenty-eight teams, and the Round Robin's field is Nationals' --
+  // and three are off by one. `npm run backtest:fields` reruns it.
+  //
+  // This remains a divergence from XXI.2.A as written and is worth confirming
+  // with the Reporting Director. See plan/07-open-questions.md.
   let forfeitedOut = 0;
   for (const [entryId, entry] of event.entries) {
     if (entry.dropped) {
       forfeitedOut++;
       continue;
     }
-    if (!anyScored) continue;
-    const missed =
-      prelims.length - (scoredPrelims.get(entryId) ?? 0) - (prelimByes.get(entryId) ?? 0);
-    if (missed >= MISSING_PRELIM_THRESHOLD) forfeitedOut++;
+    // Nothing to measure against: no prelim here carries a result.
+    if (!anyPrelimScored) continue;
+    const competed =
+      (scoredPrelims.get(entryId) ?? 0) + (prelimByes.get(entryId) ?? 0);
+    if (competed === 0) forfeitedOut++;
   }
 
   const { main, consolation } = partitionElimRounds(event.rounds);
