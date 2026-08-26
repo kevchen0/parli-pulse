@@ -280,10 +280,22 @@ the fallback for everyone else, and for events whose labels are the ordinary
 decorative "Octos"/"Finals" -- those are not bracket statements and their first
 letters must not be read as one.
 
-The two misses are the same shape: a team that broke and appears in no open
-elim section at all, having conceded the whole bracket. Recovering it from the
-break line was tried and is much worse -- 74% against 94% -- because ties at
-the line count teams that did not break.
+Both of the two misses were the same shape: a team that broke and appears in no
+open elim section at all. **Recovered from the prelim seeds**, which takes the
+open elim field to 78 of 80 tournaments. Three conditions, all necessary:
+
+- **The bracket has an unused slot.** A full bracket has nothing missing. At
+  Nueva the fourth seed withdrew and the ninth was pulled up from *below* the
+  line to fill the eight slots, so its seed gap is not a team that broke.
+  October OL held sixteen slots and fifteen teams.
+- **The gap sits below a seed that did break.** Seeds are evidence only where
+  the bracket reached past them.
+- **The team's record is at least the worst that did break.** NYPDL November OL
+  has a seed-10 gap at 2-3 against a bracket whose worst is 4-1.
+
+Recovering from the break line alone was tried first and is much worse -- 74%
+against 95% -- because ties at the line count teams that never broke. The seed
+gap is what carries the information; the record only filters it.
 
 ---
 

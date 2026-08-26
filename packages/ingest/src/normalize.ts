@@ -132,6 +132,14 @@ export interface NormalizedEvent {
    * and the two differ by a full level: 6 points in every band.
    */
   finalPlacesChampions: Set<string>;
+  /**
+   * Entry -> its prelim seed, from the `Prelim Seeds` result set.
+   *
+   * Used to recover a team that broke and then debated no elim round at all,
+   * which is invisible in the round data and still counts toward the elim
+   * field. See computeFieldStats.
+   */
+  prelimSeeds: Map<string, number>;
 }
 
 export interface NormalizedTournament {
@@ -304,6 +312,16 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         }
       }
 
+      const prelimSeeds = new Map<string, number>();
+      for (const rs of ev.result_sets ?? []) {
+        if (!/prelim\s*seed/i.test(String(rs.label ?? rs.tag ?? ''))) continue;
+        for (const res of rs.results ?? []) {
+          const e = id(res.entry);
+          const rank = Number(res.rank);
+          if (e && Number.isFinite(rank)) prelimSeeds.set(e, rank);
+        }
+      }
+
       const finalPlacesChampions = new Set<string>();
       for (const rs of ev.result_sets ?? []) {
         if (rs.tag !== 'final') continue;
@@ -328,6 +346,7 @@ export function normalizeTournament(t: TabroomTournament): NormalizedTournament 
         publishedPrelimBallots,
         publishedRecords,
         finalPlacesChampions,
+        prelimSeeds,
       });
     }
   }
@@ -453,6 +472,77 @@ export function partitionElimRounds(rounds: NormalizedRound[]): {
 }
 
 /**
+ * Teams that broke and then debated no elim round at all.
+ *
+ * They are invisible in the round data -- Tabroom pairs nobody against them --
+ * and the league still counts them in the elim field, which is the numerator of
+ * the break percentage that drives XXI.2.D. One such team at NYPDL October OL
+ * takes the break from 20.0% to 18.8%, across a threshold, costing every
+ * breaking team at the tournament a point.
+ *
+ * Recovering one needs three things to line up, and all three are necessary:
+ *
+ *  - **The bracket has an unused slot.** A full bracket has nothing missing: at
+ *    Nueva the fourth seed withdrew and the ninth was pulled up from below the
+ *    line to fill the eight slots, so the gap in the seeds is not a team that
+ *    broke. October OL's bracket held sixteen slots and fifteen teams.
+ *  - **The gap sits below a seed that did break.** Seeds are only evidence
+ *    where the bracket reached past them.
+ *  - **The team's record is at least the worst that did break.** NYPDL November
+ *    OL has a seed-10 gap at 2-3 against a bracket whose worst is 4-1: that
+ *    team did not break, it simply is not in the bracket.
+ *
+ * Reproduces the league's open elim field for 78 of 80 tournaments, against 76
+ * without it, and moves nothing else. `npm run backtest:fields` reruns it.
+ */
+function recoverAbsentBreakers(
+  event: NormalizedEvent,
+  main: NormalizedRound[],
+  elimEntries: ReadonlySet<string>,
+): number {
+  if (elimEntries.size === 0 || event.prelimSeeds.size === 0) return 0;
+
+  const widest = main.reduce((w, r) => Math.max(w, r.sections.length), 0);
+  const unfilled = widest * 2 - elimEntries.size;
+  if (unfilled <= 0) return 0;
+
+  const seedOf = event.prelimSeeds;
+  const ranks = [...elimEntries].map((e) => seedOf.get(e)).filter((r): r is number => r != null);
+  if (ranks.length !== elimEntries.size) return 0;
+  const present = new Set(ranks);
+  const deepest = Math.max(...ranks);
+
+  const perf = computeEntryPerformances(event);
+  // The break line, read off the teams that actually appeared.
+  let lineWins = Infinity;
+  let lineLosses = -Infinity;
+  for (const e of elimEntries) {
+    const p = perf.get(e);
+    if (!p) continue;
+    if (p.wins < lineWins || (p.wins === lineWins && p.losses > lineLosses)) {
+      lineWins = p.wins;
+      lineLosses = p.losses;
+    }
+  }
+  if (!Number.isFinite(lineWins)) return 0;
+
+  const byRank = new Map<number, string>();
+  for (const [entryId, rank] of seedOf) if (event.entries.has(entryId)) byRank.set(rank, entryId);
+
+  let recovered = 0;
+  for (let rank = 1; rank < deepest && recovered < unfilled; rank++) {
+    if (present.has(rank)) continue;
+    const entryId = byRank.get(rank);
+    if (!entryId) continue;
+    const p = perf.get(entryId);
+    if (!p) continue;
+    const clearedTheLine = p.wins > lineWins || (p.wins === lineWins && p.losses <= lineLosses);
+    if (clearedTheLine) recovered++;
+  }
+  return recovered;
+}
+
+/**
  * Field sizes per XXI.2.A.
  *
  * Three things here are easy to get wrong and all change points:
@@ -549,12 +639,13 @@ export function computeFieldStats(event: NormalizedEvent): EventFieldStats {
       for (const e of s.entryIds) elimEntries.add(e);
     }
   }
+  const elimField = elimEntries.size + recoverAbsentBreakers(event, main, elimEntries);
 
   return {
     rawEntries: event.entries.size,
     forfeitedOut,
     fieldSize: event.entries.size - forfeitedOut,
-    elimField: elimEntries.size,
+    elimField,
     firstElimBracket: main.length ? main[0]!.sections.length * 2 : null,
     prelimCount: prelims.length,
     byeCount,
