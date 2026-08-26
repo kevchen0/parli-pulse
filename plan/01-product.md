@@ -47,9 +47,9 @@ comparable to current ones and should not be blended into one live system.
   clean, well-designed static mirror of the historical sheets. No recomputation,
   no rating — the rules those points were computed under no longer apply, and
   recomputing them under today's rules would produce numbers that never existed.
-- **2024-25 onward:** dynamic. Full Tabroom ingestion, our own Article XXI
-  computation, Glicko-2, and speaker normalization. Exact start season (24-25 vs
-  25-26) to be confirmed — see [07-open-questions.md](07-open-questions.md).
+- **2025-26 onward:** dynamic. Full Tabroom ingestion, our own Article XXI
+  computation, Glicko-2, and speaker normalization. 2024-25 may be backfilled —
+  the schema and loader are season-keyed throughout — but it is not live today.
 
 A visible boundary in the UI between "archive" and "live" seasons, so nobody
 reads a 2021 number as commensurable with a 2026 one.

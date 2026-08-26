@@ -86,7 +86,7 @@ Held-out test, 2,209 rounds from February 2026 on:
 | **Glicko-2** | **63.4%** | **0.6378** | **0.2234** |
 
 The accuracy gap is 3.6 points, 95% interval 1.2 to 6.0 on a paired bootstrap —
-real but not comfortable. The log loss gap of 0.028 is the surer finding and
+real but not comfortable. The log loss gap of 0.029 is the surer finding and
 never reversed in two thousand resamples: the rating is better calibrated than
 it is decisive, which is what a system carrying its own uncertainty should look
 like.

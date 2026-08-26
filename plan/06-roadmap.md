@@ -65,7 +65,7 @@ reader at `/<season>/method/ratings`.
 The gate was that it beat "higher Article XXI points wins" on held-out rounds
 or be reported as a failure. On 2,209 rounds from February 2026 onward it
 predicted 63.4% against the league ranking's 59.8%, at a log loss of 0.638
-against 0.665 — a 3.6 point gap, 95% interval 1.2 to 6.0 on a paired bootstrap.
+against 0.667 — a 3.6 point gap, 95% interval 1.2 to 6.0 on a paired bootstrap.
 The log loss gap is the surer of the two.
 
 The board is ordered on the shrunk figure and predictions use the raw one.
