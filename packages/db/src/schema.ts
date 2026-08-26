@@ -426,8 +426,20 @@ export const ratings = pgTable('ratings', {
   /** Rated subject: a partnership, or a debater once TrueSkill-style. */
   subjectKind: text('subject_kind').notNull(),
   subjectId: text('subject_id').notNull(),
-  /** Rating period boundary, normally one tournament. */
-  tournamentId: text('tournament_id').references(() => tournaments.id),
+  /**
+   * Rating period boundary, normally one tournament.
+   *
+   * Cascades like every other table that references a tournament. `load`
+   * rebuilds a season by deleting its tournaments, and without the cascade that
+   * delete fails the moment the season has ratings -- which is every season
+   * after the first time `rate` runs. It survived this long only because
+   * 2025-26 had never been reloaded since ratings existed, and it would have
+   * broken the first nightly ingest of a 2026-27 that had any.
+   *
+   * Losing them on a reload is correct: ratings are derived, and `rate` runs
+   * after `load` in the chain that rebuilds them.
+   */
+  tournamentId: text('tournament_id').references(() => tournaments.id, { onDelete: 'cascade' }),
   rating: doublePrecision('rating').notNull(),
   deviation: doublePrecision('deviation').notNull(),
   volatility: doublePrecision('volatility').notNull(),

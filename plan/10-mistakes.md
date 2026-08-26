@@ -321,6 +321,19 @@ promise -- grep the flag, not the page. And an ordering is a claim like any
 other: it was read off an id that means creation order, and nothing about the
 output looked wrong, because a list is always in *some* order.
 
+42. **A foreign key that did not cascade, on the one table nobody re-ran.**
+    `load` rebuilds a season by deleting its tournaments, and every table
+    referencing `tournaments` cascades -- except `ratings`, which was written
+    without it. So `load` could not run on any season that had ever been rated.
+    It survived because 2025-26 was loaded before `rate` existed and never
+    reloaded since, and 2026-27 has no tournaments to conflict with. **The first
+    nightly ingest of a 2026-27 with results and a rating would have failed on
+    it**, which is precisely the untested third case the handoff warns about.
+    *Found by reloading a season for the first time in months.*
+
+**Rule:** a table nobody has re-run is a table nobody has tested. The pipeline
+is described as rebuilding a season; the only proof of that is rebuilding one.
+
 ---
 
 ## What actually caught these
