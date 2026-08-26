@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { createDb } from '../packages/db/src/client.ts';
 import { indexHeaders, parseEntryTab, parseWorkbook } from '../packages/ingest/src/sheet.ts';
 import { schoolKey } from '../packages/ingest/src/schools.ts';
-import { computeSeason, pairKey, teamKey } from './lib/season.ts';
+import { computeSeason, sourceFromEnv, pairKey, teamKey } from './lib/season.ts';
 import { loadOurTeams, pairStandings, type OfficialTeam } from './lib/standings.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
@@ -39,7 +39,7 @@ for (const e of entries) {
     .push({ tournament: e.tournament, result: e.result, points: e.calcPoints ?? 0 });
 }
 
-const season = computeSeason();
+const season = computeSeason(undefined, { source: sourceFromEnv() });
 const ourByTeam = new Map<string, Map<string, number>>();
 for (const c of season.cases) {
   const m = ourByTeam.get(c.team) ?? new Map<string, number>();

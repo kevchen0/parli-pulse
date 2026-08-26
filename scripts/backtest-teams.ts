@@ -11,9 +11,9 @@
  */
 import { weightedTotal } from '../packages/rules/src/index.ts';
 import { indexHeaders } from '../packages/ingest/src/sheet.ts';
-import { computeSeason, norm, teamKey, type EntryCase } from './lib/season.ts';
+import { computeSeason, sourceFromEnv, norm, teamKey, type EntryCase } from './lib/season.ts';
 
-const season = computeSeason();
+const season = computeSeason(undefined, { source: sourceFromEnv() });
 
 interface Official {
   rank: number | null;

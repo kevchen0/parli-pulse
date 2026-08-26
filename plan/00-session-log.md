@@ -15,15 +15,22 @@ head-to-head are what remain of it.
 
 | | |
 |---|---|
-| Per-entry Article XXI agreement | **98%** (1529/1564) |
-| Partnership season totals | **87.1% exact** (727/835) |
-| The league's top 100 | **92% exact**, 95% within 2% |
+| Per-entry Article XXI agreement | **96%** (1504/1564) |
+| Partnership season totals | **90% exact** (708/789) |
+| The league's top 100 | **88% exact**, 95% within 2 points |
+| Partnerships whose every result we reproduce | **99%** (707/712) |
 | Rating against the league's own ranking | **63.4%** vs 59.8% on held-out rounds |
 
-Loaded for 2025-26: 97 tournaments, 4,907 entries, 25,795 ballots, 799
+**2025-26 is loaded from Tabroom-computed points** as of 2026-08-26. The sheet
+supplies which tournaments and which teams exist; every figure is ours.
+`SOURCE=sheet npm run load` scores the old way, and the backtests take the same
+flag — under it per-entry agreement is 98%, which measures what independence
+costs rather than a better engine.
+
+Loaded for 2025-26: 97 tournaments, 4,918 entries, 26,290 ballots, 799
 partnerships, 1,183 debaters with points, 47 member schools, 387 ranked
 speakers, 1,776 rated partnerships of which 387 clear the round gate, 830
-reconciliation rows, 35 open disagreements. 140 tests.
+reconciliation rows, 60 open disagreements. 167 tests.
 
 2026-27 is open and empty: the sheet lists 110 tournaments and none has a
 results link yet. That is the correct state until the league writes up Harvard
@@ -87,7 +94,7 @@ sheet and the nightly workflow runs the whole chain. See below.
 | `npm run validate:rating` | the held-out comparison against the league ranking |
 | `npm run backtest` | fields, per-entry, partnerships |
 | `npm run compare` / `npm run diagnose` | top-N accuracy, cause attribution |
-| `npm test` | 140 tests: rules, matcher, speaks, rating, Tabroom client, site labels |
+| `npm test` | 167 tests: rules, matcher, divisions, brackets, speaks, rating, site labels |
 | `npm run dev --workspace @parli-pulse/web` | the site locally |
 
 **Order matters:** `fetch` → `load` → `rollup` → `speaks` → `rate` →

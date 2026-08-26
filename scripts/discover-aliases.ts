@@ -8,13 +8,13 @@
  */
 import { readFileSync } from 'node:fs';
 import { buildSchoolIndex, parseWorkbook, schoolKey } from '../packages/ingest/src/index.ts';
-import { computeSeason } from './lib/season.ts';
+import { computeSeason, sourceFromEnv } from './lib/season.ts';
 import { existsSync } from 'node:fs';
 import { normalizeTournament } from '../packages/ingest/src/normalize.ts';
 
 const wb = parseWorkbook(new Uint8Array(readFileSync('data/raw/sheet/rankings.zip')));
 const index = buildSchoolIndex(wb.get('SchoolList')!);
-const season = computeSeason();
+const season = computeSeason(undefined, { source: sourceFromEnv() });
 
 // entryId -> tabroom school name
 const tabroomSchool = new Map<string, string>();

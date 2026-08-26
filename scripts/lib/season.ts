@@ -178,6 +178,18 @@ export interface SeasonOptions {
   source?: InputSource | Partial<InputSources>;
 }
 
+/**
+ * The source the pipeline and its reports run under.
+ *
+ * `tabroom` by default, matching what `load` writes, so a backtest measures the
+ * engine that actually ships rather than one nothing uses. `SOURCE=sheet`
+ * restores the rule-isolating view: taking the league's field sizes means a
+ * points mismatch can never be a field-size mismatch in disguise, which is the
+ * right instrument when the question is whether a *rule* is wrong.
+ */
+export const sourceFromEnv = (): InputSource =>
+  process.env.SOURCE === 'sheet' ? 'sheet' : 'tabroom';
+
 const resolveSources = (source: SeasonOptions['source']): InputSources =>
   source === undefined ? ALL_SHEET
     : source === 'sheet' ? ALL_SHEET

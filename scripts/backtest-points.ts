@@ -4,9 +4,9 @@
  * component so a mismatch names the rule that diverged.
  */
 import { weightedTotal } from '../packages/rules/src/index.ts';
-import { computeSeason, norm, pairKey, type EntryCase } from './lib/season.ts';
+import { computeSeason, sourceFromEnv, norm, pairKey, type EntryCase } from './lib/season.ts';
 
-const { cases, unmatched, ambiguous, skippedTournaments, officialEntries } = computeSeason();
+const { cases, unmatched, ambiguous, skippedTournaments, officialEntries } = computeSeason(undefined, { source: sourceFromEnv() });
 
 const pct = (k: number, n: number): string => (n ? `${((100 * k) / n).toFixed(0)}%` : '  -');
 const line = (label: string, rows: { matched: boolean }[]): string => {

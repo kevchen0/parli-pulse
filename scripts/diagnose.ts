@@ -9,7 +9,7 @@
 import { readFileSync } from 'node:fs';
 import { createDb } from '../packages/db/src/client.ts';
 import { indexHeaders, parseWorkbook } from '../packages/ingest/src/sheet.ts';
-import { computeSeason } from './lib/season.ts';
+import { computeSeason, sourceFromEnv } from './lib/season.ts';
 import { loadOurTeams, pairStandings, type OfficialTeam } from './lib/standings.ts';
 import { teamKey } from './lib/season.ts';
 
@@ -36,7 +36,7 @@ for (let i = tc.headerIndex + 1; i < tRows.length; i++) {
 const { db, close } = createDb();
 const ourTeams = await loadOurTeams(db, SEASON);
 await close();
-const season = computeSeason();
+const season = computeSeason(undefined, { source: sourceFromEnv() });
 
 const paired = pairStandings(officialTeams.filter((t) => t.rank <= TOP), ourTeams);
 const badTeams = paired.filter((p) => p.ours === null || Math.abs(p.delta ?? 0) >= 0.051);

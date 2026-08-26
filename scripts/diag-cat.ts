@@ -1,6 +1,6 @@
-import { computeSeason } from './lib/season.ts';
+import { computeSeason, sourceFromEnv } from './lib/season.ts';
 const cat = process.argv[2] ?? 'CHSSA';
-const { cases } = computeSeason();
+const { cases } = computeSeason(undefined, { source: sourceFromEnv() });
 const rows = cases.filter((c) => c.category === cat);
 const bad = rows.filter((c) => !c.matched);
 console.log(`${cat}: ${rows.length - bad.length}/${rows.length} match; ${bad.length} bad\n`);
