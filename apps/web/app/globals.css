@@ -840,3 +840,15 @@ p.note.inset { margin: 0 0.8rem 0.7rem; }
 /* A partner's name is one thing to read, not two lines of one. The tournament
    column absorbs the width instead, since it is the one that can wrap. */
 td.with { white-space: nowrap; }
+
+/* A walkover is not a win and not a loss, so it takes neither colour. */
+.outcome.walk { color: var(--muted); font-weight: 500; text-decoration: none; cursor: help; }
+/* "No result" is a gap in the source, not a zero. Muted so a season of real
+   results is not visually punctuated by the tournaments that published none. */
+abbr.noresult {
+  color: var(--faint);
+  font-size: 0.78em;
+  text-decoration: none;
+  cursor: help;
+  white-space: nowrap;
+}

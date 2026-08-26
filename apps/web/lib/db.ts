@@ -4,7 +4,7 @@ import { weightedBreakdown } from '@parli-pulse/rules';
 import { createDb } from '@parli-pulse/db';
 import * as t from '@parli-pulse/db';
 import type { SeasonId } from './season';
-import { compareRounds } from './labels';
+import { compareRounds, walkoverDirection } from './labels';
 
 /**
  * One pool per server instance. Next re-evaluates modules on each request in
@@ -701,7 +701,18 @@ export interface ProfileRound {
   /** A round advanced without debating. Not a win and not a loss. */
   bye: boolean;
   /** Null where the section holds no opposing entry -- a bye, or an unentered room. */
-  opponent: { names: (string | null)[]; school: string | null } | null;
+  opponent: { names: (string | null)[]; school: string | null; schoolId: string | null } | null;
+  /**
+   * A same-school elim round that nobody won: the teams did not debate.
+   *
+   * `advanced` is the entry that went through, `conceded` the one that stepped
+   * aside, and `unknown` a round whose stage is unrecorded so the direction
+   * cannot be read. Null is an ordinary round, including the 87 same-school
+   * elim sections in 2025-26 that *were* decided -- two teams from one school
+   * meeting is not by itself a walkover, and calling a debated 2-1 octafinal a
+   * concession would be inventing something the ballots contradict.
+   */
+  walkover: 'advanced' | 'conceded' | 'unknown' | null;
   /** This debater's own speaker score, judge-normalized and raw. */
   speaks: number | null;
   rawSpeaks: number | null;
@@ -724,6 +735,7 @@ export interface ProfileTournament {
   elimLevel: string | null;
   wonFinal: boolean;
   school: string | null;
+  schoolId: string | null;
   /** Who they debated with. Null where the entry names nobody else. */
   partner: Named | null;
   rounds: ProfileRound[];
@@ -738,6 +750,10 @@ export interface ProfilePartnership {
   rounds: number;
   /** Whether it clears the round gate and appears on the ratings board. */
   ranked: boolean;
+  /** Place on the ratings board, which is ordered on the shrunk figure. */
+  ratingRank: number | null;
+  /** The partnership's Article XXI season total, where the league scores one. */
+  points: number | null;
 }
 
 export interface DebaterProfile {
@@ -844,7 +860,7 @@ export async function getDebaterProfile(
            er.points, er.excluded_reason as "excludedReason",
            en.prelim_wins as "prelimWins", en.prelim_losses as "prelimLosses",
            en.elim_level as "elimLevel", en.won_final as "wonFinal",
-           coalesce(sc.short_name, sc.name) as school,
+           coalesce(sc.short_name, sc.name) as school, en.school_id as "schoolId",
            p.id as "partnerId", p.name as "partnerName"
     from ${t.entryDebaters} ed
     join ${t.debaters} d on d.id = ed.debater_id
@@ -874,12 +890,15 @@ export async function getDebaterProfile(
     ) p on true
     where coalesce(d.canonical_id, d.id) = ${canonicalId}
       and tr.season_id = ${season}
-    order by tr.starts_on nulls last, tr.id
+    -- Most recent first: a reader arrives asking how someone is doing now, and
+    -- a season read top-down should open on the last thing that happened.
+    order by tr.starts_on desc nulls last, tr.id desc
   `)).rows as unknown as {
     entryId: string; tournamentId: string; name: string; startsOn: string | null;
     points: number | null; excludedReason: string | null;
     prelimWins: number; prelimLosses: number; elimLevel: string | null; wonFinal: boolean;
-    school: string | null; partnerId: string | null; partnerName: string | null;
+    school: string | null; schoolId: string | null;
+    partnerId: string | null; partnerName: string | null;
   }[];
   if (entries.length === 0 && me.points === null) return null;
 
@@ -891,14 +910,24 @@ export async function getDebaterProfile(
            count(*) filter (where b.won) as "ballotsWon",
            bool_or(b.is_bye) as bye,
            max(o.entry_id) as "opponentEntry",
+           max(o.ballots) as "opponentBallots",
+           max(o.won) as "opponentWon",
            avg(ss.display) as speaks,
            avg(ss.raw) as "rawSpeaks",
            min(ro.id) as "roundId"
     from ${t.ballots} b
     join ${t.rounds} ro on ro.id = b.round_id
+    -- The other side of the section, aggregated the same way as this one. A
+    -- walkover is a section *nobody* won, so the opponent's tally is needed to
+    -- tell one from an ordinary loss.
     left join lateral (
-      select b2.entry_id from ${t.ballots} b2
+      select b2.entry_id,
+             count(*) as ballots,
+             count(*) filter (where b2.won) as won
+      from ${t.ballots} b2
       where b2.section_id = b.section_id and b2.entry_id <> b.entry_id
+      group by b2.entry_id
+      order by b2.entry_id
       limit 1
     ) o on true
     -- This debater's own speaks, not the entry's: the partner's scores belong
@@ -915,14 +944,20 @@ export async function getDebaterProfile(
   `)).rows as unknown as {
     entryId: string; label: string; kind: string; elimLevel: string | null;
     isConsolation: boolean; side: number | null; ballots: number; ballotsWon: number;
-    bye: boolean; opponentEntry: string | null; speaks: number | null; rawSpeaks: number | null;
+    bye: boolean; opponentEntry: string | null;
+    opponentBallots: number | null; opponentWon: number | null;
+    speaks: number | null; rawSpeaks: number | null;
   }[];
 
   const opponentIds = [...new Set(rounds.map((r) => r.opponentEntry).filter((v): v is string => Boolean(v)))];
-  const opponents = new Map<string, { names: (string | null)[]; school: string | null }>();
+  const opponents = new Map<
+    string,
+    { names: (string | null)[]; school: string | null; schoolId: string | null }
+  >();
   if (opponentIds.length > 0) {
     const rows = (await db.execute(sql`
       select en.id as "entryId", coalesce(sc.short_name, sc.name) as school,
+             en.school_id as "schoolId",
              ${debaterName('dc')} as name
       from ${t.entries} en
       left join ${t.schools} sc on sc.id = en.school_id
@@ -933,9 +968,12 @@ export async function getDebaterProfile(
       left join ${t.debaters} dc on dc.id = coalesce(d.canonical_id, d.id)
       where en.id in ${opponentIds}
       order by en.id, dc.last_name nulls last, dc.id
-    `)).rows as unknown as { entryId: string; school: string | null; name: string | null }[];
+    `)).rows as unknown as {
+      entryId: string; school: string | null; schoolId: string | null; name: string | null;
+    }[];
     for (const r of rows) {
-      const found = opponents.get(r.entryId) ?? { names: [], school: r.school };
+      const found =
+        opponents.get(r.entryId) ?? { names: [], school: r.school, schoolId: r.schoolId };
       // A merged debater can hold two rows on one entry; the same name twice
       // would read as a four-person team.
       if (!found.names.includes(r.name) || r.name === null) found.names.push(r.name);
@@ -944,24 +982,46 @@ export async function getDebaterProfile(
   }
 
   const partnerships = (await db.execute(sql`
-    select r.subject_id as "subjectId", r.rating, r.deviation,
-           r.shrunk_rating as shrunk, r.rounds_counted as rounds,
+    -- The board's own ordering, reproduced so a partnership can be told where
+    -- it sits on it. Ranked over the whole season rather than filtered first,
+    -- because a rank means nothing without the field it was taken against;
+    -- the gate then decides who carries one, matching /<season>/ratings.
+    with board as (
+      select r.subject_id, r.rating, r.deviation, r.shrunk_rating, r.rounds_counted,
+             case
+               when r.rounds_counted >= ${MIN_RATED_ROUNDS}
+                 then rank() over (
+                   order by case when r.rounds_counted >= ${MIN_RATED_ROUNDS}
+                                 then r.shrunk_rating end desc nulls last
+                 )
+             end as rating_rank
+      from ${t.ratings} r
+      where r.season_id = ${season}
+        and r.subject_kind = 'partnership'
+        and r.tournament_id is null
+    )
+    select b.subject_id as "subjectId", b.rating, b.deviation,
+           b.shrunk_rating as shrunk, b.rounds_counted as rounds,
+           b.rating_rank as "ratingRank",
+           ts.points,
            p.id as "partnerId", p.name as "partnerName"
-    from ${t.ratings} r
+    from board b
+    left join ${t.teamSeasonTotals} ts
+      on ts.season_id = ${season}
+     and least(ts.debater1_id, ts.debater2_id) || '|'
+      || greatest(ts.debater1_id, ts.debater2_id) = b.subject_id
     left join lateral (
-      select d.id, ${debaterName('d')} as name from ${t.debaters} d
-      where d.id in (split_part(r.subject_id, '|', 1), split_part(r.subject_id, '|', 2))
-        and d.id <> ${canonicalId}
+      select pc.id, ${debaterName('pc')} as name from ${t.debaters} pc
+      where pc.id in (split_part(b.subject_id, '|', 1), split_part(b.subject_id, '|', 2))
+        and pc.id <> ${canonicalId}
       limit 1
     ) p on true
-    where r.season_id = ${season}
-      and r.subject_kind = 'partnership'
-      and r.tournament_id is null
-      and ${canonicalId} in (split_part(r.subject_id, '|', 1), split_part(r.subject_id, '|', 2))
-    order by r.shrunk_rating desc nulls last
+    where ${canonicalId} in (split_part(b.subject_id, '|', 1), split_part(b.subject_id, '|', 2))
+    order by b.shrunk_rating desc nulls last
   `)).rows as unknown as {
     subjectId: string; rating: number; deviation: number; shrunk: number;
-    rounds: number; partnerId: string | null; partnerName: string | null;
+    rounds: number; ratingRank: number | null; points: number | null;
+    partnerId: string | null; partnerName: string | null;
   }[];
 
   // Only the results rollup counts get a weight, and they must be presented in
@@ -972,9 +1032,13 @@ export async function getDebaterProfile(
     weights.set(scored[w.index]!.entryId, { weight: w.weight, contribution: w.contribution });
   });
 
+  const schoolOfEntry = new Map(entries.map((e) => [e.entryId, e.schoolId]));
+  const reachedOfEntry = new Map(entries.map((e) => [e.entryId, e.elimLevel]));
+
   const roundsByEntry = new Map<string, ProfileRound[]>();
   for (const r of rounds) {
     const list = roundsByEntry.get(r.entryId) ?? [];
+    const opponent = r.opponentEntry ? opponents.get(r.opponentEntry) ?? null : null;
     list.push({
       label: r.label,
       kind: r.kind,
@@ -984,7 +1048,19 @@ export async function getDebaterProfile(
       ballots: Number(r.ballots),
       ballotsWon: Number(r.ballotsWon),
       bye: r.bye,
-      opponent: r.opponentEntry ? opponents.get(r.opponentEntry) ?? null : null,
+      opponent,
+      walkover: walkoverDirection({
+        bye: r.bye,
+        kind: r.kind,
+        roundLevel: r.elimLevel,
+        mySchool: schoolOfEntry.get(r.entryId) ?? null,
+        theirSchool: opponent?.schoolId ?? null,
+        myBallots: Number(r.ballots),
+        myWon: Number(r.ballotsWon),
+        theirBallots: r.opponentBallots === null ? 0 : Number(r.opponentBallots),
+        theirWon: r.opponentWon === null ? 0 : Number(r.opponentWon),
+        reached: reachedOfEntry.get(r.entryId) ?? null,
+      }),
       speaks: r.speaks === null ? null : Number(r.speaks),
       rawSpeaks: r.rawSpeaks === null ? null : Number(r.rawSpeaks),
     });
@@ -1026,6 +1102,7 @@ export async function getDebaterProfile(
       elimLevel: e.elimLevel,
       wonFinal: e.wonFinal,
       school: e.school,
+      schoolId: e.schoolId,
       partner: e.partnerId ? { id: e.partnerId, name: e.partnerName } : null,
       rounds: roundsByEntry.get(e.entryId) ?? [],
     })),
@@ -1037,6 +1114,8 @@ export async function getDebaterProfile(
       shrunk: Number(p.shrunk),
       rounds: Number(p.rounds),
       ranked: Number(p.rounds) >= MIN_RATED_ROUNDS,
+      ratingRank: p.ratingRank === null ? null : Number(p.ratingRank),
+      points: p.points === null ? null : Number(p.points),
     })),
   };
 }

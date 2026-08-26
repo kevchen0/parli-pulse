@@ -112,3 +112,64 @@ export function compareRounds(
 const ELIM_STAGE_ORDER = [
   'tripleOcto', 'doubleOcto', 'octo', 'quarter', 'semi', 'second', 'first',
 ];
+
+/**
+ * Whether an elim round was a walkover, and which side of it this entry was on.
+ *
+ * Two teams from one school meeting in elims usually means they do not debate:
+ * one advances and the other steps aside, which XXI.5.C prices at -2 and +2.
+ * The signature is a same-school section that **nobody won** -- not merely a
+ * same-school section. On 2025-26 there are 91 of the latter and only 4 of the
+ * former: the other 87 carry a real decision, several of them 2-1, and calling
+ * a debated octafinal a concession would contradict the ballots.
+ *
+ * Direction comes from how far the entry went afterwards, because the ballots
+ * cannot say: in every one of the four, both entries carry a losing ballot and
+ * only the bracket records who advanced. Where the round's own stage is
+ * unrecorded there is nothing to compare against, and the round is reported as
+ * a walkover without a direction rather than guessed at -- pattern F.
+ */
+export function walkoverDirection(r: {
+  bye: boolean;
+  kind: string;
+  roundLevel: string | null;
+  mySchool: string | null;
+  theirSchool: string | null;
+  myBallots: number;
+  myWon: number;
+  theirBallots: number;
+  theirWon: number;
+  reached: string | null;
+}): 'advanced' | 'conceded' | 'unknown' | null {
+  if (r.bye || r.kind !== 'elim') return null;
+  if (!r.mySchool || !r.theirSchool || r.mySchool !== r.theirSchool) return null;
+  const majority = (won: number, total: number) => total > 0 && won * 2 > total;
+  if (majority(r.myWon, r.myBallots) || majority(r.theirWon, r.theirBallots)) return null;
+
+  const here = r.roundLevel ? ELIM_STAGE_ORDER.indexOf(r.roundLevel) : -1;
+  const got = r.reached ? ELIM_STAGE_ORDER.indexOf(r.reached) : -1;
+  if (here < 0 || got < 0) return 'unknown';
+  return got > here ? 'advanced' : 'conceded';
+}
+
+/** How a walkover reads in the results column. */
+export const walkoverLabel = (
+  direction: 'advanced' | 'conceded' | 'unknown',
+): { text: string; title: string } =>
+  direction === 'advanced'
+    ? {
+        text: 'Advanced',
+        title:
+          'Closeout: both teams were from the same school, so the round was not debated and this entry went through (XXI.5.C).',
+      }
+    : direction === 'conceded'
+      ? {
+          text: 'Stood down',
+          title:
+            'Closeout: both teams were from the same school, so the round was not debated and the other entry went through (XXI.5.C).',
+        }
+      : {
+          text: 'Closeout',
+          title:
+            'Both teams were from the same school and the round was not debated. Which of them advanced is not recorded.',
+        };

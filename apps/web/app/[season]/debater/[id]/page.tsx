@@ -22,8 +22,10 @@ import {
   roundLabel,
   roundOutcome,
   sideLabel,
+  walkoverLabel,
 } from '@/lib/labels';
 import { DIMINISHING_RETURNS_WEIGHTS, TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
+import { MIN_RATED_ROUNDS } from '@parli-pulse/rating';
 
 export const revalidate = 300;
 
@@ -102,7 +104,14 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
         <span aria-hidden> · </span>
         {seasonLabel(season)}
       </p>
-      <h1>{p.name}</h1>
+      <h1>
+        {p.name}
+        {p.autoQualified && (
+          <abbr className="aq" title={`Autoqualified as an individual: ${TOC_AUTOQUAL_POINTS}+ points (XXII.1.A)`}>
+            {' '}AQ
+          </abbr>
+        )}
+      </h1>
       <p className="lede subject">
         {p.school ?? 'School unknown'}
         {p.region ? <span className="region"> · {p.region}</span> : null}
@@ -112,7 +121,7 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
         <Figure
           label="Article XXI points"
           value={p.points === null ? '—' : p.points.toFixed(1)}
-          note={p.rank ? `${ordinal(p.rank)} among debaters` : 'Unranked'}
+          note={p.rank ? ordinal(p.rank) : 'Unranked'}
           href={seasonHref(season, '/points/debaters')}
         />
         <Figure
@@ -126,9 +135,17 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
           href={seasonHref(season, '/speakers')}
         />
         <Figure
-          label="Partnership rating"
+          label={p.partnerships.length > 1 ? 'Best partnership rating' : 'Partnership rating'}
           value={best ? Math.round(best.rating).toString() : '—'}
-          note={best ? `± ${Math.round(best.deviation)} over ${best.rounds} rounds` : 'Not rated'}
+          note={
+            best
+              ? [
+                  best.ratingRank ? ordinal(best.ratingRank) : 'Unranked',
+                  `± ${Math.round(best.deviation)}`,
+                  `${best.rounds} rounds`,
+                ].join(' · ')
+              : 'Not rated'
+          }
           href={seasonHref(season, '/ratings')}
         />
       </div>
@@ -143,7 +160,7 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
 
       <h2>Season</h2>
       <p className="note">
-        Every tournament, in order. Article XXI.7 counts the best{' '}
+        Every tournament, most recent first. Article XXI.7 counts the best{' '}
         {COUNTING} at falling weights — {DIMINISHING_RETURNS_WEIGHTS.join(', ')} — so most
         results here contribute nothing to the total, which is the rule working rather
         than a result being ignored. The {counted.length === 1 ? 'one that counts is' : `${counted.length} that count are`}{' '}
@@ -182,7 +199,13 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
                   )}
                 </td>
                 <td className="pts num">
-                  {t.points === null ? <span className="faint">—</span> : t.points.toFixed(0)}
+                  {t.points === null ? (
+                    <abbr className="noresult" title={noResultReason(t)}>
+                      No result
+                    </abbr>
+                  ) : (
+                    t.points.toFixed(0)
+                  )}
                 </td>
                 <td className="num weight">
                   {t.weight > 0 ? `×${t.weight.toFixed(1)}` : <span className="faint">—</span>}
@@ -212,9 +235,14 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
         <>
           <h2>Partnerships</h2>
           <p className="note">
-            Our own Glicko-2 rating, not the league&rsquo;s. A partnership is rated once it
-            has debated, and ranked on the board once it has debated ten rounds — the
-            deviation says how much the figure has been confirmed.{' '}
+            <b>Points</b> are the league&rsquo;s: this partnership&rsquo;s Article XXI season
+            total, on a different scale from the individual figure above, which pools a
+            debater&rsquo;s results across every partner. <b>Rating</b> is ours — a
+            Glicko-2 strength estimate, with the deviation saying how much it has been
+            confirmed. A partnership under {MIN_RATED_ROUNDS} rated rounds keeps a rating
+            but is not placed on the board — and the board is ordered on the rating pulled
+            toward the field by that deviation, not on the rating itself, so a place on it
+            and the figure here do not move together.{' '}
             <Link href={seasonHref(season, '/method/ratings')}>How it works</Link>.
           </p>
           <div className="tablewrap">
@@ -222,9 +250,9 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
               <thead>
                 <tr>
                   <th>With</th>
+                  <th className="num">Points</th>
                   <th className="num">Rating</th>
                   <th className="num">Rounds</th>
-                  <th>On the board</th>
                 </tr>
               </thead>
               <tbody>
@@ -237,16 +265,26 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
                         <span className="faint">—</span>
                       )}
                     </td>
+                    <td className="pts num">
+                      {x.points === null ? (
+                        <span className="faint">—</span>
+                      ) : (
+                        x.points.toFixed(1)
+                      )}
+                    </td>
                     <td className="num">
                       {Math.round(x.rating)}
                       <span className="margin"> ± {Math.round(x.deviation)}</span>
                     </td>
-                    <td className="num">{x.rounds}</td>
-                    <td>
-                      {x.ranked ? (
-                        <Link href={seasonHref(season, '/ratings')}>Ranked</Link>
-                      ) : (
-                        <span className="faint">Under ten rounds</span>
+                    <td className="num">
+                      {x.rounds}
+                      {!x.ranked && (
+                        <abbr
+                          className="tick pending"
+                          title={`Under ${MIN_RATED_ROUNDS} rated rounds, so this partnership keeps a rating but is not placed on the board.`}
+                        >
+                          {' '}*
+                        </abbr>
                       )}
                     </td>
                   </tr>
@@ -270,17 +308,51 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
   );
 }
 
+/**
+ * Why a tournament produced no scored result.
+ *
+ * Three different things, and a reader who sees a blank in the points column
+ * deserves to know which. An entry excluded under XXI.1.G scored nothing by
+ * rule; a tournament with no rounds published to Tabroom is a gap in the
+ * source; anything else was ingested but never scored, which usually means the
+ * event does not count toward Article XXI at all.
+ */
+function noResultReason(t: ProfileTournament): string {
+  if (t.excludedReason === 'teamSize') {
+    return 'Not a two-person team, so the entry scores nothing under XXI.1.G.';
+  }
+  if (t.excludedReason) return `Excluded: ${t.excludedReason}.`;
+  if (t.rounds.length === 0) {
+    return 'This tournament published no results we could read. Nothing has been scored for it.';
+  }
+  return 'Rounds were published but the tournament scores no Article XXI points — a round robin, an exhibition, or a division outside the open one.';
+}
+
 function TournamentRounds({ season, t }: { season: string; t: ProfileTournament }) {
   if (t.rounds.length === 0) {
+    const scored = t.points !== null;
     return (
       <details className="rounds">
         <summary>
           <span className="rtitle">{t.name}</span>
-          <span className="rmeta">no rounds published</span>
+          <span className="rmeta">{scored ? 'no rounds published' : 'no results'}</span>
         </summary>
         <p className="note inset">
-          The tournament published no round data we could read, so its result was scored
-          from the record the league recorded rather than from ballots.
+          {scored ? (
+            <>
+              The tournament published no round data we could read, so its result was
+              scored from the record the league recorded rather than from ballots.
+            </>
+          ) : (
+            <>
+              <b>No results published.</b> This tournament put nothing we could read on
+              Tabroom, and nothing has been hand-entered for it, so there is no record of
+              these rounds anywhere and nothing has been scored. It is a gap in the
+              source rather than a nil result —{' '}
+              <Link href={seasonHref(season, '/diagnostic')}>the reconciliation page</Link>{' '}
+              lists the tournaments this affects.
+            </>
+          )}
         </p>
       </details>
     );
@@ -309,8 +381,9 @@ function TournamentRounds({ season, t }: { season: string; t: ProfileTournament 
           </thead>
           <tbody>
             {t.rounds.map((r, i) => {
+              const walk = r.walkover ? walkoverLabel(r.walkover) : null;
               const outcome = roundOutcome(r.ballotsWon, r.ballots, r.bye);
-              const panel = panelLabel(r.ballotsWon, r.ballots);
+              const panel = walk ? null : panelLabel(r.ballotsWon, r.ballots);
               return (
                 <tr key={`${r.label}-${i}`}>
                   <td>{roundLabel(r.kind, r.elimLevel, r.label, r.isConsolation)}</td>
@@ -320,7 +393,11 @@ function TournamentRounds({ season, t }: { season: string; t: ProfileTournament 
                       <>
                         {r.opponent.names.map(displayName).join(' & ')}
                         {r.opponent.school ? (
-                          <span className="region"> · {r.opponent.school}</span>
+                          <span className="region">
+                            {' · '}
+                            {r.opponent.school}
+                            {walk ? ' — same school' : ''}
+                          </span>
                         ) : null}
                       </>
                     ) : (
@@ -328,7 +405,13 @@ function TournamentRounds({ season, t }: { season: string; t: ProfileTournament 
                     )}
                   </td>
                   <td>
-                    <span className={`outcome ${outcome.state}`}>{outcome.text}</span>
+                    {walk ? (
+                      <abbr className="outcome walk" title={walk.title}>
+                        {walk.text}
+                      </abbr>
+                    ) : (
+                      <span className={`outcome ${outcome.state}`}>{outcome.text}</span>
+                    )}
                     {panel ? <span className="margin"> {panel}</span> : null}
                   </td>
                   <td className="num">
