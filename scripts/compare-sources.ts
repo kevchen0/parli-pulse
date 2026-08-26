@@ -118,11 +118,41 @@ function main(): void {
   console.log(`  rows our own inputs win       ${gained}\n`);
 
   if (lost.length) {
-    const byTourn = new Map<string, number>();
-    for (const r of lost) byTourn.set(r.tournament, (byTourn.get(r.tournament) ?? 0) + 1);
-    console.log('  worst tournaments under our own inputs:');
-    for (const [name, n] of [...byTourn].sort((a, b) => b[1] - a[1]).slice(0, 12)) {
-      console.log(`  ${String(n).padStart(5)}  ${name}`);
+    // Which single input breaks each row. A row that survives every one-input
+    // switch and still fails under all three is an interaction, and worth
+    // knowing about separately from the rows one input explains.
+    const single = new Map<string, Map<string, EntryCase>>();
+    for (const r of runs.slice(1, -1)) {
+      single.set(r.label, new Map(r.cases.map((c) => [c.entryId, c])));
+    }
+    const blame = (c: EntryCase): string => {
+      const causes: string[] = [];
+      for (const [label, m] of single) {
+        const one = m.get(c.entryId);
+        if (one && !agrees(one)) causes.push(label.replace('our ', ''));
+      }
+      return causes.length === 0 ? 'interaction' : causes.join(' + ');
+    };
+
+    const byTourn = new Map<string, { n: number; causes: Map<string, number> }>();
+    for (const r of lost) {
+      const e = byTourn.get(r.tournament) ?? { n: 0, causes: new Map() };
+      e.n++;
+      const c = blame(r);
+      e.causes.set(c, (e.causes.get(c) ?? 0) + 1);
+      byTourn.set(r.tournament, e);
+    }
+    console.log('  worst tournaments under our own inputs, and which input did it:');
+    for (const [name, e] of [...byTourn].sort((a, b) => b[1].n - a[1].n).slice(0, 12)) {
+      const causes = [...e.causes].sort((a, b) => b[1] - a[1]).map(([c, n]) => `${c} (${n})`).join(', ');
+      console.log(`  ${String(e.n).padStart(5)}  ${name.padEnd(22)} ${causes}`);
+    }
+
+    const overall = new Map<string, number>();
+    for (const r of lost) overall.set(blame(r), (overall.get(blame(r)) ?? 0) + 1);
+    console.log('\n  by cause:');
+    for (const [c, n] of [...overall].sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${String(n).padStart(5)}  ${c}`);
     }
     console.log(
       '\n  Entries cluster by tournament because a field size is a tournament-wide\n' +

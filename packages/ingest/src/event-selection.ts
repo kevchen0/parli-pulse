@@ -13,9 +13,26 @@
  */
 import { classifyDivision, isParliEvent } from './divisions.ts';
 
-/** League tournament name -> the event name that actually holds its results. */
-export const EVENT_OVERRIDES: { tournament: RegExp; event: RegExp }[] = [
-  { tournament: /^NPDL Round Robin$/i, event: /round\s*robin/i },
+/**
+ * League tournament name -> the event holding its results, and optionally a
+ * different event supplying its field size.
+ *
+ * The two are not always the same thing. NPDL's Round Robin is a twelve-team
+ * invitational running inside Nationals, and the league scores it against the
+ * *Nationals* field rather than its own: both rows of the sheet carry an open
+ * field of 37, an elim field of 13 and six prelims, which are Open Parli's
+ * figures and not the Round Robin's twelve and six. Reading the field off the
+ * event that holds the results puts a twelve-team AFS on a tournament the
+ * league scored as a thirty-seven-team one -- several rows of the elim points
+ * table apart.
+ */
+export const EVENT_OVERRIDES: {
+  tournament: RegExp;
+  event: RegExp;
+  /** Where the field size comes from, when it is not the results event. */
+  fieldEvent?: RegExp;
+}[] = [
+  { tournament: /^NPDL Round Robin$/i, event: /round\s*robin/i, fieldEvent: /open\s*parli/i },
   { tournament: /^NPDL Nationals$/i, event: /open\s*parli/i },
 ];
 
@@ -40,6 +57,24 @@ export function openEventFilter(
   // since patterns like /open parli/ match most tournaments in the season.
   if (override) return (e) => override.event.test(e.name);
   return (e) => e.isParli && e.division === 'open';
+}
+
+/**
+ * The events whose sizes make up this league tournament's field.
+ *
+ * Usually the same events the results come from. Where an override names a
+ * `fieldEvent`, that one wins: see EVENT_OVERRIDES for why the Round Robin's
+ * field is Nationals'.
+ */
+export function fieldEventFilter(
+  officialName: string,
+): (event: SelectableEvent) => boolean {
+  const override = EVENT_OVERRIDES.find((o) => o.tournament.test(officialName));
+  if (override?.fieldEvent) {
+    const pattern = override.fieldEvent;
+    return (e) => pattern.test(e.name);
+  }
+  return openEventFilter(officialName);
 }
 
 export { classifyDivision, isParliEvent };

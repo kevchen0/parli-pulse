@@ -21,7 +21,7 @@ import {
   type EntryCandidate,
   type MatchTier,
 } from '../../packages/ingest/src/matching.ts';
-import { openEventFilter } from '../../packages/ingest/src/event-selection.ts';
+import { fieldEventFilter, openEventFilter } from '../../packages/ingest/src/event-selection.ts';
 import { MANUAL_RESULTS } from '../../packages/ingest/src/manual-results.ts';
 import {
   parseEntryTab,
@@ -240,11 +240,15 @@ export function computeSeason(
     const selectOpen = openEventFilter(off.name);
     const opens = t.events.filter((e) => selectOpen(e) && !computeFieldStats(e).phantom);
     if (!opens.length) { skippedTournaments.push(off.name); continue; }
+    // Usually the same events; different only where a league tournament runs
+    // inside another one's field. See EVENT_OVERRIDES.
+    const selectField = fieldEventFilter(off.name);
+    const fieldEvents = t.events.filter((e) => selectField(e) && !computeFieldStats(e).phantom);
 
     // Under `sheet` these prefer the league's published figures, so a points
     // mismatch is never just a field-size mismatch wearing a disguise. Under
     // `tabroom` every one is computed from the payload.
-    const stats = opens.map(computeFieldStats);
+    const stats = (fieldEvents.length ? fieldEvents : opens).map(computeFieldStats);
     // Computed once and reused: the breaking record below needs them, and so
     // does the per-entry loop.
     const perfByEvent = opens.map((ev) => computeEntryPerformances(ev));
@@ -257,7 +261,7 @@ export function computeSeason(
     //
     // XXI.6.C: where a tournament runs several open divisions each counts on
     // its own and novice/JV is not added to any of them.
-    const njvField = opens.length > 1
+    const njvField = stats.length > 1
       ? 0
       : t.events
         .filter((e) => e.isParli && (e.division === 'jv' || e.division === 'novice'))

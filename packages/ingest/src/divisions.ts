@@ -18,7 +18,15 @@ const JV = /\bjv\b|\bj\.?v\.?\b|junior\s*varsity/i;
 const MIDDLE = /\bmiddle\s*school\b|\bms\b|\bmspf\b/i;
 const OPEN = /\bopen\b|\bvarsity\b|\bvar\b|\btoc\b|\bchampionship\b/i;
 
-const PARLI = /\bparli\b|\bparliamentary\b|\bnpda\b|\bpar\b/i;
+/**
+ * A prefix rather than a whole word, so a misspelling still classifies.
+ *
+ * Singletary's open division is "Novice Parlimentary Debate" -- one letter
+ * short of parliamentary -- and under a `\bparli\b` alternative it was not a
+ * parli event at all, so its nine novice teams never reached the AFS. One event
+ * in the 2025-26 slate, and the looser pattern matches nothing else new.
+ */
+const PARLI = /\bparli\w*|\bnpda\b|\bpar\b/i;
 
 /** True if the event is parliamentary debate rather than PF/LD/speech. */
 export function isParliEvent(name: string, abbr?: string | null): boolean {
@@ -34,6 +42,14 @@ export function isParliEvent(name: string, abbr?: string | null): boolean {
  * Classifies the competitive division. Order matters: a name like "Novice
  * Parli Open Division" is novice, so the restrictive labels are tested first
  * and `open` is the fallback for an unqualified parli event.
+ *
+ * Novice and JV are tested **before** middle school, which decides the handful
+ * of divisions that combine them -- Stanford's "Parli - Middle School + Novice
+ * Combined", thirty teams. XXI.2.B counts novice and JV toward the adjusted
+ * field size and middle school not at all, and the league counts these: its
+ * Stanford N/JV is 49 against a JV division of 18. A pure middle-school event
+ * still classifies as middle and stays out, which the same sheet confirms --
+ * NPDL Nationals records N/JV as 0 beside a 15-team Middle School Parli.
  */
 export function classifyDivision(
   name: string,
@@ -43,9 +59,9 @@ export function classifyDivision(
   if (overrideKey && DIVISION_OVERRIDES[overrideKey]) return DIVISION_OVERRIDES[overrideKey]!;
 
   const haystack = `${name} ${abbr ?? ''}`;
-  if (MIDDLE.test(haystack)) return 'middle';
   if (NOVICE.test(haystack)) return 'novice';
   if (JV.test(haystack)) return 'jv';
+  if (MIDDLE.test(haystack)) return 'middle';
   if (OPEN.test(haystack)) return 'open';
 
   // An unqualified parli event at a tournament with no other divisions is the
