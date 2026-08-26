@@ -50,7 +50,9 @@ async function resolveIdentities(
       id: t.debaters.id, first: t.debaters.firstName, last: t.debaters.lastName,
       schoolId: t.debaters.schoolId,
     })
-    .from(t.debaters);
+    .from(t.debaters)
+    // Deterministic input, so grouping and merging do not depend on row order.
+    .orderBy(t.debaters.id);
 
   const letters = (s: string | null): string =>
     (s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '');
@@ -186,7 +188,14 @@ async function resolveIdentities(
       const al = a.id.startsWith('lbl_') ? 0 : 1;
       const bl = b.id.startsWith('lbl_') ? 0 : 1;
       if (al !== bl) return bl - al;
-      return appearances(b.id) - appearances(a.id);
+      const ap = appearances(b.id) - appearances(a.id);
+      if (ap !== 0) return ap;
+      // A final, total tiebreak. Without one, two records tying on every test
+      // above are ordered by however Postgres returned them, so the canonical
+      // id flips between runs -- and with it every downstream row id keyed on a
+      // partnership: team totals, speaker totals, ratings. Seven debaters
+      // changed identity on a run that loaded no new data at all.
+      return a.id.localeCompare(b.id);
     });
     const canonical = ranked[0]!;
     for (const id of ids) if (id !== canonical.id) merged.set(id, canonical.id);

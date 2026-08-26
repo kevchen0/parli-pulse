@@ -46,11 +46,22 @@ interface Row {
 async function main(): Promise<void> {
   const { db, close } = createDb();
   try {
-    // Clear anything a previous run left behind, so scores outside the open
+    // Clear what a previous run left on THIS season, so scores outside the open
     // divisions do not keep stale normalized values.
+    //
+    // Season-scoped, and it must be: unscoped, running this for one season set
+    // `z` to null on every ballot of every other season. The totals tables are
+    // season-scoped and survived, so nothing on the site looked wrong -- the
+    // damage was one level down, in the per-ballot figures those totals are
+    // rebuilt from.
     await db.execute(sql`
-      update ${t.speakerScores} set z = null, display = null,
-             excluded = false, exclusion_reason = null
+      update ${t.speakerScores} s
+      set z = null, display = null, excluded = false, exclusion_reason = null
+      from ${t.ballots} b
+      join ${t.rounds} r on r.id = b.round_id
+      join ${t.events} e on e.id = r.event_id
+      join ${t.tournaments} tn on tn.id = e.tournament_id
+      where s.ballot_id = b.id and tn.season_id = ${SEASON}
     `);
 
     const rows = (await db.execute(sql`

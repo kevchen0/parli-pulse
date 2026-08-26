@@ -7,18 +7,30 @@
  * marks which results actually count, so a reader can tell "one tournament is
  * off by six" from "we are wrong about this team everywhere".
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { eq, sql } from 'drizzle-orm';
 import { DIMINISHING_RETURNS_WEIGHTS } from '../packages/rules/src/index.ts';
 import { createDb } from '../packages/db/src/client.ts';
 import * as t from '../packages/db/src/schema.ts';
-import { indexHeaders, parseEntryTab, parseWorkbook } from '../packages/ingest/src/sheet.ts';
+import {
+  LEGACY_SHEET_PATH,
+  indexHeaders,
+  parseEntryTab,
+  parseWorkbook,
+  sheetPathFor,
+} from '../packages/ingest/src/sheet.ts';
 import { schoolKey } from '../packages/ingest/src/schools.ts';
 import { computeSeason, teamKey } from './lib/season.ts';
 import { loadOurTeams, pairStandings, type OfficialTeam } from './lib/standings.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
-const wb = parseWorkbook(new Uint8Array(readFileSync('data/raw/sheet/rankings.zip')));
+// The season's own workbook. Reading 2025-26's while tagging rows 2026-27
+// produced 830 diagnostics for a season with no results in it.
+const SHEET =
+  existsSync(sheetPathFor(SEASON)) || SEASON !== '2025-26'
+    ? sheetPathFor(SEASON)
+    : LEGACY_SHEET_PATH;
+const wb = parseWorkbook(new Uint8Array(readFileSync(SHEET)));
 const num = (s?: string): number | null => {
   if (!s) return null;
   const n = Number(s.replace(/,/g, ''));

@@ -100,7 +100,14 @@ async function main(): Promise<void> {
       await db.delete(t.tournaments).where(eq(t.tournaments.seasonId, SEASON));
     }
 
-    const cached = new Set(readdirSync(RAW_DIR).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -5)));
+    // A season whose payloads have never been fetched has an empty cache, not a
+    // missing one. The directory is absent on a fresh checkout and at the start
+    // of every season, which is exactly when this runs.
+    const cached = new Set(
+      (existsSync(RAW_DIR) ? readdirSync(RAW_DIR) : [])
+        .filter((f) => f.endsWith('.json'))
+        .map((f) => f.slice(0, -5)),
+    );
 
     const rows = {
       tournaments: [] as Record<string, unknown>[],
