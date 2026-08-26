@@ -1,18 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { computeFieldStats, type NormalizedEvent, type NormalizedRound } from './normalize.ts';
+import {
+  computeFieldStats,
+  type NormalizedBallot,
+  type NormalizedEntry,
+  type NormalizedEvent,
+  type NormalizedRound,
+} from './normalize.ts';
 
 /**
  * The elim field is the numerator of the break percentage that drives XXI.2.D,
  * so one team either way moves a whole tournament across a penalty threshold.
  */
-const entry = (id: string, dropped = false) => [id, {
+const entry = (id: string, dropped = false): [string, NormalizedEntry] => [id, {
   entryId: id, code: id, name: id, schoolId: `s${id}`, schoolName: `s${id}`,
   studentIds: [`a${id}`, `b${id}`], eligibleTeamSize: true, hybrid: false, dropped,
-}] as const;
+}];
 
-const ballot = (entryId: string, won: boolean | null) => ({
+const ballot = (entryId: string, won: boolean | null): NormalizedBallot => ({
   ballotId: `${entryId}-b`, entryId, entryCode: entryId, entryName: entryId,
-  side: null, judgeId: 'j', judgePersonId: 'j', won, isBye: false, speaks: [],
+  side: null, judgeId: 'j', judgePersonId: 'j', won, speakerPoints: [],
 });
 
 const round = (name: string, isElim: boolean, pairs: string[][]): NormalizedRound => ({
