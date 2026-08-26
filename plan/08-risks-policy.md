@@ -39,5 +39,6 @@ no "lowest speaks" view, no punitive flag, nothing that identifies a recipient.
 The same reasoning constrains judge pages: no "harshest judge" leaderboard.
 
 **Judge pages launch aggregate-first.** Distributions and league-wide context
-before any individual ranking, and a deliberate decision (Q22) before individual
+before any individual ranking, and a deliberate decision — see "judge pages" in
+[07-open-questions.md](07-open-questions.md) — before individual
 judge stats go public at all.

@@ -225,7 +225,8 @@ season: NPDL revises the Board Code annually, and XXI.11 explicitly provides
 for its own replacement each July. **The rules engine is therefore
 season-versioned** (`rulesForSeason()` in `packages/rules/src/constants.ts`) so
 a future table is a data change, not a rewrite. See
-[07-open-questions.md](07-open-questions.md) Q27.
+[07-open-questions.md](07-open-questions.md), "the alternative non-break
+table".
 
 The same query confirmed the **NPDL-TOC ballot schedule (XXI.4.A)**: records
 there are ballot counts (`6-8`, `7-7`, `9-5`) and every one scores exactly

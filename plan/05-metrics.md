@@ -61,7 +61,7 @@ accumulate — and it should be reported rather than tuned away.
 
 ## Glicko-2 rating — built, validated, shipped
 
-At `/rankings/ratings`. `npm run rate` computes it; `npm run validate:rating`
+At `/<season>/ratings`. `npm run rate` computes it; `npm run validate:rating`
 reruns every number below.
 
 ### The gate, and whether it was cleared
@@ -82,10 +82,10 @@ Held-out test, 2,209 rounds from February 2026 on:
 | Coin flip | 50.0% | 0.6931 | 0.2500 |
 | Side alone | 53.7% | 0.6909 | 0.2489 |
 | Season win rate to date | 61.3% | 0.6539 | 0.2311 |
-| **Article XXI points to date** | **61.2%** | **0.6654** | **0.2358** |
+| **Article XXI points to date** | **59.8%** | **0.6667** | **0.2362** |
 | **Glicko-2** | **63.4%** | **0.6378** | **0.2234** |
 
-The accuracy gap is 2.2 points, 95% interval 0.0 to 4.3 on a paired bootstrap —
+The accuracy gap is 3.6 points, 95% interval 1.2 to 6.0 on a paired bootstrap —
 real but not comfortable. The log loss gap of 0.028 is the surer finding and
 never reversed in two thousand resamples: the rating is better calibrated than
 it is decisive, which is what a system carrying its own uncertainty should look

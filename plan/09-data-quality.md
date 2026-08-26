@@ -5,7 +5,7 @@ Kept current — an unlisted gap will be mistaken for an ingestion bug and
 re-debugged from scratch.
 
 Current standing accuracy: per-entry **98%** (1529/1564); the league's top 100
-teams **90% exact**, 93% within 2%; schools 50% exact, 66% within 2%.
+teams **92% exact**, 95% within 2%; schools 50% exact, 66% within 2%.
 
 ---
 
@@ -173,4 +173,5 @@ Before a season opens:
 4. Confirm the speaker scale for any new league.
 5. **Confirm the rules have not changed.** The Board Code is revised each July;
    `packages/rules` is season-versioned for exactly this reason. See
-   [07-open-questions.md](07-open-questions.md) Q27.
+   [07-open-questions.md](07-open-questions.md), "the alternative non-break
+   table".

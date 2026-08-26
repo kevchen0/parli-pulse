@@ -1,6 +1,7 @@
 # Roadmap
 
-**Status:** phases 0-5 are complete. Phase 6 is next.
+**Status:** phases 0-7 complete and deployed. Phase 6 (profiles) is the
+substantial work left; the season now ingests itself nightly.
 
 The 2026-27 season's first points-eligible tournament is Harvard, Sept 5-6
 (August tournaments are excluded by XXI.1.H). Before then, run the seasonal
@@ -16,8 +17,8 @@ including the Elim Points Table the league publishes only as an image. Drizzle
 schema, Neon Postgres, Vercel.
 
 ### Phase 1 — Rankings site
-Team, debater and school standings at `/rankings`, served from Postgres, plus
-a `/rankings/diagnostic` tab reconciling every partnership against the
+Team, debater and school standings, served from Postgres, plus a
+reconciliation tab comparing every partnership against the
 league's published standings result by result.
 
 ### Phase 2 — Tabroom ingestion
@@ -45,7 +46,7 @@ own figures. It was that every mismatch be explained, and they are, in
 [09-data-quality.md](09-data-quality.md). Most are not ours to fix.
 
 ### Phase 4 — Speaker points
-Judge-normalized speaker standings at `/rankings/speakers`, sortable by z-score
+Judge-normalized speaker standings at `/<season>/speakers`, sortable by z-score
 or raw average, with a 95% interval on each figure.
 
 27,013 open-division ballots normalized; 387 debaters clear the 20-ballot
@@ -57,9 +58,9 @@ both centre and spread shrunk toward the field by sample size.
 ---
 
 ### Phase 5 — Glicko-2 with a field prior
-Partnership ratings at `/rankings/ratings`, ordered on the rating shrunk toward
+Partnership ratings at `/<season>/ratings`, ordered on the rating shrunk toward
 the field by its deviation, gated at ten rated rounds. Method written for a
-reader at `/rankings/ratings/method`.
+reader at `/<season>/method/ratings`.
 
 The gate was that it beat "higher Article XXI points wins" on held-out rounds
 or be reported as a failure. On 2,209 rounds from February 2026 onward it

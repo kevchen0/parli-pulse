@@ -1,7 +1,11 @@
 # Open questions
 
-What is still unresolved, and what has been settled. Answered items stay here
-with their answers, so nobody re-investigates them.
+What is still unresolved, and what has been settled. Answered items move to the
+bottom with their answers, so nobody re-investigates them.
+
+**Cite these by title, not by number.** Numbers are positional and shift every
+time something is answered and moves down — which is how three references
+elsewhere in the plan came to point at questions that no longer existed.
 
 ---
 
@@ -16,58 +20,58 @@ with their answers, so nobody re-investigates them.
    The rating now inherits this: it follows the people, like the standings.
 
 ### Rules still ambiguous
-4. **XXI.2.C one-third exception** — measured against the open field or the
+2. **XXI.2.C one-third exception** — measured against the open field or the
    AFS? Does a bye count as "advanced without debating"? Byes are common: 12 of
    Berkeley's 16 double-octo sections.
-5. **XXI.3.B points floor** — "lowest-seeded breaking team with a winning
+3. **XXI.3.B points floor** — "lowest-seeded breaking team with a winning
    record" by prelim seed or bracket position? The `Tournaments` tab's
    `Breaking Record` column behaves like the answer; confirm it means that.
-6. **XXI.2.F** — does "no team shall lose points" floor at 0, or at what the
+4. **XXI.2.F** — does "no team shall lose points" floor at 0, or at what the
    team's own prelim record would have earned?
-7. **XXI.6.C multiple open divisions** — how to detect programmatically versus
+5. **XXI.6.C multiple open divisions** — how to detect programmatically versus
    an Open/JV split. Stanford's `Parli - Open` / `Parli - TOC` is the case.
-8. **`manual_adj`** — what drives it? Berkeley HS and Apollo both carry a +1
+6. **`manual_adj`** — what drives it? Berkeley HS and Apollo both carry a +1
    nobody can derive. A few real examples would let the backtest classify
    these instead of leaving them unexplained.
-9. **Forfeit exclusion.** XXI.2.A read literally reproduces 62% of official
+7. **Forfeit exclusion.** XXI.2.A read literally reproduces 62% of official
    open fields; `dropped` OR three-plus missing reproduces 88%. Is the league's
    practice "the team stopped competing" rather than a ballot count?
-10. **UCLA's prelim count.** Tabroom shows six preliminary rounds, the league
-    recorded five, which is worth four points to six teams. Dropped round, or a
-    hidden elim counted as a prelim?
-11. **The alternative non-break table** (3-1=4, 3-2=3, 4-0=9, 4-1=8, 5-0=12,
-    4-2=5, 5-1=11, 6-0=14). Not 2025-26 — all 774 non-breaking rows match
-    XXI.3.A — and **not 2026-27 either**: the published Board Code still carries
-    the 2025-26 values, checked 2026-08-26 and now guarded by
-    `npm run check:rules`, which runs before every ingest. Probably an older
-    season. No longer blocking, but still unidentified.
+8. **UCLA's prelim count.** Tabroom shows six preliminary rounds, the league
+   recorded five, which is worth four points to six teams. Dropped round, or a
+   hidden elim counted as a prelim?
+9. **The alternative non-break table** (3-1=4, 3-2=3, 4-0=9, 4-1=8, 5-0=12,
+   4-2=5, 5-1=11, 6-0=14). Not 2025-26 — all 774 non-breaking rows match
+   XXI.3.A — and **not 2026-27 either**: the published Board Code still carries
+   the 2025-26 values, checked 2026-08-26 and now guarded by
+   `npm run check:rules`, which runs before every ingest. Probably an older
+   season. No longer blocking, but still unidentified.
 
 ### Product and policy
-12. **Debater profile pages** — these are minors. What is shown, and is there
-    an opt-out? Partly answered: the public Privacy page now commits to showing
-    only what the league and Tabroom already publish, never contact details,
-    never anything identifying an Article XIV sanction, and removal on request
-    without a reason. A profile is a larger surface than a table row, so the
-    remaining question is what a *page* about one debater may hold — head-to-head
-    records, opponents named, a season chart — not whether names may appear.
-13. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.
-14. **Domain name.** Is `parli-pulse` the public name?
-15. **Public "report an error" form** feeding `manual_overrides`?
-16. **Independent or NPDL-affiliated?** The build stays independent-safe either
-    way, but it changes framing and whether the reconciliation report becomes a
-    tool for the Reporting Director.
-17. **Historical archive** — how far back, and where do those sheets live?
-    Roughly 2019 was mentioned. Are they shaped consistently enough for one
-    mirror renderer?
+10. **Debater profile pages** — these are minors. What is shown, and is there
+   an opt-out? Partly answered: the public Privacy page now commits to showing
+   only what the league and Tabroom already publish, never contact details,
+   never anything identifying an Article XIV sanction, and removal on request
+   without a reason. A profile is a larger surface than a table row, so the
+   remaining question is what a *page* about one debater may hold — head-to-head
+   records, opponents named, a season chart — not whether names may appear.
+11. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.
+12. **Domain name.** Is `parli-pulse` the public name?
+13. **Public "report an error" form** feeding `manual_overrides`?
+14. **Independent or NPDL-affiliated?** The build stays independent-safe either
+   way, but it changes framing and whether the reconciliation report becomes a
+   tool for the Reporting Director.
+15. **Historical archive** — how far back, and where do those sheets live?
+   Roughly 2019 was mentioned. Are they shaped consistently enough for one
+   mirror renderer?
 
 ### Raised by the live season
-18. **What happens when the league revises a figure after we have published it?**
-    A tournament can be rescored inside the 30-day correction window. The fetch
-    picks it up, but a reader who quoted the earlier number is not told it moved.
-    Worth a visible "changed since" marker, or worth deciding it does not matter.
-20. **Does the provisional marker come off correctly?** Points are marked amber
-    until the league's sheet carries the tournament. That transition has never
-    been observed, because no season has been live since the marker existed.
+16. **What happens when the league revises a figure after we have published it?**
+   A tournament can be rescored inside the 30-day correction window. The fetch
+   picks it up, but a reader who quoted the earlier number is not told it moved.
+   Worth a visible "changed since" marker, or worth deciding it does not matter.
+17. **Does the provisional marker come off correctly?** Points are marked amber
+   until the league's sheet carries the tournament. That transition has never
+   been observed, because no season has been live since the marker existed.
 
 ---
 
@@ -87,7 +91,7 @@ with their answers, so nobody re-investigates them.
   already pays more for beating them; a multiplier would count the same fact
   twice. See [05-metrics.md](05-metrics.md).
 - **Whether the rating earns its place** — yes, on held-out rounds: 63.4%
-  against the league ranking's 61.2%, with a clearly better log loss. The
+  against the league ranking's 59.8%, with a clearly better log loss. The
   commitment was to report a failure if it lost, and it did not.
 - **Which season starts the live era** — 2025-26. Earlier seasons are archival
   (Phase 8); 2024-25 may be backfilled, and the schema and loader are
