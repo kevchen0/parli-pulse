@@ -254,6 +254,39 @@ is worse than one that errors. Where a resource is keyed by season, key the
 lookup by season and fail on a miss -- and check a new data source against a
 season whose answer is already known before trusting it.
 
+### Found by the first end-to-end run against an empty season
+
+All four were live before that run, and two were quietly damaging 2025-26.
+
+35. **`speaks` cleared every normalized score in the database.** The statement
+    that resets `z`, `display` and `excluded` before recomputing had no season
+    filter, so running the season with no results in it set `z` to null on all
+    27,013 of 2025-26's ballots. **Nothing on the site looked wrong** — the
+    totals tables are season-scoped and survived — so the damage sat one level
+    down, in the per-ballot figures those totals are rebuilt from. Found only
+    because the run was snapshotted first.
+36. **Identity merging was not deterministic.** Its ranking fell through to
+    appearance count with no total tiebreak, so two records tying on every test
+    were ordered by however Postgres returned them. Seven debaters changed
+    canonical id on a run that loaded no new data — and every row id keyed on a
+    partnership moves with them: team totals, speaker totals, ratings. It would
+    have churned nightly, forever, for nothing.
+37. **`build-diagnostics` read 2025-26's workbook whatever season it was given**,
+    reconciling last season's sheet and writing 830 rows tagged 2026-27, for a
+    season with no results at all. Fixed once at the top of the file and
+    reintroduced immediately by `computeSeason()`, whose *default argument* is
+    the same hardcoded path.
+38. **The pipeline could not run where there is no `.env`.** `--env-file=.env`
+    requires the file; a CI runner has the values in the environment instead.
+    Every script died before executing a line. `load` then crashed on a payload
+    directory that does not exist until something has been fetched, which is the
+    state every season starts in.
+
+**Rule:** run the whole chain against an empty season before trusting it, and
+snapshot the season you are not touching first. Three of these four were
+invisible in the output and two were destructive; only a before-and-after diff
+of the untouched season showed them at all.
+
 ---
 
 ## What actually caught these
@@ -282,3 +315,6 @@ Ranked by yield:
    summary.** #32 survived being written into five places and died in one
    question from the coach, who knew the circuit and could see the mechanism did
    not follow.
+8. **Snapshotting the thing you are not changing.** Running the pipeline for an
+   empty season should have touched nothing else. Diffing 2025-26 before and
+   after is what exposed #35 and #36, neither of which changed anything visible.

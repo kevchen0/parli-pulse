@@ -31,9 +31,14 @@ When everything is bold, nothing is.
 
 ---
 
-**Status:** A, B, C and D landed together. E is analytics only; the headers are
-in `next.config.mjs` and TLS never needed anything. What remains is in *Still to
-be specified* at the foot of this file.
+**Status:** A, B, C and D landed, and a second pass on top of them: tables page
+at fifty rows with search and a page-jump, totals carry amber and red marks where
+the league's sheet has not settled, TOC standing splits into AQ and AL, and
+navigation shows a skeleton on the page you clicked rather than holding you on
+the one you left.
+
+E is analytics only — the security headers are in `next.config.mjs` and TLS
+never needed anything. What remains is in *Still to be specified* below.
 
 ## Phase A — Information architecture
 
@@ -173,7 +178,7 @@ Where further changes go as they arrive. Nothing here is decided.
 - Choice between the two visual directions in Phase B.
 - Whether `/rankings` keeps forwarding once the nav is restructured, or whether
   Points gets its own path.
-- Pagination for the debaters table: 1,184 rows is 2.5MB of markup, which is
-  fine on bandwidth and not fine on an old phone.
+- ~~Pagination for the debaters table~~ — done; every table pages at fifty,
+  server-side, so only the shown rows are rendered.
 - Whether the Diagnostic gate is a login, an env flag, or an unlisted path.
 - Custom domain and the public name (open question 14).

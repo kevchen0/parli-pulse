@@ -36,13 +36,20 @@ with their answers, so nobody re-investigates them.
     recorded five, which is worth four points to six teams. Dropped round, or a
     hidden elim counted as a prelim?
 11. **The alternative non-break table** (3-1=4, 3-2=3, 4-0=9, 4-1=8, 5-0=12,
-    4-2=5, 5-1=11, 6-0=14). Definitively not 2025-26 — all 774 non-breaking
-    rows match XXI.3.A exactly. If it is 2026-27, the engine needs that
-    season's table before the season opens. `rulesForSeason()` exists for this.
+    4-2=5, 5-1=11, 6-0=14). Not 2025-26 — all 774 non-breaking rows match
+    XXI.3.A — and **not 2026-27 either**: the published Board Code still carries
+    the 2025-26 values, checked 2026-08-26 and now guarded by
+    `npm run check:rules`, which runs before every ingest. Probably an older
+    season. No longer blocking, but still unidentified.
 
 ### Product and policy
 12. **Debater profile pages** — these are minors. What is shown, and is there
-    an opt-out? Needed before Phase 6.
+    an opt-out? Partly answered: the public Privacy page now commits to showing
+    only what the league and Tabroom already publish, never contact details,
+    never anything identifying an Article XIV sanction, and removal on request
+    without a reason. A profile is a larger surface than a table row, so the
+    remaining question is what a *page* about one debater may hold — head-to-head
+    records, opponents named, a season chart — not whether names may appear.
 13. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.
 14. **Domain name.** Is `parli-pulse` the public name?
 15. **Public "report an error" form** feeding `manual_overrides`?
@@ -52,6 +59,18 @@ with their answers, so nobody re-investigates them.
 17. **Historical archive** — how far back, and where do those sheets live?
     Roughly 2019 was mentioned. Are they shaped consistently enough for one
     mirror renderer?
+
+### Raised by the live season
+18. **What happens when the league revises a figure after we have published it?**
+    A tournament can be rescored inside the 30-day correction window. The fetch
+    picks it up, but a reader who quoted the earlier number is not told it moved.
+    Worth a visible "changed since" marker, or worth deciding it does not matter.
+19. **Nothing watches the nightly run.** A failure leaves the site quietly stale
+    and colours a square nobody looks at. An email, a commit to a status file, or
+    a banner reading the last successful run — cheapest first.
+20. **Does the provisional marker come off correctly?** Points are marked amber
+    until the league's sheet carries the tournament. That transition has never
+    been observed, because no season has been live since the marker existed.
 
 ---
 

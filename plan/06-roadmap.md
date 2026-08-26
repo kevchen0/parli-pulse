@@ -88,28 +88,51 @@ additive, which cannot see the partnership the board is about.
 
 ---
 
-## Next
-
 ### Phase 6a — Site structure and identity
-Navigation that encodes what is the league's and what is ours, a real season
-control, an About/Privacy/Method/Feedback set, and an identity that is chosen
-rather than defaulted. Planned in [11-site.md](11-site.md).
+Seasons are routable, so `/2025-26/points` keeps its meaning when a new season
+opens and `/rankings` forwards to whichever is current at request time.
+Navigation splits on whose numbers they are: **Points** holds Teams, Debaters
+and Schools; **Ratings** and **Speakers** sit outside it because they are ours.
+About, Privacy, Method and Feedback exist, the last two of which the site had
+been promising and not delivering.
 
-### Phase 6 — Profiles and depth
-Debater, team, school and tournament pages. Head-to-head records.
+Identity is ink and slate, on a flat masthead rather than floating cards, with
+the unofficial notice present on every page and loud on none. Tables page at
+fifty rows with search and a page-jump, and mark totals the league's sheet has
+not settled — amber where it has no row yet, red where it has one and we differ.
+Loading states appear on the page you clicked rather than the one you left.
+
+Full plan, including what was deliberately not done, in [11-site.md](11-site.md).
 
 ### Phase 7 — Live season
-`npm run fetch` refreshes the season from the league's sheet: the `Results`
-column decides which tournaments exist, payloads are pulled by the id in it, and
-the circuit calendar is reported as a lookahead rather than used for discovery.
-`npm run check:rules` guards the point tables against a July revision, and
-`.github/workflows/ingest.yml` runs the chain nightly.
+`npm run fetch` refreshes from the league's sheet: the **Results** column of the
+`Tournaments` tab decides what exists, payloads are pulled by the id written
+into it, and the circuit calendar is reported as a lookahead rather than used
+for discovery — it finds 44 tournaments where the sheet finds 95.
 
-**Still needed before the opener:** the 2026-27 sheet id in `SHEET_IDS`, the
-`DATABASE_URL` secret and `CURRENT_SEASON` variable set on the repository, and
-one full end-to-end run against 2026-27 so the first live tournament is not the
-first test. Then "updated N hours ago", new-result diffing, and the disagreement
-queue as an ops dashboard.
+`npm run check:rules` compares the engine's point tables against the published
+Board Code and runs first, so a July revision stops ingestion instead of
+silently scoring a season under last year's rules.
+`.github/workflows/ingest.yml` runs the chain at 09:10 UTC nightly and on
+demand, under three scoped credentials: `parli_ingest` writes, `parli_web`
+reads, and the owner role never leaves the maintainer's machine.
+
+The first end-to-end run against an empty 2026-27 found four bugs, two of which
+were quietly damaging the live season. They are in
+[10-mistakes.md](10-mistakes.md) as 35-38; the pattern is that anything reading
+a season must be given the season.
+
+---
+
+## Next
+
+### Phase 6 — Profiles and depth
+Debater, team, school and tournament pages. Head-to-head records. The highest
+user value left: the rankings are a dead end with nothing to click into.
+
+Partly unblocked — [08-risks-policy.md](08-risks-policy.md) and the public
+Privacy page now state what may be shown — but a profile is a larger surface
+than a table row and the scope is worth deciding rather than inheriting.
 
 ### Phase 8 — Historical archive
 Static mirror of pre-2024 sheets, visually separated and never recomputed. See
@@ -119,3 +142,11 @@ Static mirror of pre-2024 sheets, visually separated and never recomputed. See
 Per-judge profiles: tournaments judged, panel rate, squirrel rate, speaker
 generosity, side bias. Shrunk by sample size with visible confidence intervals,
 launched aggregate-first. See [08-risks-policy.md](08-risks-policy.md).
+
+### Smaller, ready when wanted
+- **Analytics.** Held deliberately until the Privacy page existed. Aggregate,
+  cookieless, described there before it ships.
+- **A Seasons page.** The picker covers two; a third will want a list.
+- **Gating the reconciliation view** to maintainers. Honest and public today.
+- **Nine analysis scripts** still hardcode `rankings.zip`. Correct for the
+  season they run against, wrong for any other.

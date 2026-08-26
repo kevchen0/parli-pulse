@@ -19,6 +19,7 @@ judge-normalized speaker points that exist nowhere today.
 | [08-risks-policy.md](08-risks-policy.md) | Risks, privacy, and editorial policy |
 | [09-data-quality.md](09-data-quality.md) | **Known gaps, manual entries, seasonal checklist** |
 | [10-mistakes.md](10-mistakes.md) | **Errors made and the patterns behind them. Read before changing scoring** |
+| [11-site.md](11-site.md) | Site structure, visual identity, and the pages that were missing |
 
 ## Ground rules
 
@@ -36,13 +37,19 @@ judge-normalized speaker points that exist nowhere today.
    identity.** Several bugs there were reintroduced once already, in tooling
    written after the original fix. The patterns recur; the specific bugs are
    less important than the rules at the end of each one.
+5. **Anything that reads a season must take the season.** A workbook, a cache
+   path, a clearing `UPDATE`, a hardcoded document id: each has silently used
+   the wrong season at least once, and every time the output looked normal. A
+   source that yields a plausible answer for the wrong input is worse than one
+   that errors.
 
 ## Status
 
-Phases 0-5 complete; Phase 6 (profiles) is next. Per-entry Article XXI
-agreement is 98%, partnership season totals 87% exact, and the league's top 100
-92% exact. The Glicko-2 rating beats the league's own ranking at predicting
-held-out rounds, 63.4% against 61.2%.
+Phases 0-7 complete; Phase 6 (profiles) is the substantial work left. Per-entry
+Article XXI agreement is 98%, partnership season totals 87.1% exact, and the
+league's top 100 92% exact. The Glicko-2 rating beats the league's own ranking
+at predicting held-out rounds, 63.4% against 59.8%. The season ingests itself
+nightly from the league's sheet.
 
 See [00-session-log.md](00-session-log.md) for the handoff and
 [06-roadmap.md](06-roadmap.md) for the phases.

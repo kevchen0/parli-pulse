@@ -5,15 +5,33 @@ never context-switches languages.
 
 ```
 parli-pulse/
-├─ apps/web/              Next.js 15 App Router
+├─ apps/web/              Next.js 15 App Router; seasons are routable
 ├─ packages/rules/        Article XXI engine (pure, heavily tested)
-├─ packages/rating/       Glicko-2
+├─ packages/rating/       Glicko-2, the field prior, Bradley-Terry
 ├─ packages/speaks/       Speaker-point normalization
 ├─ packages/ingest/       Tabroom client, sheet mirror, entity resolution
 ├─ packages/db/           Drizzle schema + migrations
-├─ data/raw/              Cached payloads (gitignored)
+├─ scripts/               The pipeline, backtests and diagnostics
+├─ .github/workflows/     Nightly ingest
+├─ data/raw/              Cached payloads (gitignored, ~800MB)
 ├─ docs/                  Rules text, Elim Points Table image
 └─ plan/                  This plan
+```
+
+## Routes
+
+The season is in the URL rather than implied, so a link shared in August still
+means what it meant when it was shared.
+
+```
+/                          → the most recent season with results
+/<season>/points           Teams, and the section holding Debaters and Schools
+/<season>/ratings          ours
+/<season>/speakers         ours
+/<season>/method/ratings   the rating specification
+/<season>/diagnostic       reconciliation against the league's sheet
+/method /about /privacy /feedback   not about any one season
+/rankings/*                forwards to the current season, mapped page by page
 ```
 
 ## Stack
@@ -24,8 +42,14 @@ parli-pulse/
 
 ## Ingestion
 
-Runs as a **GitHub Actions cron**, not a Vercel cron: raw payloads reach 84 MB
-(Stanford) and Actions has no execution-time pressure.
+Runs as a **GitHub Actions cron** at 09:10 UTC, not a Vercel cron: raw payloads
+reach 84 MB (Stanford) and Actions has no execution-time pressure.
+
+**The league's sheet decides what exists.** The `Results` column of its
+`Tournaments` tab holds a Tabroom URL, written in as each tournament is scored;
+`fetch` takes the id from it and `load` accepts nothing else. The circuit
+calendar finds 44 tournaments where the sheet finds 95, so it is reported as a
+lookahead and never used for discovery — see [02-findings.md](02-findings.md).
 
 - Cache every payload by `tourn_id` + content hash. Unchanged tournaments are
   never re-fetched, and the whole site can be rebuilt offline.
@@ -33,6 +57,29 @@ Runs as a **GitHub Actions cron**, not a Vercel cron: raw payloads reach 84 MB
   plus slack).
 - Sequential fetches with backoff. The endpoint is undocumented and
   unauthenticated; do not hammer it.
+- The workbook and its cache are **keyed by season**. A new document is
+  published each year and an unknown season throws rather than falling back:
+  reading last season's sheet reports a full slate of finished tournaments and
+  nothing about the output looks wrong.
+
+The chain is `fetch → load → rollup → speaks → rate → diagnostics`, and the
+order is not negotiable — `rollup` settles identity, and everything after it
+groups by what it settled. `check:rules` runs first of all, so a revised point
+table stops ingestion rather than scoring a season under last year's rules.
+
+## Credentials
+
+Three roles, scoped by where they run rather than by what they do.
+
+| where | role | rights |
+|---|---|---|
+| GitHub Actions | `parli_ingest` | select, insert, update, delete |
+| Vercel | `parli_web` | select |
+| the maintainer's laptop | owner | everything, including DDL |
+
+Only the owner can migrate, which is why it stays local; `drizzle-kit migrate`
+is never run by CI. `ALTER DEFAULT PRIVILEGES` covers tables a future migration
+creates, so a new table is readable by both scoped roles without a manual grant.
 
 ## Data model
 
