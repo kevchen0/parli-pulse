@@ -858,5 +858,8 @@ abbr.noresult {
 
 /* The AQ mark keeps the ratio it has in the points tables -- 0.6875rem against
    a 0.875rem row -- so it reads the same beside a heading as beside a name in a
-   table, rather than shrinking to a footnote next to a 1.9rem title. */
-h1 abbr.aq, h1 abbr.al { font-size: 0.786em; vertical-align: 0.28em; }
+   table, rather than shrinking to a footnote next to a 1.9rem title.
+   It sits on the baseline, as it does in the tables: raising it turns a mark
+   that qualifies the name into one that annotates it, which reads as a
+   footnote reference rather than part of the heading. */
+h1 abbr.aq, h1 abbr.al { font-size: 0.786em; }
