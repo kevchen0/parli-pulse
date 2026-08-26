@@ -85,7 +85,13 @@ interface Outcome {
  * reorders the workbook, and a single archive either arrives complete or does
  * not arrive at all.
  */
-async function fetchSheet(path: string): Promise<'changed' | 'unchanged' | 'failed'> {
+interface SheetResult {
+  status: 'changed' | 'unchanged' | 'failed';
+  /** Kept so a dry run can read a sheet it has deliberately not written. */
+  body?: Buffer;
+}
+
+async function fetchSheet(path: string): Promise<SheetResult> {
   const url = `https://docs.google.com/spreadsheets/d/${sheetIdFor(SEASON)}/export?format=zip`;
   try {
     const res = await fetch(url, { headers: { accept: '*/*' } });
@@ -97,15 +103,15 @@ async function fetchSheet(path: string): Promise<'changed' | 'unchanged' | 'fail
     if (body.subarray(0, 2).toString() !== 'PK') throw new Error('response was not a zip');
     const before = existsSync(path) ? sha(readFileSync(path).toString('base64')) : null;
     const after = sha(body.toString('base64'));
-    if (before === after) return 'unchanged';
+    if (before === after) return { status: 'unchanged', body };
     if (!DRY) {
       mkdirSync(SHEET_DIR, { recursive: true });
       writeFileSync(path, body);
     }
-    return 'changed';
+    return { status: 'changed', body };
   } catch (err) {
     console.error(`  sheet: ${(err as Error).message}`);
-    return 'failed';
+    return { status: 'failed' };
   }
 }
 
@@ -167,14 +173,18 @@ async function main(): Promise<void> {
       : seasonPath;
 
   const sheet = await fetchSheet(seasonPath);
-  if (sheet === 'failed' && !existsSync(cachedPath)) {
+  if (sheet.status === 'failed' && !existsSync(cachedPath)) {
     throw new Error('no rankings sheet, cached or fetched; cannot tell which tournaments exist');
   }
-  if (sheet === 'failed') console.log('  sheet: using the cached copy');
-  else console.log(`  sheet: ${sheet}`);
+  if (sheet.status === 'failed') console.log('  sheet: using the cached copy');
+  else console.log(`  sheet: ${sheet.status}`);
 
-  const readFrom = existsSync(seasonPath) ? seasonPath : cachedPath;
-  const workbook = parseWorkbook(new Uint8Array(readFileSync(readFrom)));
+  // A dry run does not write, so it reads what it just downloaded rather than a
+  // cache that may not exist yet.
+  const bytes = sheet.body
+    ? new Uint8Array(sheet.body)
+    : new Uint8Array(readFileSync(existsSync(seasonPath) ? seasonPath : cachedPath));
+  const workbook = parseWorkbook(bytes);
   const tab = workbook.get('Tournaments');
   if (!tab) throw new Error('the workbook has no Tournaments tab');
 
@@ -187,6 +197,9 @@ async function main(): Promise<void> {
   );
   if (linked.length === 0) {
     console.log('\nNothing to fetch yet. Tournaments appear here as the league posts results links.');
+    // The lookahead matters most in exactly this state: the sheet is empty, and
+    // what the circuit already knows about is the only forward view there is.
+    await reportLookahead(new Set());
     return;
   }
 
@@ -211,7 +224,7 @@ async function main(): Promise<void> {
       `${count('skipped')} outside the window, ${count('empty')} published nothing, ` +
       `${count('failed')} failed`,
   );
-  if (moved > 0 || sheet === 'changed') {
+  if (moved > 0 || sheet.status === 'changed') {
     console.log('run `npm run load` to rebuild the season from the cache');
   }
 

@@ -103,6 +103,7 @@ const int = (s: string): number | null => {
  */
 export const SHEET_IDS: Record<string, string> = {
   '2025-26': '1oz6E9Bxw7d__DmNWJykS3VcRvJivffX7y_Jqtw7YxcU',
+  '2026-27': '1Ro8hjOVL0OApCafrvQtF2F1Tr3Lm_6liz68TDgEM7DE',
 };
 
 export function sheetIdFor(season: string): string {
