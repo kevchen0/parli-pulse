@@ -104,19 +104,40 @@ points table, not a rounding difference. Worth **+243 entries** on its own, and
 a good illustration of why the sheet-first default hid so much: the bug had
 been there the whole time and nothing could see it.
 
-What is left is 98 entries across eight tournaments, each with its own cause:
+Three of those were event classification rather than any rule, and closing them
+took it to **92.1%**. Singletary spelled it "Parlimentary", one letter short of
+the pattern, so its open division was not a parli event and its novice teams
+never reached the AFS. Stanford's "Parli - Middle School + Novice Combined" --
+thirty teams -- classified as middle school and so counted toward nothing.
+The Round Robin was scored against its own twelve-team field where the league
+scores it against the Nationals field it ran inside.
 
-- **Stanford** (23) — the `Parli - Open` / `Parli - TOC` split, which is Q5
-  above, plus novice divisions we do not classify. Our N/JV reads 18 against 49.
-- **NPDL Round Robin** (6) — shares a payload with Nationals; the event split is
-  in `EVENT_OVERRIDES` but the field figures come out of the wrong half.
-- **Singletary** (6) — its novice event does not classify, so N/JV reads 0
-  against 9.
-- **UCLA** (10) — the known six-versus-five prelim disagreement in
-  [09-data-quality.md](09-data-quality.md). Ours is arguably right.
-- **NYPDL October / January / February** (33) — open and elim fields off by one
-  in the shared-pool partition.
-- **Cal Parli** (4) — every field figure matches, so this is a points rule.
+What remains is 86 entries, and `compare:sources` now attributes each to the
+single input that breaks it:
+
+| cause | n | |
+|---|---|---|
+| field sizes | 64 | Stanford 23, NYPDL Oct 15, Jan 13, UCLA 10, Ridge 4 |
+| walkovers | 16 | closeouts Tabroom holds no section for |
+| breaking record | 5 | NYPDL February OL |
+| interaction | 1 | |
+
+- **Stanford** (23) — our AFS is 109 against 111, one point the wrong side of
+  the 92-109 band, so every breaking team reads a row too low. Both divisions
+  are short by exactly one team: this is Q7, the forfeit exclusion, and ours
+  excludes one more than the league did.
+- **NYPDL October and January** (28) — elim field off by one in the shared-pool
+  partition, which moves break percentage across a XXI.2.D threshold.
+- **UCLA** (10) — the six-versus-five prelim disagreement in
+  [09-data-quality.md](09-data-quality.md). **Ours is arguably the right one**,
+  so this is not obviously a gap to close.
+- **Ridge Debates** (4) — the tournament published four of twenty-eight teams.
+  Nothing recovers it.
+- **The 16 walkovers** are irreducible: when a final or semi is conceded some
+  tournaments never create the round, so there is no section to read.
+
+So of 86, roughly 30 are either defensible as ours or absent from the source.
+The real target is Q7's forfeit rule and the NYPDL partition, worth ~51.
 
 `SOURCE=tabroom npm run load` scores this way today; the default is still the
 sheet, because 91.4% against 97.7% is a real regression to put in front of

@@ -173,6 +173,25 @@ equally trustworthy:
 
 Keep `manual` rare. Prefer fixing ingestion whenever a result exists somewhere.
 
+## 7b. Event names that defeated the classifier
+
+Field sizes decide which row of the elim points table a tournament reads, so an
+event read as the wrong division is not a rounding error. Three found by
+running the season without the sheet's figures, all fixed in
+`packages/ingest/src/divisions.ts` and `event-selection.ts`:
+
+| Tournament | Event | Was | Should be |
+|---|---|---|---|
+| Singletary | `Novice Parlimentary Debate` | not parli at all | novice, 9 teams |
+| Stanford | `Parli - Middle School + Novice Combined` | middle | novice, 30 teams |
+| NPDL Round Robin | field read from `Round Robin` | 12 teams | Nationals' 37 |
+
+**Watch for these each season.** A misspelling, a combined division, and a
+tournament running inside another's field are all things a tab director does
+without thinking about it. `npm run compare:sources` surfaces them: an event
+misread as the wrong division shows up as a whole tournament's entries moving
+at once.
+
 ## 8. Seasonal checklist
 
 Before a season opens:
@@ -182,7 +201,10 @@ Before a season opens:
 2. Re-run `scripts/discover-aliases.ts` and fold in new academies.
 3. Confirm no new tournament shares a `tourn_id` with another.
 4. Confirm the speaker scale for any new league.
-5. **Confirm the rules have not changed.** The Board Code is revised each July;
+5. Run `npm run compare:sources` and check no tournament has a whole block of
+   entries moving: that is an event name the division classifier misread. See
+   section 7b.
+6. **Confirm the rules have not changed.** The Board Code is revised each July;
    `packages/rules` is season-versioned for exactly this reason. See
    [07-open-questions.md](07-open-questions.md), "the alternative non-break
    table".
