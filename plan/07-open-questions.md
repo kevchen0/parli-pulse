@@ -46,6 +46,49 @@ elsewhere in the plan came to point at questions that no longer existed.
    `npm run check:rules`, which runs before every ingest. Probably an older
    season. No longer blocking, but still unidentified.
 
+### Computing from Tabroom alone
+
+The goal is points derived entirely from Tabroom, with the sheet kept for
+back-comparison. Today the sheet is load-bearing in the scoring path itself.
+Audited 2026-08-26; each item is a place the sheet's value is used, not merely
+compared against.
+
+1. **Field sizes come from the sheet whenever it has them** — the single
+   biggest one. `scripts/lib/season.ts` reads
+   `off.openField ?? computed`, and the same for AFS, elim field, break
+   percentage, prelim count and breaking record. The sheet supplies them for
+   **86-88 of 110 tournaments**, so for most of the season the AFS band that
+   picks the points row is the league's number, not ours.
+   The comment above it explains why — "so a points mismatch is never just a
+   field-size mismatch wearing a disguise" — and that is the right call for a
+   *backtest*, where isolating one variable is the whole point. It is the wrong
+   default for the live pipeline, which uses the same function. The two want
+   different behaviour and currently share one.
+   [02-findings.md](02-findings.md) §2 validated our own field computation at
+   3/3 on hand-checked tournaments; what is unmeasured is how it does across
+   all 110, which is exactly what flipping the `??` would tell us.
+2. **Which entries get scored at all.** `computeSeason` iterates the sheet's
+   `Entry` rows and matches them to Tabroom entries, so a team in Tabroom with
+   no sheet row scores nothing. This is close to by design — the sheet decides
+   what exists — but it means a live tournament is invisible until written up.
+3. **Walkovers.** Now derivable: `npm run check:walkovers` reproduces the
+   league's column for 1,525 of 1,541 entries, with 11 of the 16 residuals
+   being rounds Tabroom does not contain. The engine still reads the sheet.
+4. **State qualifier results** (`qual` = 8, `alt` = 4) come from the sheet's
+   `result` column. Genuinely not in Tabroom — XXI.4.C outcomes are not a
+   bracket position.
+5. **Prelim-only fallback scoring** (`sheet-record` provenance) scores a row
+   from the league's own recorded result where the matcher found no entry.
+   Weaker by construction, and already flagged as such in the provenance field.
+6. **Tournament discovery** — the `Results` column. Deliberate, measured, and
+   not up for revisiting: the circuit calendar finds 44 where the sheet finds
+   95.
+
+Order to attack: **1 first**, since it is the one that silently changes points
+and the one with a measurable answer. Flip the fallback so Tabroom wins, run
+the backtest, and see what the 98% becomes. If it holds, the sheet has stopped
+being an input to anything except discovery and the two genuinely-absent cases.
+
 ### Product and policy
 10. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.
 11. **Domain name.** Is `parli-pulse` the public name?

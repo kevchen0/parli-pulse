@@ -62,6 +62,14 @@ lookahead and never used for discovery — see [02-findings.md](02-findings.md).
   reading last season's sheet reports a full slate of finished tournaments and
   nothing about the output looks wrong.
 
+**The sheet is still an input to scoring, not only a check.** Field sizes, AFS,
+break percentage and prelim count are taken from its `Tournaments` tab wherever
+it has them — 86-88 of 110 — with our Tabroom computation as the fallback rather
+than the other way round. That was a deliberate choice for the *backtest*, so a
+points mismatch could never be a field-size mismatch in disguise, and it leaked
+into the live pipeline because both use one function. Audited in full in
+[07-open-questions.md](07-open-questions.md).
+
 The chain is `fetch → load → rollup → speaks → rate → diagnostics`, and the
 order is not negotiable — `rollup` settles identity, and everything after it
 groups by what it settled. `check:rules` runs first of all, so a revised point
