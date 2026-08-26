@@ -23,8 +23,10 @@ import {
   normalizeTournament,
   partitionElimRounds,
   indexHeaders,
+  LEGACY_SHEET_PATH,
   parseTournamentsTab,
   parseWorkbook,
+  sheetPathFor,
   type NormalizedEvent,
 } from '../packages/ingest/src/index.ts';
 import { openEventFilter } from '../packages/ingest/src/event-selection.ts';
@@ -32,7 +34,16 @@ import { computeSeason } from './lib/season.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 const RAW_DIR = 'data/raw/tabroom';
-const SHEET = 'data/raw/sheet/rankings.zip';
+/**
+ * The season's own workbook, falling back to the unsuffixed name for 2025-26,
+ * whose cache predates seasons having one each. A new document is published
+ * every year, so a shared filename would let one season's fetch overwrite
+ * another season's ground truth.
+ */
+const SHEET =
+  existsSync(sheetPathFor(SEASON)) || SEASON !== '2025-26'
+    ? sheetPathFor(SEASON)
+    : LEGACY_SHEET_PATH;
 
 /** Postgres caps bound parameters per statement; insert in slices. */
 async function insertAll<T extends Record<string, unknown>>(

@@ -233,6 +233,27 @@ cases that have the supposed cause without the correlate, and confirm the fix
 still fires. A mechanism nobody tested is a story, and it will be repeated in
 every document that cites it.
 
+33. **Built discovery on the wrong source, and it looked like it worked.** The
+    fetcher read Tabroom's circuit-179 calendar because a note in
+    plan/02-findings.md recommended it. On 2025-26 that finds 44 tournaments
+    against the 95 the season actually used, and would have fetched 37 --
+    silently ingesting 39% of a season, with Jack Howe, Yale, Sid Fox and La
+    Costa Canyon simply absent. The real source is the `Results` column of the
+    rankings sheet, which `sheet.ts` had been reading correctly all along. The
+    note was comparing the calendar against a *different* sheet.
+34. **A season-keyed document read from a hardcoded id.** `SHEET_ID` pointed at
+    the 2025-26 workbook, so `SEASON=2026-27 npm run fetch` reported 96
+    tournaments with results links -- every one of them last season's, all
+    finished, and nothing in the output looking wrong. The same fallback then
+    turned up again in `load.ts`, where an unsuffixed cache filename meant
+    2026-27 would read 2025-26's sheet. Both now throw or use a season-scoped
+    path instead of quietly resolving to the most recent thing available.
+
+**Rule:** a source that yields a plausible non-empty answer for the wrong input
+is worse than one that errors. Where a resource is keyed by season, key the
+lookup by season and fail on a miss -- and check a new data source against a
+season whose answer is already known before trusting it.
+
 ---
 
 ## What actually caught these

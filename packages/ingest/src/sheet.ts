@@ -92,6 +92,41 @@ const int = (s: string): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
+/**
+ * The league's rankings workbook, per season.
+ *
+ * A new document each year, so this cannot be a constant. Reading last season's
+ * sheet for this season is worse than reading none: it reports a full slate of
+ * tournaments, every one of them finished and irrelevant, and nothing about the
+ * output looks wrong. `sheetIdFor` therefore throws on an unknown season rather
+ * than falling back to the most recent one.
+ */
+export const SHEET_IDS: Record<string, string> = {
+  '2025-26': '1oz6E9Bxw7d__DmNWJykS3VcRvJivffX7y_Jqtw7YxcU',
+};
+
+export function sheetIdFor(season: string): string {
+  const id = process.env.SHEET_ID ?? SHEET_IDS[season];
+  if (!id) {
+    throw new Error(
+      `no rankings sheet known for ${season}. Add its document id to SHEET_IDS in ` +
+        'packages/ingest/src/sheet.ts, or pass SHEET_ID= for a one-off run. ' +
+        "Using another season's sheet would look like it worked.",
+    );
+  }
+  return id;
+}
+
+/**
+ * Where a season's workbook is cached. Season-scoped, so fetching one season
+ * cannot overwrite another's ground truth; the unsuffixed name is honoured for
+ * 2025-26, whose cache predates this.
+ */
+export const LEGACY_SHEET_PATH = 'data/raw/sheet/rankings.zip';
+
+export const sheetPathFor = (season: string): string =>
+  `data/raw/sheet/rankings-${season}.zip`;
+
 export interface OfficialTournament {
   row: number;
   name: string;

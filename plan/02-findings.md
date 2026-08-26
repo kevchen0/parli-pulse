@@ -30,22 +30,52 @@ where circuit 179 lists only sanctioned invitationals. The two failures
 (`37257` Jon Schamber, `37432` Rutgers) never published results at all — they
 need manual entry, not authentication.
 
-### Tournament discovery — NPDL is Tabroom circuit 179
+### Tournament discovery — the rankings sheet, not the circuit calendar
+
+**The `Results` column of the rankings sheet's `Tournaments` tab.** It holds a
+full Tabroom URL, written in as each tournament is scored, and `sheet.ts` reads
+the id straight out of it. This is what produced the season: of 97 tournaments
+loaded for 2025-26, **95 carry a Tabroom id and a payload**, and those 95 are
+exactly the ids in that column. The other two published nothing to Tabroom and
+were hand-entered.
+
+**The circuit calendar cannot do this job, though it looks like it should.**
 
 ```
-https://www.tabroom.com/index/circuit/calendar.mhtml?circuit_id=179&year=<season>
+https://www.tabroom.com/index/circuit/calendar.mhtml?circuit_id=179&year=<start year>
 ```
 
-`year=2025` yields all 44 tournament ids. Better than the NPDL calendar sheet,
-which was last updated 11/17/2025 and is missing `tourn_id` for about half its
-rows. Approval status still comes from that sheet:
+Measured on 2025-26: the sheet gives 95, the calendar gives 44 rows of which a
+parli filter would fetch 37, and **58 of the 95 are missing** — Jack Howe, Yale,
+Sid Fox, La Costa Canyon, Ridge Debates, NPDL Fall, Peninsula. Circuit 179 lists
+only tournaments that registered themselves with it, which most parli
+tournaments never do even while publishing full results. It also offers three
+the loader would ignore, including a middle-school invitational.
+
+An earlier note here said the calendar was "better than the NPDL calendar sheet,
+which is missing `tourn_id` for about half its rows". That was comparing against
+the *calendar* sheet, which is a different document. Against the **rankings**
+sheet the calendar loses badly, and building discovery on it would have silently
+ingested 39% of a season.
+
+The calendar is still worth reading as a **lookahead** — it names tournaments
+before the league writes them up — and `npm run fetch` reports that at the end
+without acting on it.
+
+Approval status comes from the NPDL calendar sheet:
 `docs.google.com/spreadsheets/d/1VNW2wNf_QD0hqaIhXwkXUvC1VyZH8Rsy06adijMCA0A/gviz/tq?tqx=out:csv`
 
 ### Official rankings sheet (public, machine-readable)
 
-Sheet `1oz6E9Bxw7d__DmNWJykS3VcRvJivffX7y_Jqtw7YxcU`. Fetch **all tabs in one
-request** via `export?format=zip` — named HTML per tab, more robust than
-per-tab gids. Cached at `data/raw/sheet/rankings.zip`.
+Sheet `1oz6E9Bxw7d__DmNWJykS3VcRvJivffX7y_Jqtw7YxcU` **for 2025-26**. A new
+document each year, so the id is keyed by season in `SHEET_IDS` and an unknown
+season throws rather than falling back — reading last season's sheet reports a
+full slate of finished tournaments and nothing about the output looks wrong.
+
+Fetch **all tabs in one request** via `export?format=zip` — named HTML per tab,
+more robust than per-tab gids. Cached per season at
+`data/raw/sheet/rankings-<season>.zip`; 2025-26 keeps the unsuffixed name its
+cache was written under.
 
 Two independent ground-truth sets:
 

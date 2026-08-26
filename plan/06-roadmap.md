@@ -99,8 +99,17 @@ rather than defaulted. Planned in [11-site.md](11-site.md).
 Debater, team, school and tournament pages. Head-to-head records.
 
 ### Phase 7 — Live season
-Scheduled ingest, "updated N hours ago", new-result diffing, and the
-disagreement queue as an ops dashboard.
+`npm run fetch` refreshes the season from the league's sheet: the `Results`
+column decides which tournaments exist, payloads are pulled by the id in it, and
+the circuit calendar is reported as a lookahead rather than used for discovery.
+`npm run check:rules` guards the point tables against a July revision, and
+`.github/workflows/ingest.yml` runs the chain nightly.
+
+**Still needed before the opener:** the 2026-27 sheet id in `SHEET_IDS`, the
+`DATABASE_URL` secret and `CURRENT_SEASON` variable set on the repository, and
+one full end-to-end run against 2026-27 so the first live tournament is not the
+first test. Then "updated N hours ago", new-result diffing, and the disagreement
+queue as an ops dashboard.
 
 ### Phase 8 — Historical archive
 Static mirror of pre-2024 sheets, visually separated and never recomputed. See
