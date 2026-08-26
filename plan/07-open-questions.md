@@ -123,9 +123,14 @@ elsewhere in the plan came to point at questions that no longer existed.
 - **Non-standard speaker scales** — NYPDL 23-30 (verified: 157 scores land
   exactly on 23, with a smooth distribution above), YFL 1 at 0-100. Everything
   else 25-30. Held in a config table, never inferred.
-- **Walkovers** — XXI.5.C adjustments are visible in the data (same-school
-  elim sections with no scored ballot), but the engine still reads the value
-  from the sheet's `walkover_adjustment`. Auto-detection is possible and
-  unbuilt.
+- **Walkovers** — detectable, and the profile pages now do detect them for
+  display: a same-school elim section that *nobody* won, four of them in
+  2025-26. Note the qualifier — 87 further same-school elim sections carry a
+  real decision, so "two teammates met" is not the signature and an earlier
+  note saying "no scored ballot" was loose about it.
+  **The scoring side is a different matter and is broken:** the engine was
+  believed to read the value from the sheet's `walkover_adjustment`, and that
+  column is null for every mirrored row while ours is 0 for all 1,564. Nobody
+  is applying the -2/+2. See [09-data-quality.md](09-data-quality.md).
 - **State qualifier results** are not derivable from Tabroom and come from the
   sheet's own result column.

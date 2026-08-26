@@ -109,6 +109,17 @@ but **elim placement is unrecoverable** — teams the league records as reaching
 finals or semifinals score only their prelim points here. Four results. Same
 class as Ridge Debates, and only manual entry fixes it.
 
+**Walkover adjustments are not ingested at all.** `entry_results.walkover_adjustment`
+is `0` for all 1,564 rows and `official_entry_results.walkover_adjustment` is
+null for every row, so neither our figure nor the sheet mirror carries the
+XXI.5.C -2/+2 that [02-findings.md](02-findings.md) §4 describes at Nueva. Either
+the sheet column is not being read or it is named differently in the workbook.
+Found while building the profile page, which needed to tell a walkover from a
+loss; the display side detects them from the rounds instead — a same-school elim
+section that nobody won, of which 2025-26 has four. Worth checking against the
+`Entry` tab before the next backtest, since any tournament with a closeout is
+currently scored without its adjustment.
+
 **Still unexplained.** One result:
 
 | Tournament | Official | Ours | Note |
