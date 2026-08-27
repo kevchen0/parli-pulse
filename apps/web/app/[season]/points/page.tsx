@@ -195,8 +195,8 @@ async function TeamsTable({
           for a tournament the league has not scored.{' '}
           <abbr className="tick differs">*</abbr>{' '}
           <b>red</b> means the sheet reports a figure different from ours. Hover for the
-          league&rsquo;s number. Wherever numbers disagree, the league&rsquo;s figure is the
-          official one.
+          league&rsquo;s number.{' '}
+          <em>Wherever numbers disagree, the league&rsquo;s figure is the official one.</em>
         </li>
       </ol>
     </>
