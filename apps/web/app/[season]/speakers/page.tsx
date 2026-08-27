@@ -7,10 +7,14 @@ export default async function SpeakersPage(
   { params }: { params: Promise<{ season: string }> },
 ) {
   const { season } = await params;
-  if (!dbReady()) return <p className="empty">Database not connected.</p>;
+  if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
   const [speakers, summary] = await Promise.all([getSpeakers(season), getSpeakerSummary(season)]);
   if (speakers.length === 0) {
-    return <p className="empty">No speaker standings yet. Run <code>npm run speaks</code>.</p>;
+    return (
+      <p className="empty">
+        No speaker standings yet for this season. They appear as tournaments report.
+      </p>
+    );
   }
 
   return (

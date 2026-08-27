@@ -37,9 +37,15 @@ async function DebatersTable({
   query: string;
   pageParam: string | undefined;
 }) {
-  if (!dbReady()) return <p className="empty">Database not connected.</p>;
+  if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
   const debaters = await getDebaters(season);
-  if (debaters.length === 0) return <p className="empty">No standings yet.</p>;
+  if (debaters.length === 0) {
+    return (
+      <p className="empty">
+        No standings yet for this season. They appear as tournaments report.
+      </p>
+    );
+  }
 
   const qualified = debaters.filter((d) => d.autoQualified).length;
   const needle = query.toLowerCase();

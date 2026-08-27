@@ -34,7 +34,7 @@ async function SchoolsTable({
   query: string;
   pageParam: string | undefined;
 }) {
-  if (!dbReady()) return <p className="empty">Database not connected.</p>;
+  if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
   const schools = await getSchools(season);
   const needle = query.toLowerCase();
   const matches = needle
@@ -45,7 +45,13 @@ async function SchoolsTable({
   const totalPages = pageCount(matches.length);
   const page = clampPage(pageParam, totalPages);
   const shown = matches.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  if (schools.length === 0) return <p className="empty">No standings yet.</p>;
+  if (schools.length === 0) {
+    return (
+      <p className="empty">
+        No standings yet for this season. They appear as tournaments report.
+      </p>
+    );
+  }
 
   return (
     <>

@@ -42,7 +42,7 @@ export default async function TeamsPage({
   searchParams: Promise<{ page?: string; q?: string }>;
 }) {
   const { season } = await params;
-  if (!dbReady()) return <p className="empty">Database not connected.</p>;
+  if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
   const sp = await searchParams;
   return (
     <>

@@ -74,7 +74,7 @@ export default async function DebaterPage({
   params: Promise<{ season: string; id: string }>;
 }) {
   const { season, id } = await params;
-  if (!dbReady()) return <p className="empty">Database not connected.</p>;
+  if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
 
   const canonical = await resolveDebaterId(id);
   // A missing debater and a withheld one are the same response deliberately.

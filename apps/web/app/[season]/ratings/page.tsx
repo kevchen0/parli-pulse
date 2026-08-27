@@ -10,10 +10,15 @@ export default async function RatingsPage(
   { params }: { params: Promise<{ season: string }> },
 ) {
   const { season } = await params;
-  if (!dbReady()) return <p className="empty">Database not connected.</p>;
+  if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
   const [ratings, summary] = await Promise.all([getRatings(season), getRatingSummary(season)]);
   if (ratings.length === 0) {
-    return <p className="empty">No ratings yet. Run <code>npm run rate</code>.</p>;
+    return (
+      <p className="empty">
+        No ratings yet for this season. A rating needs decided rounds to build on, so
+        these appear once tournaments have been debated and their results published.
+      </p>
+    );
   }
 
   return (
