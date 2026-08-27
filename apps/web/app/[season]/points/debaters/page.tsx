@@ -144,8 +144,6 @@ async function DebatersTable({
           size — a total is marked when at least one per cent of it rests on partnerships
           that disagree. It says a result feeding this figure is unsettled, not that the
           league&rsquo;s debater total differs.
-          The <a href={seasonHref(season, '/diagnostic')}>reconciliation page</a> shows
-          which result caused it.
         </li>
       </ol>
     </>

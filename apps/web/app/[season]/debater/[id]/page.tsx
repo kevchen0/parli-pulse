@@ -363,9 +363,7 @@ function TournamentRounds({ season, t }: { season: string; t: ProfileTournament 
               <b>No results published.</b> This tournament put nothing we could read on
               Tabroom, and nothing has been hand-entered for it, so there is no record of
               these rounds anywhere and nothing has been scored. It is a gap in the
-              source rather than a nil result —{' '}
-              <Link href={seasonHref(season, '/diagnostic')}>the reconciliation page</Link>{' '}
-              lists the tournaments this affects.
+              source rather than a nil result.
             </>
           )}
         </p>

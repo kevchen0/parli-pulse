@@ -203,9 +203,7 @@ async function TeamsTable({
           <abbr className="tick differs">*</abbr>{' '}
           <b>red</b> means the sheet has a figure and ours differs, which means one of the
           two is wrong. Hover for the league&rsquo;s number. Where they disagree, the
-          league&rsquo;s figure is the official one; the{' '}
-          <a href={seasonHref(season, '/diagnostic')}>reconciliation page</a> shows which
-          result caused it.
+          league&rsquo;s figure is the official one.
         </li>
       </ol>
     </>

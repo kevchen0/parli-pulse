@@ -15,7 +15,7 @@ describe('seasonDestination', () => {
       '/2025-26/points/debaters',
       '/2025-26/ratings',
       '/2025-26/speakers',
-      '/2025-26/diagnostic',
+      '/2025-26/internal/reconciliation',
       '/2025-26/method/ratings',
       null,
     ]) {

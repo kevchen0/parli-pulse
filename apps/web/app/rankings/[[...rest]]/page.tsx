@@ -20,7 +20,6 @@ const MOVED: Record<string, string> = {
   'speakers': '/speakers',
   'ratings': '/ratings',
   'ratings/method': '/method/ratings',
-  'diagnostic': '/diagnostic',
 };
 
 export default async function LegacyRankings({

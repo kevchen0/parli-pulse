@@ -89,7 +89,7 @@ export type SeasonPath =
   | '/ratings'
   | '/speakers'
   | '/method/ratings'
-  | '/diagnostic';
+  | '/internal/reconciliation';
 
 export function seasonHref(season: SeasonId, path: SeasonPath, hash = ''): never {
   return `/${season}${path}${hash}` as never;
@@ -136,10 +136,16 @@ export const SEASON_NAV: NavItem[] = [
   { label: 'Speakers', path: '/speakers' },
 ];
 
-/** Pages that are not about one season. */
+/**
+ * Pages that are not about one season.
+ *
+ * Ordered by how likely a reader is to want them, not alphabetically: Method
+ * answers the question the tables provoke, Feedback is where a wrong number
+ * gets reported, and About is the one nobody needs in a hurry.
+ */
 export const SITE_NAV = [
   { label: 'Method', path: '/method' },
-  { label: 'About', path: '/about' },
-  { label: 'Privacy', path: '/privacy' },
   { label: 'Feedback', path: '/feedback' },
+  { label: 'Privacy', path: '/privacy' },
+  { label: 'About', path: '/about' },
 ] as const;

@@ -1,5 +1,7 @@
 # Parli Pulse
 
+**[parli-pulse.vercel.app](https://parli-pulse.vercel.app)**
+
 A public rankings site for American high school parliamentary debate. It mirrors
 the National Parliamentary Debate League's official Article XXI points, and adds
 two things that exist nowhere today: a Glicko-2 partnership rating and

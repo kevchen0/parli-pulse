@@ -8,3 +8,6 @@ next-env.d.ts
 
 # Cached Tabroom payloads: large (up to ~84MB each) and reproducible.
 data/raw/
+
+# macOS
+.DS_Store

@@ -41,9 +41,8 @@ export default function MethodPage() {
         Most of the remaining gap is not ours to close. Some tournaments published little
         or nothing to Tabroom; the league&rsquo;s sheet carries manual adjustments no
         engine can derive; and a few rows are typos that created partnerships which never
-        existed. Every difference is listed on the{' '}
-        <Link href={seasonHref(season, '/diagnostic')}>reconciliation page</Link>, result
-        by result.
+        existed. Every difference is recorded result by result, and the list is available
+        to anyone who asks for it.
       </p>
       <p>
         <strong>Where a figure here differs from the league&rsquo;s, the league&rsquo;s is

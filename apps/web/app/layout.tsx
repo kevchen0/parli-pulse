@@ -7,6 +7,14 @@ export const metadata: Metadata = {
   title: 'Parli Pulse — NPDL rankings',
   description:
     'Rankings for American high school parliamentary debate. Unofficial, not affiliated with the NPDL.',
+  /**
+   * Belt and braces with app/robots.ts, which do different jobs: robots.txt
+   * asks a crawler not to fetch, and this tells one that fetched anyway not to
+   * index. A page nobody crawls can still be indexed from an inbound link, so
+   * the header is the half that actually keeps a debater's name out of a
+   * search result.
+   */
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

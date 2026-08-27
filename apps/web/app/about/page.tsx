@@ -8,61 +8,62 @@ export default function AboutPage() {
       <h1>About</h1>
 
       <p className="lede">
-        Parli Pulse is an independent mirror of NPDL rankings, plus two measures the
-        league does not publish. It is one person&rsquo;s project, built for a coach who
-        wanted to see more than a points total.
+        Parli Pulse shows NPDL rankings for high school parliamentary debate, plus two
+        measures the league does not publish: a strength rating, and speaker points
+        adjusted for the judge who gave them. It is one person&rsquo;s project, built for
+        a coach who wanted to see more than a points total.
       </p>
 
       <h2>Why it exists</h2>
       <p>
-        Article XXI points answer one question well: what did a partnership accumulate
-        over a season? Enter more tournaments, win more rounds, score more points. That is
-        the right basis for qualification, and it is what the league publishes.
+        Article XXI points measure what a partnership accumulated over a season. Enter
+        more tournaments, win more rounds, score more points. That is the right way to
+        decide qualification, and it is what the league publishes.
       </p>
       <p>
-        It is not a description of how strong a team is. Five wins at a small local
-        outscore four at Stanford, because the rules do not ask who you beat. Nor does it
-        say anything about who is speaking well, since speaker points carry no ranking
-        weight and vary as much with the judge as the debater.
+        It does not tell you how strong a team is. Five wins at a small local tournament
+        outscore four at Stanford, because the rules do not ask who you beat. It says
+        nothing about speaking either, since speaker points carry no ranking weight and
+        depend as much on the judge as the debater.
       </p>
       <p>
-        So this site does three things. It recomputes the league&rsquo;s own points from
-        published results, so they can be checked. It adds a strength rating that prices
-        who you actually debated. And it normalizes speaker points against the judge who
-        awarded them.
+        So the site adds two things. A rating that accounts for who you actually debated,
+        and speaker scores measured against the judge who awarded them.
       </p>
 
-      <h2>How the numbers are produced</h2>
+      <h2>Where the numbers come from</h2>
       <p>
-        Results come from Tabroom, which publishes every ballot for most tournaments.
-        Those are scored against Article XXI, then reconciled against the league&rsquo;s own
-        spreadsheet result by result. The reconciliation is public, on the{' '}
-        <Link href="/2025-26/diagnostic">diagnostic page</Link>, including the places we
-        disagree.
+        Tabroom publishes every ballot for most tournaments. The site reads those, scores
+        them under Article XXI, and compares the result against the league&rsquo;s own
+        spreadsheet one result at a time.
       </p>
       <p>
-        Agreement currently runs at 98% of individual results and 87% of partnership
-        season totals, rising to 92% across the league&rsquo;s top hundred. Most of the
-        remaining gap is not ours to close: some tournaments published little or nothing
-        to Tabroom, and the league&rsquo;s sheet carries manual adjustments that no engine
-        can derive.
+        On the 2025-26 season it matches the league on 96% of individual results and 92%
+        of partnership season totals. Across the league&rsquo;s top hundred teams, 89%
+        match exactly and 95% land within two points.
+      </p>
+      <p>
+        Most of the rest cannot be fixed here. Some tournaments published little or
+        nothing to Tabroom. The league&rsquo;s spreadsheet carries manual adjustments that
+        no set of rules can reproduce. A few rows are typos. Every difference is recorded,
+        and I will share the list with anyone who wants it.
       </p>
 
       <h2>What this is not</h2>
       <p>
         It is not official and it is not affiliated with the NPDL. Where a figure here
-        differs from the league&rsquo;s, the league&rsquo;s is correct and ours is a bug or
-        a disagreement worth reporting. Nothing here affects qualification, seeding or
-        standing.
+        differs from the league&rsquo;s, the league&rsquo;s is correct and mine is either a
+        bug or a disagreement worth reporting. Nothing on this site affects qualification,
+        seeding or standing.
       </p>
       <p>
-        The rating in particular is our own. The league publishes nothing like it, Article
-        XXI does not use it, and it should not be quoted as though it carried weight.
+        The rating is mine alone. The league publishes nothing like it, Article XXI does
+        not use it, and it should not be quoted as though it counted for something.
       </p>
 
       <h2>Corrections</h2>
       <p>
-        A wrong number is worth reporting even if you are not sure it is wrong.{' '}
+        A number that looks wrong is worth reporting even if you are not sure.{' '}
         <Link href="/feedback">How to get in touch</Link>.
       </p>
     </main>
