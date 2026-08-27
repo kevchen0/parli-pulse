@@ -6,7 +6,15 @@
 import { weightedTotal } from '../packages/rules/src/index.ts';
 import { computeSeason, sourceFromEnv, norm, pairKey, type EntryCase } from './lib/season.ts';
 
-const { cases, unmatched, ambiguous, skippedTournaments, officialEntries } = computeSeason(undefined, { source: sourceFromEnv() });
+const season = computeSeason(undefined, { source: sourceFromEnv() });
+const { unmatched, ambiguous, skippedTournaments, officialEntries } = season;
+// Agreement is measured against the league's published figure, so only entries
+// it publishes one for can be in it. Under Tabroom-driven entries the run also
+// scores teams the league does not list -- those have no official value, and
+// counting them as mismatches would report a disagreement with a number that
+// was never written down.
+const unlisted = season.cases.filter((c) => c.unlisted);
+const cases = season.cases.filter((c) => !c.unlisted);
 
 const pct = (k: number, n: number): string => (n ? `${((100 * k) / n).toFixed(0)}%` : '  -');
 const line = (label: string, rows: { matched: boolean }[]): string => {
@@ -18,6 +26,13 @@ console.log('='.repeat(60));
 console.log('STAGE 2 BACKTEST — per-entry Article XXI points');
 console.log('='.repeat(60));
 console.log(line('ALL', cases));
+if (unlisted.length) {
+  const scoring = unlisted.filter((c) => c.ours > 0).length;
+  console.log(
+    `  plus ${unlisted.length} entries the league does not list (${scoring} of them scoring),\n` +
+    `  which have no published figure to be measured against.`,
+  );
+}
 
 // The TOC scores under its own schedule (XXI.4.A), so it is broken out of
 // "Regular" rather than diluted into it.

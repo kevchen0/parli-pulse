@@ -38,7 +38,9 @@ function scoreable(cases: EntryCase[]): EntryCase[] {
   // Only entries we computed from round data. Hand-entered and sheet-scored
   // results are the same under both sources by construction, so including them
   // would dilute the comparison with rows that cannot move.
-  return cases.filter((c) => c.provenance === 'tabroom');
+  // Unlisted entries have no official figure, so they cannot be measured
+  // against one.
+  return cases.filter((c) => c.provenance === 'tabroom' && !c.unlisted);
 }
 
 function byCategory(cases: EntryCase[]): Map<string, EntryCase[]> {

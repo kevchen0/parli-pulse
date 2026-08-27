@@ -273,7 +273,11 @@ async function main(): Promise<void> {
             excludedReason: linked.length === 2 ? null : 'teamSize',
             countsTowardToc: true,
           });
-          if (!c.matched) {
+          // An entry the league does not list has no official figure, so there
+          // is nothing to disagree with. Recording one would fill the
+          // reconciliation queue with rows whose "official" value is a zero
+          // that was never published.
+          if (!c.matched && !c.unlisted) {
             rows.disagreements.push({
               id: `dis_${entryId}`, seasonId: SEASON, tournamentId: tournId, entryId,
               scope: 'entry_points', ourValue: c.ours, officialValue: c.theirs,

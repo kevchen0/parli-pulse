@@ -204,7 +204,7 @@ export const ALL_SHEET: InputSources = {
   fields: 'sheet', breakingRecord: 'sheet', walkover: 'sheet', entries: 'sheet',
 };
 export const ALL_TABROOM: InputSources = {
-  fields: 'tabroom', breakingRecord: 'tabroom', walkover: 'tabroom', entries: 'sheet',
+  fields: 'tabroom', breakingRecord: 'tabroom', walkover: 'tabroom', entries: 'tabroom',
 };
 
 export interface SeasonOptions {
@@ -485,17 +485,27 @@ export function computeSeason(
                   eligibleTeamSize: mine.size, walkoverAdjustment: walkover,
                 }, ctx);
 
+          // Naming, not scoring. Where the league lists this entry, its own
+          // spelling is used: it writes "Ma. Qiu" to separate two Qius and
+          // "Menlo-Atherton" where Tabroom writes "Menlo-Atherton High School",
+          // and every report that groups partnerships is keyed on these. Using
+          // Tabroom's here instead makes the same partnership two different
+          // keys, which reads as a collapse in agreement rather than a
+          // difference in vocabulary. Points come from the payload either way.
           const surnames = cand.people.map((x) => x.last);
+          const schoolName = row?.school1 ?? cand.schoolName ?? '';
+          const name1 = row?.partner1 ?? surnames[0] ?? '';
+          const name2 = row?.partner2 ?? surnames[1] ?? '';
           cases.push({
             tournament: off.name,
             category: off.category || '(none)',
             tournId: off.tournId!,
-            school: cand.schoolName ?? '',
-            hybridSchool: null,
-            team: teamKey(cand.schoolName ?? '', surnames[0] ?? '', surnames[1] ?? ''),
-            pair: pairKey(surnames[0] ?? '', surnames[1] ?? ''),
-            partner1: surnames[0] ?? '',
-            partner2: surnames[1] ?? '',
+            school: schoolName,
+            hybridSchool: row?.school2 || null,
+            team: teamKey(schoolName, name1, name2),
+            pair: pairKey(name1, name2),
+            partner1: name1,
+            partner2: name2,
             entryId: cand.entryId,
             matchTier: 'exact-surnames',
             matchAmbiguous: false,

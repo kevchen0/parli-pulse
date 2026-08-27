@@ -14,6 +14,8 @@ import { indexHeaders } from '../packages/ingest/src/sheet.ts';
 import { computeSeason, sourceFromEnv, norm, teamKey, type EntryCase } from './lib/season.ts';
 
 const season = computeSeason(undefined, { source: sourceFromEnv() });
+// Only entries the league publishes a figure for can be compared against it.
+season.cases = season.cases.filter((c) => !c.unlisted);
 
 interface Official {
   rank: number | null;
