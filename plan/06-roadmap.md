@@ -39,7 +39,7 @@ against `team_calc`.
 | CHSSA | 99% |
 | Regular invitationals | 96% |
 | Partnerships, all 835 | **87% exact** |
-| Top 100 | **91% exact**, 97% within 2 points |
+| Top 100 | **89% exact**, 95% within 2 points |
 
 The gate was never 100% — `manual_adj` bakes human judgement into the league's
 own figures. It was that every mismatch be explained, and they are, in

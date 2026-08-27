@@ -5,7 +5,7 @@ Kept current — an unlisted gap will be mistaken for an ingestion bug and
 re-debugged from scratch.
 
 Current standing accuracy: per-entry **96%** (1504/1564); the league's top 100
-teams **91% exact**, 97% within 2 points; schools 52% exact. Points are computed from Tabroom, not read from the league's figures — the sheet supplies which tournaments and teams exist, and nothing numeric. `SOURCE=sheet` scores the old way and reaches 98%, which is the measure of what independence costs rather than a better engine.
+teams **89% exact**, 95% within 2 points; schools 50% exact. Points are computed from Tabroom, not read from the league's figures — the sheet supplies which tournaments and teams exist, and nothing numeric. `SOURCE=sheet` scores the old way and reaches 98%, which is the measure of what independence costs rather than a better engine.
 
 ---
 

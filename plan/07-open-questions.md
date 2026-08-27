@@ -67,40 +67,50 @@ elsewhere in the plan came to point at questions that no longer existed.
 
 ### What the sheet still supplies
 
-Points are computed from Tabroom as of 2026-08-26 — `SOURCE=sheet` restores the
-old behaviour for the backtests. Agreement with the league is **96.1%** against
-**97.7%** when its own figures were fed back in, a trade taken deliberately: a
-check that reads its inputs from the thing it is checking is not a check.
+Entries come from Tabroom as of 2026-08-26: every open-division entry that
+clears XXI.1.D and resolves to a school is scored, whether or not the league
+lists it, and results worth nothing are stored and never shown. `SOURCE=sheet`
+restores the old behaviour.
 
-Six things still come from the sheet. **None of them is a computed figure**, and
-they are not all "discovery" — the list is worth keeping honest:
+**Six things remain, and only two are numbers.**
 
-1. **Which tournaments exist** — the `Results` column. Deliberate and measured:
-   the circuit calendar finds 44 where the sheet finds 95.
-2. **Which teams the league scores** — `computeSeason` walks the `Entry` tab and
-   matches its rows to Tabroom entries, so a team in Tabroom with no sheet row
-   scores nothing. Bigger than it sounds, and the reason a live tournament is
-   invisible until the league writes it up.
-3. **School attribution and partner spellings** — `school1`, `school2` and the
-   partner names are the sheet's, and the partnership key is built from them.
-   Tabroom carries its own school ids, but the league's is the one XXI.9 tables.
-4. **Tournament category** — `CHSSA` / `OSAA` / `NYPDL` / `Regular`, which
-   selects the scoring schedule and the speaker scale. A league classification;
-   nothing in a Tabroom payload states it.
-5. **State qualifier results** — `qual` = 8, `alt` = 4, read from the sheet's
-   `result` column. Genuinely absent from Tabroom: XXI.4.C outcomes are not a
-   bracket position.
-6. **The prelim-only fallback** (`sheet-record` provenance) scores a row from
-   the league's own recorded result where the matcher found no Tabroom entry.
-   Weaker by construction and already flagged as such in the provenance field.
+*Structural — the league telling us what exists:*
 
-Items 5 and 6 are irreducible without another data source. Items 2 and 3 are the
-ones worth revisiting if full independence is ever the goal — they would mean
-scoring every open-division team in Tabroom rather than every team the league
-lists, which is a different product decision, not a parsing problem.
+1. **Which tournaments exist** — the `Results` column of the `Tournaments` tab.
+   Measured and deliberate: the circuit calendar finds 44 where the sheet finds
+   95. Nothing else in Tabroom enumerates a league's season.
+2. **Which schools are members** — the `School` tab. XXI.9.A tables members
+   only. A league membership roll is not in Tabroom by construction.
+3. **Canonical school names and regions** — the `SchoolList` tab, which resolves
+   "Menlo-Atherton High School" to "Menlo-Atherton" and gives it a region.
+   Without it a school is whatever each tab director typed.
+4. **Tournament category and approval** — `CHSSA` / `OSAA` / `NYPDL` /
+   `Regular`, which selects the scoring schedule and the speaker scale, plus the
+   XXI.1.E/F approval flag. League classifications; a payload states neither.
 
-**Where the remaining 25 entries are.** `npm run compare:sources` attributes
-each to the single input that moves it:
+*Values Tabroom cannot carry:*
+
+5. **State qualifier placements** — `qual` = 8, `alt` = 4 under XXI.4.C, for
+   **80 entries**. A placement is not a bracket position and appears nowhere in
+   the payload. An entry the league has not placed now scores nothing rather
+   than falling through to the ordinary prelim table.
+6. **The prelim-only fallback** — **11 entries** at tournaments that published
+   no pairings, scored from the league's own recorded result. Marked
+   `sheet-record` in the provenance, because the input is the thing being
+   checked.
+
+Plus **40 hand-entered results** in `packages/ingest/src/manual-results.ts` for
+tournaments that are not on Tabroom at all (SpeechWire) or published almost
+nothing (Ridge Debates). Those are not sheet dependencies but they are not
+computed either.
+
+**So 91 of 1,587 scoring entries — 5.7% — still take their value from the
+league.** Items 5 and 6 are irreducible without another data source. Items 1
+through 4 are facts about the league rather than about a tournament, and there
+is no version of this project that derives them from round data.
+
+**Where the remaining disagreement is.** `npm run compare:sources` attributes
+each losing row to the single input that moves it:
 
 | cause | n | |
 |---|---|---|
@@ -109,10 +119,14 @@ each to the single input that moves it:
 | breaking record | 5 | NYPDL February OL |
 | interaction | 1 | |
 
-Sixteen of the twenty-five are not gaps to close: UCLA is settled in our favour,
-Ridge published four of twenty-eight teams, and Clackamas is a different-school
-closeout XXI.5.C does not provide for. The one genuinely open item is NYPDL
-February OL's breaking record.
+Sixteen of the twenty-five are settled or absent: UCLA is ours, Ridge published
+four of twenty-eight teams, Clackamas is a different-school closeout XXI.5.C
+does not provide for. The one open item is NYPDL February OL's breaking record.
+
+**And four partnerships now hold a result the league does not.** Blair & Ray
+Chaudhuri, Patil & Malik, Squires & Luft, and Hu & Qiu each gained a real
+Tabroom result the `Entry` tab omits. Whether the league missed them or excluded
+them deliberately is unresolved, and worth asking the Reporting Director.
 
 ### Product and policy
 10. **Judge pages** public, or coach-only behind a login? Needed before Phase 9.

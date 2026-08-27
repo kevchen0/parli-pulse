@@ -17,7 +17,7 @@ head-to-head are what remain of it.
 |---|---|
 | Per-entry Article XXI agreement | **96%** (1532/1588) |
 | Partnership season totals | **92% exact** (735/799) |
-| The league's top 100 | **91% exact**, 97% within 2 points |
+| The league's top 100 | **89% exact**, 95% within 2 points |
 | Partnerships whose every result we reproduce | **99%** (707/712) |
 | Rating against the league's own ranking | **63.4%** vs 59.8% on held-out rounds |
 
