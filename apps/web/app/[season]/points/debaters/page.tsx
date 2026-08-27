@@ -147,8 +147,7 @@ async function DebatersTable({
           <abbr className="tick differs">*</abbr>{' '}
           <b>red</b> means results depend on partnership data that disagree with the
           league&rsquo;s sheet.{' '}
-          Hover for the league&rsquo;s number. Wherever numbers disagree, the
-          league&rsquo;s figure is the official one.
+          Wherever numbers disagree, the league&rsquo;s figure is the official one.
         </li>
       </ol>
     </>
