@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CONTACT } from '@/lib/contact';
 
 export const metadata = { title: 'Privacy — Parli Pulse' };
 
@@ -53,8 +53,9 @@ export default function PrivacyPage() {
         where the rules require, but the name will not appear.
       </p>
       <p>
-        <Link href="/feedback">Get in touch</Link> to make a request, or to raise anything
-        on this page that does not sit right.
+        Email <a href={`mailto:${CONTACT}`}>{CONTACT}</a> to make a request, or to raise
+        anything on this page that does not sit right. Requests are handled without asking
+        for a reason, and go to a mailbox only I read.
       </p>
     </main>
   );
