@@ -69,7 +69,12 @@ async function SchoolsTable({
       <div className="tablewrap">
         <table>
           <thead>
-            <tr><th>#</th><th>School</th><th>Region</th><th className="num">Points</th></tr>
+            <tr>
+              <th>#</th><th>School</th><th>Region</th>
+              <th className="num">
+                Points<sup className="fnref"><a href="#fn-recon">1</a></sup>
+              </th>
+            </tr>
           </thead>
           <tbody>
             {shown.map((s, i) => (
@@ -109,18 +114,13 @@ async function SchoolsTable({
 
       <ol className="footnotes">
         <li id="fn-recon">
-          An asterisk beside a total means it is not settled against the league&rsquo;s
-          published sheet.{' '}
+          An asterisk beside a total means it disagrees with the league&rsquo;s published
+          sheet.{' '}
           <abbr className="tick pending">*</abbr>{' '}
-          amber means the sheet has no row yet, which is normal for a tournament the
-          league has not written up.{' '}
+          <b>amber</b> means the sheet has not updated its tournament results yet.{' '}
           <abbr className="tick differs">*</abbr>{' '}
-          red means results behind this total disagree with the sheet by enough to matter.
-          The league publishes no per-school table we mirror, so this is derived from the
-          partnerships behind the total rather than compared directly, and thresholded on
-          size — a total is marked when at least one per cent of it rests on partnerships
-          that disagree. It says a result feeding this figure is unsettled, not that the
-          league&rsquo;s school total differs.
+          <b>red</b> means results depend on partnership data that disagree with the
+          league&rsquo;s sheet.
         </li>
       </ol>
     </>

@@ -62,7 +62,7 @@ async function DebatersTable({
   return (
     <>
       <p className="meta">
-        <span><b>{debaters.length}</b> debaters with Article XXI points</span>
+        <span><b>{debaters.length}</b> debaters ranked</span>
         <span>
           <b>{qualified}</b> at or above the {TOC_AUTOQUAL_POINTS}-point
           autoqualification line<sup className="fnref"><a href="#fn-aq">1</a></sup>
@@ -79,7 +79,10 @@ async function DebatersTable({
         <table>
           <thead>
             <tr>
-              <th>#</th><th>School</th><th>Debater</th><th className="num">Points</th>
+              <th>#</th><th>School</th><th>Debater</th>
+              <th className="num">
+                Points<sup className="fnref"><a href="#fn-recon">2</a></sup>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -130,26 +133,20 @@ async function DebatersTable({
 
       <ol className="footnotes">
         <li id="fn-aq">
-          <b>AQ.</b> Under XXII.1.A an individual with at least {TOC_AUTOQUAL_POINTS} points
-          on March 1 autoqualifies for the TOC. It is an individual threshold: a partnership
-          may only accept a bid when <em>both</em> partners cleared it, which is shown on the{' '}
-          <a href={seasonHref(season, '/points')}>teams table</a>. Autoqualification also
-          depends on results being reported by the deadline, so treat this as a guide rather
-          than a statement about who is going.
+          <b>AQ</b> means the debater is at or above the {TOC_AUTOQUAL_POINTS}-point
+          autoqualification line. Under XXII.1.A an individual with at least{' '}
+          {TOC_AUTOQUAL_POINTS} points on March 1 autoqualifies for the TOC.
         </li>
         <li id="fn-recon">
-          An asterisk beside a total means it is not settled against the league&rsquo;s
-          published sheet.{' '}
+          The league publishes no per-debater table, and our points are derived from
+          partnership data. An asterisk beside a total means it disagrees with the
+          league&rsquo;s published sheet.{' '}
           <abbr className="tick pending">*</abbr>{' '}
-          amber means the sheet has no row yet, which is normal for a tournament the
-          league has not written up.{' '}
+          <b>amber</b> means the sheet has no row for this partnership yet, which is normal
+          for a tournament the league has not scored.{' '}
           <abbr className="tick differs">*</abbr>{' '}
-          red means results behind this total disagree with the sheet by enough to matter.
-          The league publishes no per-debater table we mirror, so this is derived from the
-          partnerships behind the total rather than compared directly, and thresholded on
-          size — a total is marked when at least one per cent of it rests on partnerships
-          that disagree. It says a result feeding this figure is unsettled, not that the
-          league&rsquo;s debater total differs.
+          <b>red</b> means results depend on partnership data that disagree with the
+          league&rsquo;s sheet.
         </li>
       </ol>
     </>

@@ -17,7 +17,7 @@ export default function SiteHeader() {
   return (
     <header className="masthead">
       <div className="mastrow">
-        <Link href="/" className="wordmark">Parli&nbsp;Pulse</Link>
+        <Link href="/" className="wordmark">parli-pulse</Link>
         <nav className="sitenav" aria-label="About this site">
           <Link href={`/${currentSeason()}/points` as never}>Rankings</Link>
           {SITE_NAV.map((item) => (
@@ -26,8 +26,8 @@ export default function SiteHeader() {
         </nav>
       </div>
       <p className="unofficial">
-        An independent mirror. Not affiliated with the National Parliamentary Debate
-        League, whose official rankings are at{' '}
+        Not affiliated with the National Parliamentary Debate League, whose official
+        rankings are at{' '}
         <a href="https://www.parliamentarydebate.org/rankings">parliamentarydebate.org</a>.
       </p>
     </header>

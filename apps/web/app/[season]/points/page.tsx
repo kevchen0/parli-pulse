@@ -47,9 +47,7 @@ export default async function TeamsPage({
   return (
     <>
       <h1>Teams</h1>
-      <p className="lede">
-        Points scored under the Article XXI rules, computed from published Tabroom results.
-      </p>
+      <p className="lede">Points scored under the Article XXI rules.</p>
       <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton columns={TEAM_COLUMNS} />}>
         <TeamsTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
       </Suspense>
@@ -101,7 +99,7 @@ async function TeamsTable({
         </span>
         {unresolved > 0 && (
           <span>
-            <b>{unresolved}</b> not settled against the sheet
+            <b>{unresolved}</b> disagreements with the sheet
             <sup className="fnref"><a href="#fn-recon">2</a></sup>
           </span>
         )}
@@ -119,7 +117,10 @@ async function TeamsTable({
           <thead>
             <tr>
               <th>#</th><th>School</th><th>Partnership</th>
-              <th className="num">Tourns</th><th className="num">Points</th>
+              <th className="num">Tourns</th>
+              <th className="num">
+                Points<sup className="fnref"><a href="#fn-recon">2</a></sup>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -181,29 +182,28 @@ async function TeamsTable({
 
       <ol className="footnotes">
         <li id="fn-toc">
-          <b>AQ</b> means both partners finished at or above the {TOC_AUTOQUAL_POINTS}-point
-          individual line. Under XXII.1.A an individual autoqualifies at that threshold, and
-          under XXII.1.E a partnership may accept a bid only when both partners did — so a
-          debater can autoqualify and still have no team able to accept.{' '}
+          <b>AQ</b> means both partners are at or above the {TOC_AUTOQUAL_POINTS}-point
+          autoqualification line. Under XXII.1.A an individual autoqualifies at that
+          threshold, and under XXII.1.E a partnership may accept a bid only when both
+          partners autoqualify.{' '}
           <b>AL</b> marks a partnership where one partner autoqualified and the other did
           not, so it cannot accept an autoqualification bid and would need an at-large one.{' '}
           <em>
-            AL is our guess and nothing more. At-large bids are awarded by committee against
-            regional allocations that are not modelled here, qualification depends on results
-            reported by a deadline, and a bid must be accepted to be used. Treat this column
-            as a rough guide and never as a statement about who is going.
+            TOC qualification labels here are only a prediction. At-large bids depend on
+            ordinal rankings, regional bid distributions, and underrepresented group point
+            allocations that are not modelled here.
           </em>
         </li>
         <li id="fn-recon">
-          An asterisk beside a total means it is not settled against the league&rsquo;s
-          published sheet.{' '}
+          An asterisk beside a total means it disagrees with the league&rsquo;s published
+          sheet.{' '}
           <abbr className="tick pending">*</abbr>{' '}
           <b>amber</b> means the sheet has no row for this partnership yet, which is normal
-          for a tournament the league has not written up.{' '}
+          for a tournament the league has not scored.{' '}
           <abbr className="tick differs">*</abbr>{' '}
-          <b>red</b> means the sheet has a figure and ours differs, which means one of the
-          two is wrong. Hover for the league&rsquo;s number. Where they disagree, the
-          league&rsquo;s figure is the official one.
+          <b>red</b> means the sheet reports a figure different from ours. Hover for the
+          league&rsquo;s number. Wherever numbers disagree, the league&rsquo;s figure is the
+          official one.
         </li>
       </ol>
     </>
