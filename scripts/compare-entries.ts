@@ -24,25 +24,12 @@
  * Run: npm run compare:entries
  */
 import { existsSync } from 'node:fs';
-import { computeSeason, teamKey, type EntryCase } from './lib/season.ts';
-import { resolveSheetPath, parseWorkbook, parseEntryTab } from '../packages/ingest/src/sheet.ts';
-import { readFileSync } from 'node:fs';
+import { computeSeason, type EntryCase } from './lib/season.ts';
+import { resolveSheetPath } from '../packages/ingest/src/sheet.ts';
 import { weightedTotal } from '../packages/rules/src/index.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 const EPSILON = 0.051;
-
-/** A partnership's weighted season total from its scored results. */
-function totals(cases: EntryCase[]): Map<string, number> {
-  const byTeam = new Map<string, number[]>();
-  for (const c of cases) {
-    if (c.ours === 0) continue; // zero results contribute nothing to a best-five
-    const list = byTeam.get(c.team) ?? [];
-    list.push(c.ours);
-    byTeam.set(c.team, list);
-  }
-  return new Map([...byTeam].map(([k, pts]) => [k, weightedTotal(pts)]));
-}
 
 function main(): void {
   const path = resolveSheetPath(SEASON, existsSync);
@@ -92,37 +79,63 @@ function main(): void {
   show('gained, by tournament:', gained);
   show('scored differently, by tournament:', changed);
 
-  // Agreement with the league's published partnership totals, which is the
-  // figure a reader actually sees.
-  const compare = (label: string, cases: EntryCase[]): void => {
-    const mine = totals(cases);
-    let exact = 0;
-    let seen = 0;
-    for (const [k, theirTotal] of officialTotals(path)) {
-      seen++;
-      if (Math.abs((mine.get(k) ?? 0) - theirTotal) < EPSILON) exact++;
-    }
-    console.log(`  ${label.padEnd(16)} ${exact}/${seen}  (${((100 * exact) / seen).toFixed(1)}%)`);
-  };
-  console.log(`\n  partnership season totals against the league's own:`);
-  compare('sheet-driven', sheet);
-  compare('tabroom-driven', tab);
-}
+  // The question that matters: does every partnership the league scores come
+  // out of the Tabroom-driven run with the same season total?
+  //
+  // Entry-level counts cannot answer it. Team keys are built from names, and
+  // the two runs read names from different places -- the sheet writes
+  // "Ma. Qiu" to separate two Qius where Tabroom just says "Qiu", and
+  // "Menlo-Atherton" where Tabroom says "Menlo-Atherton High School". So
+  // partnerships are matched through the one identity both runs share: the
+  // Tabroom entry id. An entry the sheet run scored belongs to a known
+  // partnership, and every entry the Tabroom run scores is then attributed to
+  // that same partnership, or counted as new.
+  const teamOfEntry = new Map<string, string>();
+  for (const c of sheet) teamOfEntry.set(c.entryId, c.team);
 
-/** The league's weighted season total per partnership, from its `Entry` rows. */
-function officialTotals(path: string): Map<string, number> {
-  const rows = parseEntryTab(parseWorkbook(readFileSync(path)).get('Entry')!);
-  const byTeam = new Map<string, number[]>();
-  for (const e of rows) {
-    if (e.incorrectTeamSize) continue;
-    const pts = e.calcPoints ?? 0;
-    if (pts === 0) continue;
-    const k = teamKey(e.school1, e.partner1, e.partner2);
-    const list = byTeam.get(k) ?? [];
-    list.push(pts);
-    byTeam.set(k, list);
+  const sheetTotals = new Map<string, number[]>();
+  for (const c of sheet) {
+    if (c.ours <= 0) continue;
+    (sheetTotals.get(c.team) ?? sheetTotals.set(c.team, []).get(c.team)!).push(c.ours);
   }
-  return new Map([...byTeam].map(([k, pts]) => [k, weightedTotal(pts)]));
+  const tabTotals = new Map<string, number[]>();
+  let attachedToKnown = 0;
+  let brandNew = 0;
+  for (const c of tab) {
+    if (c.ours <= 0) continue;
+    const key = teamOfEntry.get(c.entryId);
+    if (key === undefined) {
+      brandNew++;
+      continue;
+    }
+    if (!sheetTotals.has(key)) attachedToKnown++;
+    (tabTotals.get(key) ?? tabTotals.set(key, []).get(key)!).push(c.ours);
+  }
+
+  let same = 0;
+  let missing = 0;
+  let moved = 0;
+  const movedRows: { team: string; before: number; after: number }[] = [];
+  for (const [team, pts] of sheetTotals) {
+    const before = weightedTotal(pts);
+    const after = tabTotals.has(team) ? weightedTotal(tabTotals.get(team)!) : null;
+    if (after === null) { missing++; continue; }
+    if (Math.abs(after - before) < EPSILON) same++;
+    else { moved++; movedRows.push({ team, before, after }); }
+  }
+  const n = sheetTotals.size;
+  console.log(`\n  partnerships the league scores: ${n}`);
+  console.log(`    identical season total   ${same}  (${((100 * same) / n).toFixed(2)}%)`);
+  console.log(`    total moved              ${moved}`);
+  console.log(`    absent entirely          ${missing}`);
+  console.log(`\n  partnerships the Tabroom run adds that the sheet run has none of: ${brandNew} entries`);
+
+  if (movedRows.length) {
+    console.log('\n  partnerships whose total moved:');
+    for (const r of movedRows.sort((a, b) => Math.abs(b.after - b.before) - Math.abs(a.after - a.before)).slice(0, 15)) {
+      console.log(`    ${r.team.padEnd(46)} ${r.before.toFixed(1).padStart(6)} -> ${r.after.toFixed(1)}`);
+    }
+  }
 }
 
 main();

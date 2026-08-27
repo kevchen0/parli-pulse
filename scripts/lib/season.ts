@@ -430,6 +430,10 @@ export function computeSeason(
     const entriesFromTabroom = sources.entries === 'tabroom' && clearsXxi1D;
 
     if (entriesFromTabroom) {
+      // A qualifier announces itself: its rows carry `qual` and `alt` placements
+      // where a league tournament's carry records.
+      const qualifierTournament = (off.category === 'CHSSA' || off.category === 'OSAA')
+        && sheetRows.some((r) => ['qual', 'alt'].includes(r.result.toLowerCase()));
       const sheetForEntry = new Map<string, (typeof sheetRows)[number]>();
       for (const [i, m] of result.matches) {
         if (!m.ambiguous) sheetForEntry.set(m.entryId, sheetRows[i]!);
@@ -451,11 +455,16 @@ export function computeSeason(
 
           const row = sheetForEntry.get(cand.entryId);
           const isToc = /NPDL-TOC/i.test(off.name);
-          // A qualifier's placement is not in the payload, so it can only come
-          // from the league. An entry it has not listed scores nothing here.
+          // XXI.4.C: at a state qualifier only the qualifiers and alternates
+          // score -- 8 and 4 -- and everyone else earns nothing however well
+          // they did. The placement is not a bracket position and is not in the
+          // payload at all, so an entry the league has not placed scores zero
+          // rather than falling through to the ordinary prelim table, which
+          // would pay a 3-2 four points it is not owed.
           const isQualifier = (off.category === 'CHSSA' || off.category === 'OSAA')
             ? ({ qual: 8, alt: 4 } as Record<string, number>)[(row?.result ?? '').toLowerCase()]
             : undefined;
+          if (isQualifier === undefined && qualifierTournament) continue;
           const walkover = sources.walkover === 'sheet'
             ? (row?.walkoverAdjustment ?? 0)
             : mine.walkover;
