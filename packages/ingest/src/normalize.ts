@@ -894,6 +894,19 @@ export function computeEntryPerformances(event: NormalizedEvent): Map<string, En
       p.prelimBallotsTotal = prelims.length * panelSize;
       continue;
     }
+    // An entry with no decided ballot anywhere did not compete -- it registered
+    // and never debated. Crediting its unentered rounds as wins hands it a
+    // clean sweep: 32 such entries at the 2025-26 NPDL-TOC each scored the
+    // maximum 27, and only the league's own list kept them out of the
+    // standings. The credit below is for a *result nobody entered*, which is
+    // a different thing, and it is only safe once we know the team turned up.
+    // Same signal as XXI.2.A's forfeit exclusion, a different consumer.
+    const competed = prelims.some((r) =>
+      r.sections.some((sec) =>
+        sec.ballots.some((b) => b.entryId === entryId && b.won !== null),
+      ),
+    );
+    if (!competed) continue;
     for (const r of prelims) {
       const mine = r.sections.flatMap((sec) => sec.ballots).filter((b) => b.entryId === entryId);
       const scored = mine.filter((b) => b.won !== null);

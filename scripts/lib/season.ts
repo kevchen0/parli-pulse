@@ -8,7 +8,15 @@
  * on reconciling Tabroom's school-name variants.
  */
 import { existsSync, readFileSync } from 'node:fs';
-import { prelimPoints, scoreEntry, scoreToc, type ElimLevel } from '../../packages/rules/src/index.ts';
+import {
+  MIN_PRELIM_ROUNDS,
+  MIN_SCHOOLS,
+  MIN_TEAMS,
+  prelimPoints,
+  scoreEntry,
+  scoreToc,
+  type ElimLevel,
+} from '../../packages/rules/src/index.ts';
 import {
   buildStudentIndex,
   computeEntryPerformances,
@@ -22,8 +30,10 @@ import {
   type MatchTier,
 } from '../../packages/ingest/src/matching.ts';
 import { fieldEventFilter, openEventFilter } from '../../packages/ingest/src/event-selection.ts';
+import { buildSchoolIndex, schoolKey } from '../../packages/ingest/src/schools.ts';
 import { INCOMPLETE_TOURNAMENTS, MANUAL_RESULTS } from '../../packages/ingest/src/manual-results.ts';
 import {
+  indexHeaders,
   parseEntryTab,
   parseTournamentsTab,
   parseWorkbook,
@@ -94,6 +104,15 @@ export interface EntryCase {
    */
   ourWalkover: number;
   ourFloor: string | null;
+  /**
+   * True for an entry the league's own list does not carry.
+   *
+   * Only ever set under `entries: 'tabroom'`. Most of these score nothing --
+   * XXI.3.A pays no losing record -- and they are kept rather than dropped so
+   * the data says "this team competed and earned nothing" instead of saying
+   * nothing at all. The site shows only what scores.
+   */
+  unlisted: boolean;
 }
 
 export interface SeasonResult {
@@ -164,13 +183,28 @@ export interface InputSources {
   fields: InputSource;
   breakingRecord: InputSource;
   walkover: InputSource;
+  /**
+   * Which teams exist at a tournament.
+   *
+   * `sheet` walks the league's `Entry` tab and scores the rows it can match to
+   * a Tabroom entry, so a team the league has not listed is invisible -- and a
+   * tournament cannot be scored at all until the league writes it up.
+   *
+   * `tabroom` scores every open-division entry that clears XXI.1 and belongs to
+   * a member school, keeping the ones worth nothing rather than dropping them.
+   * The league's own list is still read, to compare against and to supply the
+   * results Tabroom cannot carry: a state qualifier's `qual`/`alt` placement is
+   * not a bracket position, and a tournament that published nothing has no
+   * entry to find.
+   */
+  entries: InputSource;
 }
 
 export const ALL_SHEET: InputSources = {
-  fields: 'sheet', breakingRecord: 'sheet', walkover: 'sheet',
+  fields: 'sheet', breakingRecord: 'sheet', walkover: 'sheet', entries: 'sheet',
 };
 export const ALL_TABROOM: InputSources = {
-  fields: 'tabroom', breakingRecord: 'tabroom', walkover: 'tabroom',
+  fields: 'tabroom', breakingRecord: 'tabroom', walkover: 'tabroom', entries: 'sheet',
 };
 
 export interface SeasonOptions {
@@ -207,6 +241,31 @@ export function computeSeason(
   const workbook = parseWorkbook(new Uint8Array(readFileSync(zipPath)));
   const officialTournaments = parseTournamentsTab(workbook.get('Tournaments')!);
   const officialEntries = parseEntryTab(workbook.get('Entry')!);
+  // XXI.9.A tables member schools only, and the league's membership is a fact
+  // about the league rather than a figure -- the same kind of thing as which
+  // tournaments exist.
+  //
+  // Resolved through the same index the loader uses, never a fresh key: Tabroom
+  // writes "Menlo-Atherton High School" where the league writes
+  // "Menlo-Atherton", and comparing normalized strings directly drops most of
+  // the season. That is the rule at the end of pattern B in
+  // plan/10-mistakes.md, and this is what breaking it looks like -- 784 scoring
+  // entries silently gone and partnership agreement at 9.5%.
+  const schoolIndex = (() => {
+    const schoolTab = workbook.get('School');
+    const list = workbook.get('SchoolList');
+    if (!list) return null;
+    const memberNames = schoolTab
+      ? (() => {
+          const { headerIndex, col } = indexHeaders(schoolTab);
+          const c = col('School');
+          return schoolTab.slice(headerIndex + 1)
+            .map((r) => (r[c] ?? '').trim())
+            .filter(Boolean);
+        })()
+      : [];
+    return buildSchoolIndex(list, memberNames);
+  })();
 
   const cases: EntryCase[] = [];
   const unmatched: { tournament: string; team: string }[] = [];
@@ -246,6 +305,7 @@ export function computeSeason(
           partner1: row.partner1, partner2: row.partner2,
           entryId: `manual_${off.name}_${pairKey(row.partner1, row.partner2)}`.replace(/\s+/g, '_'),
           matchTier: 'exact-surnames', matchAmbiguous: false, provenance: 'manual',
+          unlisted: false,
           ours: manual.points, theirs: row.calcPoints ?? 0,
           matched: manual.points === (row.calcPoints ?? 0),
           broke: false, hybrid: row.hybrid,
@@ -347,7 +407,113 @@ export function computeSeason(
     }));
     const result = matchTeams(teams, candidates);
 
-    for (const [i, m] of result.matches) {
+    // Under `entries: 'tabroom'`, every open-division entry that clears XXI.1
+    // and belongs to a member school is scored, whether or not the league
+    // listed it. The match is still run, because it is what ties an entry to
+    // the league's own figure for comparison.
+    // XXI.1.D -- five schools, ten teams, three prelims in the open division.
+    //
+    // Only decidable where the payload states them. Several CHSSA league events
+    // and every state qualifier publish no rounds and no school ids at all, so
+    // measuring them says "0 schools, 0 prelims" and would throw the tournament
+    // out -- 233 scoring entries, at tournaments the league does count. A thin
+    // payload is not a small tournament, and Tabroom cannot tell us which this
+    // is. Where it cannot, the league's own list decides who exists, as before.
+    const schoolsHere = new Set(
+      candidates.map((c) => schoolIndex?.resolve(c.schoolName)?.id ?? schoolKey(c.schoolName ?? ''))
+        .filter(Boolean),
+    );
+    const clearsXxi1D =
+      schoolsHere.size >= MIN_SCHOOLS
+      && candidates.length >= MIN_TEAMS
+      && prelimCount >= MIN_PRELIM_ROUNDS;
+    const entriesFromTabroom = sources.entries === 'tabroom' && clearsXxi1D;
+
+    if (entriesFromTabroom) {
+      const sheetForEntry = new Map<string, (typeof sheetRows)[number]>();
+      for (const [i, m] of result.matches) {
+        if (!m.ambiguous) sheetForEntry.set(m.entryId, sheetRows[i]!);
+      }
+
+      for (const cand of candidates) {
+          const mine = byEntry.get(cand.entryId);
+          if (!mine) continue;
+          // A school we cannot resolve cannot be attributed to anyone, and its
+          // entry would land in no standing. Membership is deliberately *not*
+          // tested here: XXI.9.A limits the school rankings table to member
+          // schools, not who earns points, and the league scores non-members
+          // throughout -- Princeton, Hopkins and Horace Mann all carry team and
+          // individual points. Filtering on membership here drops 373 entries
+          // the league counts. The member restriction belongs where the school
+          // total is summed, which is where rollup already applies it.
+          const school = schoolIndex?.resolve(cand.schoolName);
+          if (!school) continue;
+
+          const row = sheetForEntry.get(cand.entryId);
+          const isToc = /NPDL-TOC/i.test(off.name);
+          // A qualifier's placement is not in the payload, so it can only come
+          // from the league. An entry it has not listed scores nothing here.
+          const isQualifier = (off.category === 'CHSSA' || off.category === 'OSAA')
+            ? ({ qual: 8, alt: 4 } as Record<string, number>)[(row?.result ?? '').toLowerCase()]
+            : undefined;
+          const walkover = sources.walkover === 'sheet'
+            ? (row?.walkoverAdjustment ?? 0)
+            : mine.walkover;
+          const sb = isQualifier !== undefined
+            ? { points: isQualifier, basePoints: isQualifier, prelimCountAdjustment: 0,
+                breakPenalty: 0, walkoverAdjustment: 0, floorApplied: 'none' as const,
+                excluded: null, broke: false }
+            : isToc
+              ? scoreToc({
+                  prelimBallotsWon: mine.prelimBallotsWon,
+                  broke: mine.elimLevel !== null,
+                  elimWins: mine.elimWins,
+                  champion: mine.elimLevel === 'first',
+                  walkoverAdjustment: walkover,
+                }, breakPct)
+              : scoreEntry({
+                  wins: mine.wins, losses: mine.losses, elimLevel: mine.elimLevel,
+                  eligibleTeamSize: mine.size, walkoverAdjustment: walkover,
+                }, ctx);
+
+          const surnames = cand.people.map((x) => x.last);
+          cases.push({
+            tournament: off.name,
+            category: off.category || '(none)',
+            tournId: off.tournId!,
+            school: cand.schoolName ?? '',
+            hybridSchool: null,
+            team: teamKey(cand.schoolName ?? '', surnames[0] ?? '', surnames[1] ?? ''),
+            pair: pairKey(surnames[0] ?? '', surnames[1] ?? ''),
+            partner1: surnames[0] ?? '',
+            partner2: surnames[1] ?? '',
+            entryId: cand.entryId,
+            matchTier: 'exact-surnames',
+            matchAmbiguous: false,
+            provenance: 'tabroom',
+            unlisted: !row,
+            ours: sb.points,
+            theirs: row?.calcPoints ?? 0,
+            matched: sb.points === (row?.calcPoints ?? 0),
+            broke: mine.elimLevel !== null,
+            hybrid: row?.hybrid ?? false,
+            ourBase: sb.basePoints,
+            theirBase: row?.basePoints ?? null,
+            ourAdj: sb.prelimCountAdjustment + sb.breakPenalty,
+            theirAdj: row?.breakPrelimAdjustment ?? null,
+            ourPrelimAdj: sb.prelimCountAdjustment,
+            ourBreakPenalty: sb.breakPenalty,
+            ourWalkover: sb.walkoverAdjustment,
+            ourFloor: sb.floorApplied ?? null,
+        });
+      }
+
+    }
+
+    // The sheet-driven pass. Skipped entirely when entries come from Tabroom;
+    // the fallback loop below still runs either way, because a hand entry and a
+    // prelim-only record are rows Tabroom cannot supply at all.
+    for (const [i, m] of entriesFromTabroom ? [] : result.matches) {
       const row = sheetRows[i]!;
       const mine = byEntry.get(m.entryId);
       if (!mine) continue;
@@ -396,6 +562,7 @@ export function computeSeason(
         matchTier: m.tier,
         matchAmbiguous: m.ambiguous,
         provenance: 'tabroom',
+        unlisted: false,
         ours: sb.points,
         theirs: row.calcPoints ?? 0,
         matched: sb.points === (row.calcPoints ?? 0),
@@ -454,6 +621,7 @@ export function computeSeason(
         matchTier: 'exact-surnames',
         matchAmbiguous: false,
         provenance: fallback.provenance,
+        unlisted: false,
         ours: fallback.points,
         theirs: row.calcPoints ?? 0,
         matched: fallback.points === (row.calcPoints ?? 0),

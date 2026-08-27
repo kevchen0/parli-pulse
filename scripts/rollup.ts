@@ -5,7 +5,7 @@
  * Kept separate from the loader so standings can be recomputed after a rules
  * change without re-reading 370MB of payloads.
  */
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, gt, isNull, sql } from 'drizzle-orm';
 import { weightedTotal } from '../packages/rules/src/index.ts';
 import { createDb } from '../packages/db/src/client.ts';
 import * as t from '../packages/db/src/schema.ts';
@@ -243,6 +243,13 @@ async function main(): Promise<void> {
     // Only scored, eligible entries count. XXI.1.G exclusions are stored with
     // their points intact, so they must be filtered here rather than assumed
     // to be zero.
+    // Results worth nothing are stored but never aggregated.
+    //
+    // They contribute nothing to a best-five total by definition, so excluding
+    // them changes no figure -- but including them would inflate
+    // `tournaments_counted`, and under Tabroom-driven entries it would put
+    // thousands of nil rows in the standings. A team that competed and earned
+    // nothing is a fact the data should hold and the tables should not show.
     const results = await db
       .select({
         entryId: t.entries.id,
@@ -255,7 +262,11 @@ async function main(): Promise<void> {
       .innerJoin(t.entries, eq(t.entries.id, t.entryResults.entryId))
       .innerJoin(t.events, eq(t.events.id, t.entries.eventId))
       .innerJoin(t.tournaments, eq(t.tournaments.id, t.events.tournamentId))
-      .where(and(eq(t.tournaments.seasonId, SEASON), isNull(t.entryResults.excludedReason)));
+      .where(and(
+        eq(t.tournaments.seasonId, SEASON),
+        isNull(t.entryResults.excludedReason),
+        gt(t.entryResults.points, 0),
+      ));
 
     const members = await db.select({ id: t.schools.id, isMember: t.schools.isMember }).from(t.schools);
     const memberIds = new Set(members.filter((m) => m.isMember).map((m) => m.id));

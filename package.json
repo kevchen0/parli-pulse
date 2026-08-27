@@ -20,6 +20,7 @@
     "check:rules": "node scripts/check-rules.ts",
     "check:walkovers": "node --env-file-if-exists=.env scripts/check-walkovers.ts",
     "compare:sources": "node scripts/compare-sources.ts",
+    "compare:entries": "node scripts/compare-entries.ts",
     "load": "node --env-file-if-exists=.env scripts/load.ts",
     "rollup": "node --env-file-if-exists=.env scripts/rollup.ts",
     "compare": "node --env-file-if-exists=.env scripts/compare-top.ts",
