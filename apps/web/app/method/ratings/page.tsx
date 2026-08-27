@@ -28,7 +28,7 @@ export default async function RatingMethodPage() {
   const f = season ? await getRatingMethodFigures(season) : null;
 
   return (
-    <article className="method">
+    <main className="wrap method">
       <h1>How the rating works</h1>
       <p className="lede">
         Specification for the partnership rating. This is our own measure, not the
@@ -370,6 +370,6 @@ export default async function RatingMethodPage() {
           <Link href="/method">&larr; Method</Link>
         )}
       </p>
-    </article>
+    </main>
   );
 }
