@@ -84,17 +84,27 @@ restores the old behaviour.
 3. **Canonical school names and regions** — the `SchoolList` tab, which resolves
    "Menlo-Atherton High School" to "Menlo-Atherton" and gives it a region.
    Without it a school is whatever each tab director typed.
-4. **Tournament category and approval** — `CHSSA` / `OSAA` / `NYPDL` /
-   `Regular`, which selects the scoring schedule and the speaker scale, plus the
-   XXI.1.E/F approval flag. League classifications; a payload states neither.
+4. **Tournament category** — `CHSSA` / `OSAA` / `NYPDL` / `Regular`, which
+   selects the scoring schedule *and* the speaker scale (NYPDL is 23-30 where
+   everyone else is 25-30). A league classification; a payload does not state
+   it. The `Approval` column is parsed and stored and **read by nothing**, so
+   XXI.1.E/F is not currently enforced at all.
+5. **Which school a result is credited to** — the `Entry` tab's school column,
+   preferred over Tabroom's wherever a row matched. It differs on **78
+   entries**: a team entering under a club or independent registration is
+   credited to its school, and Tabroom only knows the registration. Stuyvesant's
+   top team also competed as "Rodda's Disciples".
+6. **The second school of a hybrid** — `school 2`, on **33 entries**. Tabroom
+   files a hybrid under one school, so XXI.9.C's half-value split is not
+   recoverable from it.
 
 *Values Tabroom cannot carry:*
 
-5. **State qualifier placements** — `qual` = 8, `alt` = 4 under XXI.4.C, for
+7. **State qualifier placements** — `qual` = 8, `alt` = 4 under XXI.4.C, for
    **80 entries**. A placement is not a bracket position and appears nowhere in
    the payload. An entry the league has not placed now scores nothing rather
    than falling through to the ordinary prelim table.
-6. **The prelim-only fallback** — **11 entries** at tournaments that published
+8. **The prelim-only fallback** — **11 entries** at tournaments that published
    no pairings, scored from the league's own recorded result. Marked
    `sheet-record` in the provenance, because the input is the thing being
    checked.
@@ -104,10 +114,19 @@ tournaments that are not on Tabroom at all (SpeechWire) or published almost
 nothing (Ridge Debates). Those are not sheet dependencies but they are not
 computed either.
 
-**So 91 of 1,587 scoring entries — 5.7% — still take their value from the
-league.** Items 5 and 6 are irreducible without another data source. Items 1
-through 4 are facts about the league rather than about a tournament, and there
-is no version of this project that derives them from round data.
+**So 91 of 1,587 scoring entries — 5.7% — take their points from the league,
+and a further 111 take their school from it.** Items 7 and 8 are irreducible
+without another data source. Items 1 through 4 are facts about the league rather
+than about a tournament. Items 5 and 6 are the ones a determined effort could
+narrow: `SCHOOL_ALIASES` already maps 26 club registrations by hand, and a
+hybrid's second school could in principle be read off its debaters' own school
+records rather than the entry's.
+
+**Two things previously listed here were wrong.** The `Approval` column and the
+whole `official_tournament_stats` table are parsed, stored, and read by nothing
+— the same shape as `manual_overrides` and the `suppressed` flag before it. A
+dependency nobody exercises is not a dependency; it is dead weight that makes
+the audit look worse than it is.
 
 **Where the remaining disagreement is.** `npm run compare:sources` attributes
 each losing row to the single input that moves it:
