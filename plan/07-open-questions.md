@@ -185,7 +185,7 @@ them deliberately is unresolved, and worth asking the Reporting Director.
   could never meet, and the extra evidence would be evidence about a different
   competition.
 - **Minimum rounds before a partnership appears on the rating board** — ten.
-  387 of 1,776 rated partnerships clear it. Every partnership keeps a rating and
+  387 of 1,779 rated partnerships clear it. Every partnership keeps a rating and
   a deviation regardless; the gate decides only who is ranked. It matters less
   than it looked, because the board is ordered on the rating *less* its
   deviation, which already pushes thin ratings down rather than out.
@@ -224,14 +224,13 @@ them deliberately is unresolved, and worth asking the Reporting Director.
 - **Non-standard speaker scales** — NYPDL 23-30 (verified: 157 scores land
   exactly on 23, with a smooth distribution above), YFL 1 at 0-100. Everything
   else 25-30. Held in a config table, never inferred.
-- **Walkovers** — detectable, and the profile pages now do detect them for
-  display: a same-school elim section that *nobody* won, four of them in
-  2025-26. Note the qualifier — 87 further same-school elim sections carry a
-  real decision, so "two teammates met" is not the signature and an earlier
-  note saying "no scored ballot" was loose about it.
-  **The scoring side is a different matter and is broken:** the engine was
-  believed to read the value from the sheet's `walkover_adjustment`, and that
-  column is null for every mirrored row while ours is 0 for all 1,564. Nobody
-  is applying the -2/+2. See [09-data-quality.md](09-data-quality.md).
+- **Walkovers** — derived, at 1,535 of 1,541 against the league's own column.
+  The signature is a same-school elim section that drew a *short panel*, not
+  merely a same-school section: 2025-26 has 91 of the latter and 87 of those
+  carry real decisions. Two further shapes leave no section to read — a
+  semifinal closeout with no published final, and a round missing from the
+  middle of the bracket — and are inferred from the bracket around them. The
+  earlier note here said the engine read the value from the sheet and that
+  nobody was applying it; the first was true and the second was not.
 - **State qualifier results** are not derivable from Tabroom and come from the
   sheet's own result column.

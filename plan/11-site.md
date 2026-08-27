@@ -41,7 +41,10 @@ E is analytics only — the security headers are in `next.config.mjs` and TLS
 never needed anything. What remains is in *Still to be specified* below.
 
 **Phase F, profiles, has started.** Debater pages at `/<season>/debater/<id>`,
-linked from all four tables. Two things they forced that were not on this list:
+linked from all four tables: the three figures the site holds about a person,
+every tournament with the five Article XXI counts marked, partnership ratings,
+and every round with the opponent, the panel split and their own speaks. Three
+things they forced that were not on this list:
 
 - **The loading boundary moved down.** It sat at `[season]/`, which put a
   Suspense boundary over every page under a season — and a page that streams has
@@ -52,6 +55,10 @@ linked from all four tables. Two things they forced that were not on this list:
   place to discover that, so it was built first: one SQL fragment, one
   component, and a name that is withheld everywhere it appears rather than only
   on its own page.
+- **Zero-point results do not reach a table.** Under Tabroom-driven entries the
+  data holds every team that competed, 3,302 results of which 1,587 are worth
+  points. `rollup` aggregates only what scores, so a team that earned nothing is
+  a fact the data keeps and the tables never show.
 
 ## Phase A — Information architecture
 

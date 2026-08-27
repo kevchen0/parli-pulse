@@ -21,16 +21,19 @@ head-to-head are what remain of it.
 | Partnerships whose every result we reproduce | **99%** (707/712) |
 | Rating against the league's own ranking | **63.4%** vs 59.8% on held-out rounds |
 
-**2025-26 is loaded from Tabroom-computed points** as of 2026-08-26. The sheet
-supplies which tournaments and which teams exist; every figure is ours.
-`SOURCE=sheet npm run load` scores the old way, and the backtests take the same
-flag — under it per-entry agreement is 98%, which measures what independence
-costs rather than a better engine.
+**Points are computed from Tabroom.** Field sizes, break percentage, prelim
+count, the breaking record, XXI.5.C walkovers and **which teams exist** all come
+from the payload. What the sheet still supplies is audited in
+[07-open-questions.md](07-open-questions.md) — six things, of which only two are
+numbers, and 5.7% of scoring entries take their points from it.
+`SOURCE=sheet` scores the old way and reaches 98% per-entry, which measures what
+independence costs rather than a better engine; the backtests take the same flag.
 
-Loaded for 2025-26: 97 tournaments, 4,918 entries, 26,290 ballots, 799
-partnerships, 1,183 debaters with points, 47 member schools, 387 ranked
-speakers, 1,776 rated partnerships of which 387 clear the round gate, 830
-reconciliation rows, 60 open disagreements. 167 tests.
+Loaded for 2025-26: 98 tournaments, 4,946 entries, 25,851 ballots, **3,302
+scored results of which 1,587 are worth points** — a result worth nothing is
+stored and never shown — 806 partnerships, 1,194 debaters with points, 47 member
+schools, 387 ranked speakers of 1,831, 1,779 rated partnerships of which 387
+clear the round gate, 830 reconciliation rows, 56 open disagreements. 167 tests.
 
 2026-27 is open and empty: the sheet lists 110 tournaments and none has a
 results link yet. That is the correct state until the league writes up Harvard
@@ -60,6 +63,46 @@ being legible from the arithmetic. **Nobody has requested removal, so this has
 been exercised against a flag that is false for all 3,933 debaters** — see
 "Waiting on the user".
 
+**Independence from the sheet, measured one input at a time.** The engine used
+to take the league's field sizes, break percentage, prelim count, breaking
+record and walkover adjustment wherever the sheet had them — a deliberate choice
+for the *backtest*, where isolating the points rules means a mismatch can never
+be a field-size mismatch in disguise, and the wrong default for a live pipeline
+that has to score a tournament before the league writes it up. Both used one
+function, so the backtest's choice was production's.
+
+Each input now moves separately (`npm run compare:sources`), and all of them
+have moved. The first run scored 76.2% and exposed a bug that had been invisible
+for exactly the reason above: **our AFS was the open field alone** where XXI.2.B
+is open *plus* novice/JV, so Berkeley read as 104 against the league's 141. Our
+own AFS had never been the number under test.
+
+Then the rules themselves, each measured rather than chosen:
+
+- **The forfeit exclusion is "did they compete", not a count of missing rounds.**
+  A threshold has to mean different things at a four-round tournament and a
+  six-round one; `dropped` or nothing scored reproduces 94% of open fields
+  against 89% for the three-or-more rule it replaced, and 78% for `dropped`
+  alone. See [07-open-questions.md](07-open-questions.md).
+- **NYPDL says which bracket a round is in** and we were inferring it.
+  `round.label` carries `VO`/`VQ`/`VS`/`VF` and `NQ`/`NS`/`NF`; exact on 15 of
+  17 NYPDL tournaments.
+- **XXI.5.C is derived**, at 1,535 of 1,541 against the league's own column. A
+  walkover is a same-school elim section that drew a *short panel* — not merely
+  same-school, and not "no result entered", both of which were tried and
+  measured.
+- **A team that broke and debated nothing is recovered from the seeds.**
+  Invisible in the round data and still counted by the league; one such team
+  moves NYPDL October OL's break from 20.0% to 18.8%, across a XXI.2.D
+  threshold.
+- **Entries come from Tabroom.** Every open-division entry clearing XXI.1.D is
+  scored, listed or not, and results worth nothing are stored and never shown.
+  Verified partnership by partnership: 835 of 835 keep every result and the same
+  total. Four gained one the league does not list.
+
+96% per-entry against 98% under the sheet's inputs — 1.6 points traded for the
+check and the thing being checked no longer sharing a source.
+
 **Phase 5 — Glicko-2 with a field prior.** Partnership ratings at
 `/<season>/ratings`, with the specification at `/<season>/method/ratings`. The
 board is ordered on the rating shrunk toward the field by its deviation;
@@ -85,6 +128,7 @@ sheet and the nightly workflow runs the whole chain. See below.
 | `npm run check:rules` | engine point tables against the published Board Code |
 | `npm run check:walkovers` | XXI.5.C derived from Tabroom against the league's column |
 | `npm run compare:sources` | what the sheet's inputs are worth, one input at a time |
+| `npm run compare:entries` | scoring every Tabroom entry vs only the league's list |
 | `npm run load` | rebuild a season from cached payloads (`SEASON=` to pick) |
 | `npm run rollup` | identity merging, then team/debater/school standings |
 | `npm run speaks` | judge-normalized speaker points |
@@ -100,6 +144,10 @@ sheet and the nightly workflow runs the whole chain. See below.
 **Order matters:** `fetch` → `load` → `rollup` → `speaks` → `rate` →
 `diagnostics` → `mark-ingest`. `rollup` decides who is one person and who is two, and
 everything after it groups by the identities it settles.
+
+`SOURCE=sheet` on any of `load`, the backtests or `diagnose` restores the
+league's own inputs, which is what a backtest wants: it isolates the points
+rules so a mismatch cannot be a field-size mismatch in disguise.
 
 ## How the live season works
 
@@ -140,19 +188,43 @@ which stays on the maintainer's laptop because only it can run migrations.
   path, a clearing `UPDATE`: each has silently used the wrong season at least
   once, and each time the output looked entirely normal.
 - **All comparison and aggregation goes through `scripts/lib/standings.ts`,
-  `scripts/lib/identity.ts` or `packages/ingest/src/matching.ts`.** Never write
-  a new match key.
+  `scripts/lib/identity.ts`, `packages/ingest/src/matching.ts` or
+  `buildSchoolIndex`.** Never write a new match key. Comparing normalized school
+  strings directly — Tabroom writes "Menlo-Atherton High School" where the league
+  writes "Menlo-Atherton" — silently dropped 784 scoring entries and put
+  agreement at 9.5%.
+- **A zero-point result is stored and never aggregated.** `rollup` filters on
+  `points > 0`, so a team that competed and earned nothing is a fact the data
+  holds and the tables do not show. 3,302 stored, 1,587 worth points.
+- **An entry the league does not list is not a disagreement.** It has no
+  official figure, so the reconciliation queue and both backtests exclude the
+  `unlisted` cases rather than counting them as mismatches against a number
+  nobody published.
 - **Raw payloads are gitignored** (~800MB). A fresh clone cannot run the
   backtests until `npm run fetch` has re-fetched them.
+- **`load` deletes a season's tournaments to rebuild it**, and every table
+  referencing `tournaments` must cascade. `ratings` did not, so `load` failed
+  outright on any season that had ever been rated — invisible until a season was
+  reloaded for the first time in months.
 
 ## Where the remaining error lives
 
-Catalogued in [09-data-quality.md](09-data-quality.md). Most of it is not ours:
-~30 results at tournaments that published little or nothing to Tabroom, 14 at El
-Cerrito where the league applied an adjustment 27 of 28 comparable tournaments
-did not, ~8 where the league splits one partnership across two registrations,
-6 at UCLA, ~5 human `manual_adj` overrides, and 3 league typos creating phantom
-teams. The realistic ceiling without manual entry is about 88-89%.
+Catalogued in [09-data-quality.md](09-data-quality.md), and it is now small
+enough to enumerate. Of the 25 entries where scoring from Tabroom disagrees with
+the league, **16 are settled or absent rather than open**:
+
+| | n | |
+|---|---|---|
+| UCLA | 10 | six prelims are in the payload, the league recorded five. **Ours stands.** |
+| Ridge Debates | 4 | published four of twenty-eight teams; all 28 hand-entered |
+| Cal Parli | 4 | three one-ballot same-school elims, unresolvable either way |
+| Clackamas | 2 | a different-school closeout XXI.5.C does not provide for |
+| NYPDL February OL | 5 | the breaking record — **the one genuinely open item** |
+
+Separately, **four partnerships now hold a result the league does not list** —
+Blair & Ray Chaudhuri, Patil & Malik, Squires & Luft, Hu & Qiu. Real Tabroom
+results at tournaments the league scores. Whether it missed them or excluded
+them deliberately is a question for the Reporting Director.
 
 ## Next
 
@@ -164,11 +236,18 @@ teams. The realistic ceiling without manual entry is about 88-89%.
 2. **Watch the first real tournament.** Everything has been exercised against an
    empty season or a complete one. A season with exactly one tournament is a
    third case, and the dry run that found four bugs suggests untested cases here
-   contain things.
-3. **Analytics.** Deliberately held until the Privacy page existed, which it now
+   contain things. The ratings cascade (mistake 42) would have broken the first
+   2026-27 ingest that had a rating; assume there are others.
+3. **Three dead mechanisms.** `manual_overrides` is declared with no reader or
+   writer; `official_tournament_stats` is written every load and read by
+   nothing; `Approval` is parsed, stored, and never consulted, so XXI.1.E/F is
+   not enforced at all. Each is either a feature to finish or a table to delete,
+   and a schema that promises something it does not do is worse than one that
+   promises nothing.
+4. **Analytics.** Deliberately held until the Privacy page existed, which it now
    does. Aggregate and cookieless, described on that page before it ships.
-4. **Smaller:** a Seasons page; gating the reconciliation view to maintainers;
-   the nine analysis scripts that still hardcode `rankings.zip`.
+5. **Smaller:** a Seasons page; gating the reconciliation view to maintainers;
+   the analysis scripts that still hardcode `rankings.zip`.
 
 ## Waiting on the user
 
@@ -181,7 +260,9 @@ None of it blocking:
   on the four tables and as an opponent on somebody else's page, that their own
   page 404s, and that school and partnership totals do not move. Then set it
   back.
+- **The four unlisted results above** — are they the league's oversight or its
+  judgement? Two are at NYPDL October OL, which suggests one cause rather than
+  four.
 - Whether a partnership follows the people or the registration. Both the
   standings and the rating currently follow the people.
-- Manual entry for Ridge Debates, worth −54 to Ridge's school total.
 - A custom domain, and whether `parli-pulse` is the public name.

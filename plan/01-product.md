@@ -14,8 +14,11 @@ rating metric.
 
 Two parallel systems, always clearly distinguished:
 
-1. **Official Article XXI points** — mirrored from NPDL, displayed as
-   authoritative, never contradicted in public.
+1. **Official Article XXI points** — computed from Tabroom round data through
+   an implementation of the rules, reconciled against NPDL's published figures
+   result by result. The league's number is displayed as authoritative and never
+   contradicted in public; ours is the check, and a divergence goes to a triage
+   queue rather than onto the page.
 2. **Glicko-2 rating** — our own, computed from raw Tabroom round data.
    Visually distinct, and never labeled "rankings."
 

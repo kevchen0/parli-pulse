@@ -45,11 +45,15 @@ means what it meant when it was shared.
 Runs as a **GitHub Actions cron** at 09:10 UTC, not a Vercel cron: raw payloads
 reach 84 MB (Stanford) and Actions has no execution-time pressure.
 
-**The league's sheet decides what exists.** The `Results` column of its
-`Tournaments` tab holds a Tabroom URL, written in as each tournament is scored;
-`fetch` takes the id from it and `load` accepts nothing else. The circuit
+**The league's sheet decides which tournaments exist.** The `Results` column of
+its `Tournaments` tab holds a Tabroom URL, written in as each tournament is
+scored; `fetch` takes the id from it and `load` accepts nothing else. The circuit
 calendar finds 44 tournaments where the sheet finds 95, so it is reported as a
 lookahead and never used for discovery — see [02-findings.md](02-findings.md).
+
+It no longer decides which *teams* exist. Every open-division entry clearing
+XXI.1.D is scored, listed or not, and a result worth nothing is stored and never
+aggregated — 3,302 stored for 2025-26, of which 1,587 are worth points.
 
 - Cache every payload by `tourn_id` + content hash. Unchanged tournaments are
   never re-fetched, and the whole site can be rebuilt offline.
@@ -63,13 +67,18 @@ lookahead and never used for discovery — see [02-findings.md](02-findings.md).
   nothing about the output looks wrong.
 
 **Points are computed from Tabroom.** Field sizes, break percentage, prelim
-count, the breaking record and XXI.5.C walkovers are all derived from the
-payload; `SOURCE=sheet` restores the old behaviour of preferring the league's
-published figures, which is what the backtests want because it isolates the
-points rules. The trade is 96.1% agreement against 97.7%, taken deliberately:
-depending on the sheet for the numbers means the check and the thing being
-checked share a source. What the sheet still supplies is audited in
-[07-open-questions.md](07-open-questions.md) — none of it is a computed figure.
+count, the breaking record, XXI.5.C walkovers and which teams exist are all
+derived from the payload; `SOURCE=sheet` restores the old behaviour of
+preferring the league's published figures, which is what the backtests want
+because it isolates the points rules. The trade is 96% per-entry agreement
+against 98%, taken deliberately: depending on the sheet for the numbers means
+the check and the thing being checked share a source.
+
+What the sheet still supplies is audited in
+[07-open-questions.md](07-open-questions.md). Six things, of which two are
+numbers — state qualifier placements and a prelim-only fallback, together 5.7%
+of scoring entries — and two more decide *which school* a result belongs to,
+which Tabroom cannot state for a club registration or a hybrid.
 
 The chain is `fetch → load → rollup → speaks → rate → diagnostics`, and the
 order is not negotiable — `rollup` settles identity, and everything after it

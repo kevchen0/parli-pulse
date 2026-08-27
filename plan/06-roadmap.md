@@ -1,7 +1,9 @@
 # Roadmap
 
-**Status:** phases 0-7 complete and deployed. Phase 6 (profiles) is the
-substantial work left; the season now ingests itself nightly.
+**Status:** phases 0-7 complete and deployed, Phase 6 half done — debater
+profiles are live, team/school/tournament pages are not. The season ingests
+itself nightly, and its points are computed from Tabroom rather than mirrored
+from the league.
 
 The 2026-27 season's first points-eligible tournament is Harvard, Sept 5-6
 (August tournaments are excluded by XXI.1.H). Before then, run the seasonal
@@ -123,6 +125,36 @@ were quietly damaging the live season. They are in
 [10-mistakes.md](10-mistakes.md) as 35-38; the pattern is that anything reading
 a season must be given the season.
 
+### Phase 7b — Computing rather than mirroring
+
+The engine took the league's field sizes, break percentage, prelim count,
+breaking record and walkover adjustment wherever the sheet had them, and walked
+its `Entry` tab to decide which teams existed. Every one of those now comes from
+the payload.
+
+Each input was moved separately and measured, because switching all of them at
+once says the accuracy changed and not which input changed it
+(`npm run compare:sources`). The first run scored **76.2%** and exposed a bug
+invisible for the same reason the default existed: our AFS was the open field
+alone where XXI.2.B is open *plus* novice/JV, so Berkeley read as 104 against
+the league's 141. Our own AFS had never been the number under test.
+
+Then the rules, each measured against the league's own figures rather than
+chosen:
+
+| | |
+|---|---|
+| Forfeit exclusion | `dropped` **or never competed** — 94% of open fields, against 89% for a three-round threshold and 78% for `dropped` alone |
+| Bracket partition | NYPDL's `VO`/`NQ` round labels — exact on 15 of 17 |
+| XXI.5.C walkovers | a same-school **short panel** — 1,535 of 1,541 |
+| Absent breakers | recovered from prelim seeds — elim field 95% → 97% |
+| Entries | every Tabroom entry clearing XXI.1.D — 835 of 835 partnerships identical |
+
+The trade is **96% per-entry against 98%**, taken deliberately: a check that
+reads its inputs from the thing it is checking is not a check. What the sheet
+still supplies is audited in [07-open-questions.md](07-open-questions.md) — six
+things, of which two are numbers.
+
 ---
 
 ## Next
@@ -168,5 +200,9 @@ launched aggregate-first. See [08-risks-policy.md](08-risks-policy.md).
   cookieless, described there before it ships.
 - **A Seasons page.** The picker covers two; a third will want a list.
 - **Gating the reconciliation view** to maintainers. Honest and public today.
-- **Nine analysis scripts** still hardcode `rankings.zip`. Correct for the
-  season they run against, wrong for any other.
+- **Analysis scripts that hardcode `rankings.zip`.** Correct for the season
+  they run against, wrong for any other.
+- **Three dead mechanisms.** `manual_overrides` has no reader or writer;
+  `official_tournament_stats` is written every load and read by nothing;
+  `Approval` is parsed and never consulted, so XXI.1.E/F is unenforced. Each is
+  a feature to finish or a table to delete.

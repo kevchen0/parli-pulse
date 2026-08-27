@@ -4,20 +4,30 @@ Every known gap, anomaly, and hand-entered result, with what to do about each.
 Kept current — an unlisted gap will be mistaken for an ingestion bug and
 re-debugged from scratch.
 
-Current standing accuracy: per-entry **96%** (1504/1564); the league's top 100
-teams **89% exact**, 95% within 2 points; schools 50% exact. Points are computed from Tabroom, not read from the league's figures — the sheet supplies which tournaments and teams exist, and nothing numeric. `SOURCE=sheet` scores the old way and reaches 98%, which is the measure of what independence costs rather than a better engine.
+Current standing accuracy against the league's published figures: per-entry
+**96%** (1532/1588), the league's top 100 teams **89% exact** and 95% within two
+points, schools 50% exact.
+
+Points are computed from Tabroom, not read from the league. `SOURCE=sheet`
+scores the old way and reaches 98% per-entry — the measure of what independence
+costs, not of a better engine. What the sheet still supplies is audited in
+[07-open-questions.md](07-open-questions.md).
 
 ---
 
 ## 1. Tournaments that do not use Tabroom
 
 Results are entered by hand in `packages/ingest/src/manual-results.ts` with
-`source` recorded. **These need updating every season.**
+`source` recorded — **41 results across three tournaments**. Each is a claim we
+cannot verify against a source we control, so keep the list short and prefer
+fixing ingestion wherever a result exists somewhere. **These need updating every
+season.**
 
-| Tournament | Platform | Status |
+| Tournament | Why | Status |
 |---|---|---|
-| Phillipsburg Fall Spooktacular | SpeechWire | 6 results entered for 2025-26 |
-| Hap Hingston | SpeechWire | 6 results entered for 2025-26 |
+| Phillipsburg Fall Spooktacular | runs on SpeechWire | 6 results entered for 2025-26 |
+| Hap Hingston | runs on SpeechWire | 6 results entered for 2025-26 |
+| Ridge Debates | published 4 of 28 teams | all 28 entered for 2025-26 |
 
 Neither has a `tourn_id` in the league calendar, so the ingest cannot discover
 them. **Before each season, check SpeechWire for these and any new ones.**
@@ -142,16 +152,13 @@ but **elim placement is unrecoverable** — teams the league records as reaching
 finals or semifinals score only their prelim points here. Four results. Same
 class as Ridge Debates, and only manual entry fixes it.
 
-**Walkover adjustments are not ingested at all.** `entry_results.walkover_adjustment`
-is `0` for all 1,564 rows and `official_entry_results.walkover_adjustment` is
-null for every row, so neither our figure nor the sheet mirror carries the
-XXI.5.C -2/+2 that [02-findings.md](02-findings.md) §4 describes at Nueva. Either
-the sheet column is not being read or it is named differently in the workbook.
-Found while building the profile page, which needed to tell a walkover from a
-loss; the display side detects them from the rounds instead — a same-school elim
-section that nobody won, of which 2025-26 has four. Worth checking against the
-`Entry` tab before the next backtest, since any tournament with a closeout is
-currently scored without its adjustment.
+**Walkover adjustments are derived now, not ingested.** They were once read
+from the sheet's `walkover_adjustment` column and written to the database as
+zeros — the points were right, because `scoreEntry` applied the value, but the
+per-rule audit trail the table exists for held nothing. Both are fixed:
+`computeEntryPerformances` derives XXI.5.C from the bracket, and `load` persists
+each adjustment in its own column. 67 walkover adjustments, 211 prelim-count
+adjustments and 1,541 floor decisions where all three were previously 0.
 
 **Still unexplained.** One result:
 
@@ -159,16 +166,25 @@ currently scored without its adjustment.
 |---|---|---|---|
 | TCFL Spring, 3-1 | 7 | 0 | we read no record for this team |
 
-## 6b. Partnerships with no standing of ours (44)
+## 6b. Partnerships with no standing of ours (23)
 
-Categorised, because they are not one problem:
+Down from 44: hand-entering Ridge Debates closed most of it. What is left is
+not one problem.
 
 | Cause | n | Fixable |
 |---|---|---|
-| We scored none of their results | 24 | No — these are the Ridge Debates / Randolph Fall Classic / CBSR 3 gaps in sections 1-2 |
-| The league lists one partnership under two schools | ~8 | No — see below |
-| League typo creating a phantom second team | 3 | No |
-| School ambiguity and hybrids | ~9 | Partly |
+| Tournament published nothing usable | 10 | No — YFL 4, CBSR 3, Randolph Fall Classic |
+| UCLA's prelim-count disagreement | 6 | No — we read 3-3 where the league reads 3-2, and ours is the defensible number |
+| Names the matcher will not resolve | 4 | Partly — see below |
+| The league splits one partnership across two registrations | ~3 | No — see below |
+
+Three of the four naming cases are instructive. **Franklin's Singer & St.
+Martin** and **Blind Brook's Mohapatra & Segura** we now score from Tabroom
+without a sheet row to match against, so they appear in our standings and not in
+the comparison. **Harriton's "Bigdeli & Pedram"** is one person entered as two:
+Pedram Bigdeli, first and last name split across the partner columns. **Francis
+Parker's Blair & Chaudhuri** is our "Ray Chaudhuri" — a surname the sheet
+truncates.
 
 **The league keys a team by school *and* debaters, so one partnership competing
 under two registrations becomes two rows with the points split between them:**
@@ -229,15 +245,32 @@ at once.
 
 Before a season opens:
 
-1. Check SpeechWire for Phillipsburg, Hap Hingston, and any new non-Tabroom
+1. **Confirm the rules have not changed.** `npm run check:rules` compares the
+   engine's tables against the published Board Code and runs first in the chain,
+   so a July revision stops ingestion rather than scoring a season under last
+   year's rules. `packages/rules` is season-versioned for exactly this.
+2. Check SpeechWire for Phillipsburg, Hap Hingston, and any new non-Tabroom
    tournaments.
-2. Re-run `scripts/discover-aliases.ts` and fold in new academies.
-3. Confirm no new tournament shares a `tourn_id` with another.
-4. Confirm the speaker scale for any new league.
-5. Run `npm run compare:sources` and check no tournament has a whole block of
-   entries moving: that is an event name the division classifier misread. See
-   section 7b.
-6. **Confirm the rules have not changed.** The Board Code is revised each July;
-   `packages/rules` is season-versioned for exactly this reason. See
-   [07-open-questions.md](07-open-questions.md), "the alternative non-break
-   table".
+3. Re-run `scripts/discover-aliases.ts` and fold in new academies.
+4. Confirm no new tournament shares a `tourn_id` with another, and that its
+   *field* comes from the right event where one does — see section 3.
+5. Confirm the speaker scale for any new league.
+
+During and after:
+
+6. **`npm run compare:sources`** — a whole tournament's entries moving at once
+   is a field-size input, usually an event name the division classifier misread.
+   See section 7b.
+7. **`npm run backtest:fields`** — open field, N/JV, AFS, elim field and prelim
+   count against the league's own. AFS is the one that selects a points row, so
+   it is the one to watch.
+8. **`npm run check:walkovers`** — XXI.5.C against the league's column.
+9. **Snapshot before any reload, and diff after.** Two destructive bugs and one
+   silent identity churn were caught this way and by nothing else. Speaker
+   totals and ratings should not move when only points change; canonical ids
+   should not move at all.
+
+The first tournament of a season is its own case. Everything here has been
+exercised against an empty season and a complete one; a season holding exactly
+one tournament has never run, and the one dry run against an empty season found
+four bugs.

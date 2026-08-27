@@ -174,9 +174,9 @@ its opponent too — unfortunate, and better than attributing it to the wrong
 pair.
 
 Coverage against the league's own partnership list is complete in the only
-sense available: all 740 of the 799 partnerships that have a decided open round
-in Tabroom are rated, and every one of the 59 that are not has no decided open
-round at all.
+sense available: 736 of the league's 806 partnerships carry a rating, and every
+one of the 70 that do not has no decided open round in Tabroom to build one
+from.
 
 ### Still to do
 

@@ -220,10 +220,14 @@ Greenleaf & Singel (Menlo-Atherton) −2 and Panzer & Tse (Mountain View) −2 f
 walking over teammates; Kassayan & Shivakumar (MA) +2 and Chen & Nalumasu (MV)
 +2 for being walked over. Exactly XXI.5.C.
 
-Detection heuristic to try: an elim section pairing two same-school entries
-where no ballot carries a score. This may remove most of the manual entry the
-plan previously assumed was unavoidable. Validate against
-`walkover_adjustment` across all 1,612 rows before relying on it.
+**Now derived, and the heuristic above is not the one that works.** "An elim
+section where no ballot carries a score" finds 4 of roughly 47: a walkover still
+carries a token ballot naming whoever went through. The signature is a
+same-school section that drew a **short panel** — fewer ballots than the same
+round gave its other sections — which reproduces the league's column for 1,535
+of 1,541 entries. Nor is "same school" sufficient on its own: 2025-26 has 91
+same-school elim sections and 87 of them carry real decisions, several 2-1.
+See [03-rules-engine.md](03-rules-engine.md) and `npm run check:walkovers`.
 
 ---
 

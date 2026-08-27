@@ -63,10 +63,23 @@ nothing unless XXI.2.C's one-third exception applies.
 Same-school only: being walked over +2, walking over −2, finals closeout −3.
 Different-school walkovers count as forfeits.
 
-**Likely auto-detectable** — an elim section pairing two same-school entries
-with no scored ballot. Both Nueva semifinals show this signature. Validate
-against `walkover_adjustment` across all 1,612 rows before relying on it;
-fall back to `manual_overrides` where detection is uncertain.
+**Derived from the bracket**, and validated at 1,535 of 1,541 against the
+league's own column (`npm run check:walkovers`). The signature is a same-school
+elim section that drew a **short panel** — fewer ballots than the same round
+gave its other sections. Two things it deliberately is not:
+
+- not *same school*, because teammates do sometimes debate: Harvard's octafinal
+  between two Menlo-Atherton teams went 2-1 on a full panel and the league
+  records no adjustment;
+- not *no result entered*, because a walkover still carries a token ballot
+  naming whoever went through. That test finds 4 of roughly 47.
+
+Two further shapes leave no section to read, and are inferred from the bracket
+around them: two same-school teams win the semifinals and no final is ever
+published, which is a closeout at −3 each; and a whole round missing from the
+middle of the bracket, applied only where the reconstruction is *forced*.
+
+State qualifiers are excluded — XXI.4.C scores them on qual/alt, not a bracket.
 
 ## Stage 4 — Non-invitational tournaments (XXI.4)
 
