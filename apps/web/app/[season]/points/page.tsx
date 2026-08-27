@@ -86,7 +86,6 @@ async function TeamsTable({
   const page = clampPage(pageParam, totalPages);
   const shown = matches.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const bids = teams.filter((x) => x.partnersQualified >= 2).length;
-  const unresolved = teams.filter((x) => x.reconciliation !== 'agrees').length;
 
   return (
     <>
@@ -97,12 +96,6 @@ async function TeamsTable({
           <b>{bids}</b> eligible for a TOC bid
           <sup className="fnref"><a href="#fn-toc">1</a></sup>
         </span>
-        {unresolved > 0 && (
-          <span>
-            <b>{unresolved}</b> disagreements with the sheet
-            <sup className="fnref"><a href="#fn-recon">2</a></sup>
-          </span>
-        )}
       </p>
 
       <TableSearch
