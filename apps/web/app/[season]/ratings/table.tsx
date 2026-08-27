@@ -19,7 +19,7 @@ import DebaterLink from '@/app/debater-link';
  * not making the same claim, and ordering on the rating alone puts the twelve
  * first -- which reports how little is known, not who is better. Computed by
  * `npm run rate` and stored, so the site and the pipeline cannot disagree about
- * the order; the method is at /<season>/method/ratings.
+ * the order; the method is at /method/ratings.
  */
 const shown = (r: RatingRow): number => Number(r.shrunk ?? r.rating);
 

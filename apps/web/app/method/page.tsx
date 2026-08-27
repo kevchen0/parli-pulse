@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { currentSeason, seasonHref } from '@/lib/season';
 
 export const metadata = { title: 'Method — Parli Pulse' };
 
@@ -8,12 +7,10 @@ export const metadata = { title: 'Method — Parli Pulse' };
  *
  * Global rather than season-scoped: the methods do not change with the season,
  * and a reader asking "what is this number" is not asking it about a particular
- * year. The rating specification, which quotes figures measured on one season,
- * stays under that season and is linked from here.
+ * year. The rating specification sits under this page for the same reason; the
+ * measured parameters in it name the season they came from.
  */
 export default function MethodPage() {
-  const season = currentSeason();
-
   return (
     <main className="wrap prose">
       <h1>Method</h1>
@@ -33,9 +30,10 @@ export default function MethodPage() {
       </p>
       <p>
         Recomputing rather than mirroring is the point. It means the figures can be
-        checked, and it means a disagreement is visible instead of invisible. Agreement
-        currently runs at 98% of individual results and 87% of partnership season totals,
-        rising to 92% across the league&rsquo;s top hundred.
+        checked, and it means a disagreement is visible instead of invisible. On the
+        2025-26 season the figures match the league on 96% of individual results and 92%
+        of partnership season totals; across the league&rsquo;s top hundred teams, 89%
+        match exactly and 95% land within two points.
       </p>
       <p>
         Most of the remaining gap is not ours to close. Some tournaments published little
@@ -64,7 +62,7 @@ export default function MethodPage() {
         59.8% — which is the test it had to pass to be published at all.
       </p>
       <p>
-        <Link href={seasonHref(season, '/method/ratings')}>
+        <Link href="/method/ratings">
           The full specification, with the equations
         </Link>
         .

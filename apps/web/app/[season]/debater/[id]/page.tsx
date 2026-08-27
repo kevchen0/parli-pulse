@@ -256,7 +256,7 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
             but is not placed on the board — and the board is ordered on the rating pulled
             toward the field by that deviation, not on the rating itself, so a place on it
             and the figure here do not move together.{' '}
-            <Link href={seasonHref(season, '/method/ratings')}>How it works</Link>.
+            <Link href="/method/ratings">How it works</Link>.
           </p>
           <div className="tablewrap">
             <table>

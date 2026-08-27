@@ -19,7 +19,6 @@ const MOVED: Record<string, string> = {
   'schools': '/points/schools',
   'speakers': '/speakers',
   'ratings': '/ratings',
-  'ratings/method': '/method/ratings',
 };
 
 export default async function LegacyRankings({
@@ -29,6 +28,9 @@ export default async function LegacyRankings({
 }) {
   const { rest } = await params;
   const key = rest?.join('/') ?? '';
+  // The rating specification is no longer under a season, so it is the one
+  // destination here that must not be prefixed with one.
+  if (key === 'ratings/method') redirect('/method/ratings');
   // An unrecognised tail lands on Points rather than a 404: the reader followed
   // a link that used to work, and the season's front page is a better answer
   // than an error.

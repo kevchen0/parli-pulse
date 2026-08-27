@@ -611,6 +611,29 @@ export interface SeasonSummary {
   lastResultOn: string | null;
 }
 
+/**
+ * The most recent season that actually holds ratings.
+ *
+ * The rating specification is not about one season -- the method is the same
+ * every year -- but the parameters in it are measured, so the page has to read
+ * them from somewhere. It reads them from the newest season that has any,
+ * which in the weeks around an opener is not the current one, and names the
+ * season it used rather than saying "this season" on a page that is no longer
+ * under one.
+ *
+ * Null where nothing has been rated at all.
+ */
+export async function latestRatedSeason(): Promise<SeasonId | null> {
+  const { db } = handle();
+  const rows = (await db.execute(sql`
+    select season_id as id from ${t.ratings}
+    group by season_id
+    order by season_id desc
+    limit 1
+  `)).rows as unknown as { id: string }[];
+  return rows[0]?.id ?? null;
+}
+
 export async function getSeasons(): Promise<SeasonSummary[]> {
   const { db } = handle();
   const rows = (await db.execute(sql`

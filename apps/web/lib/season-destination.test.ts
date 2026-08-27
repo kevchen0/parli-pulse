@@ -16,7 +16,7 @@ describe('seasonDestination', () => {
       '/2025-26/ratings',
       '/2025-26/speakers',
       '/2025-26/internal/reconciliation',
-      '/2025-26/method/ratings',
+      '/2025-26/internal/reconciliation/detail',
       null,
     ]) {
       expect(seasonDestination(path, '2026-27')).toBe('/2026-27/points');

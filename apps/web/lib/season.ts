@@ -88,7 +88,6 @@ export type SeasonPath =
   | '/points/schools'
   | '/ratings'
   | '/speakers'
-  | '/method/ratings'
   | '/internal/reconciliation';
 
 export function seasonHref(season: SeasonId, path: SeasonPath, hash = ''): never {
