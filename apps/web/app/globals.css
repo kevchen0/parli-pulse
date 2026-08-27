@@ -219,6 +219,19 @@ td.school {
 
 /* --- footnote references --- */
 sup.fnref { font-size: 0.62em; margin-left: 0.15em; letter-spacing: 0.02em; }
+/*
+ * A footnote marker in a right-aligned column header must not take width.
+ * The header labels the figures beneath it and they line up on the column's
+ * right edge; a marker sitting in the line box pushes the word left by its own
+ * width, so "Points" stops sitting over the points. Zero-width, it renders
+ * into the cell's 0.9rem padding instead and the label keeps its alignment.
+ */
+th.num sup.fnref {
+  display: inline-block; width: 0; margin-left: 0;
+  /* The gap before the marker is drawn, not laid out: a margin would
+     count toward the line box and put the label back off the edge. */
+  transform: translateX(0.2em);
+}
 sup.fnref a { color: var(--accent); text-decoration: none; }
 sup.fnref a:hover { text-decoration: underline; }
 ol.footnotes li:target { color: var(--text); }

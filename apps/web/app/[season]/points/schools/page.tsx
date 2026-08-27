@@ -120,7 +120,9 @@ async function SchoolsTable({
           <b>amber</b> means the sheet has not updated its tournament results yet.{' '}
           <abbr className="tick differs">*</abbr>{' '}
           <b>red</b> means results depend on partnership data that disagree with the
-          league&rsquo;s sheet.
+          league&rsquo;s sheet.{' '}
+          Hover for the league&rsquo;s number. Wherever numbers disagree, the
+          league&rsquo;s figure is the official one.
         </li>
       </ol>
     </>
