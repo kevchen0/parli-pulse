@@ -404,12 +404,16 @@ export default async function MethodPage() {
       <section id="speaks">
         <h2>3. Speaker points</h2>
         <p>
-          A raw speaker score measures the judge as much as the debater: panels differ by
-          two points and more, so a season average depends heavily on the draw. Each ballot
-          is measured against the judge who awarded it.
+          Judges differ in how generously they score, and panels differ by two points and
+          more, so a raw season average depends heavily on which judges a debater drew. We
+          normalize each ballot against the judge who awarded it.
         </p>
 
         <h3>Per ballot</h3>
+        <p>
+          With <V>x</V> the raw score, <Sub><V>m</V><V>j</V></Sub> the centre of judge{' '}
+          <V>j</V>&rsquo;s scores and <Sub><V>s</V><V>j</V></Sub> their spread:
+        </p>
         <div className="eqn">
           <E block>
             <V>z</V><Op>=</Op>
@@ -420,20 +424,18 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          <V>x</V> is the raw score, <Sub><V>m</V><V>j</V></Sub> the centre of judge{' '}
-          <V>j</V>&rsquo;s scores and <Sub><V>s</V><V>j</V></Sub> their spread. Centre is a{' '}
-          <b>median</b> and spread a <b>winsorized standard deviation</b> rather than a mean
-          and a plain SD. A sub-scale score is usually a conduct sanction under Article XIV;
-          it is real and stays in the record, but one of them must not stretch a
-          judge&rsquo;s spread and quietly compress everyone else that judge ranked. Spread
-          is floored at 0.35 so a judge who gave nearly identical scores cannot divide by
-          almost nothing.
+          The centre is a median and the spread is a winsorized standard deviation. Scores
+          below a scale&rsquo;s minimum are usually conduct sanctions under Article XIV;
+          they stay in the record, and a mean with a plain standard deviation would let one
+          of them widen a judge&rsquo;s spread and compress every other debater that judge
+          scored. The spread is floored at 0.35, so a judge who gave nearly identical scores
+          does not divide by close to zero.
         </p>
 
         <h3>Judges with few ballots</h3>
         <p>
-          A median over four ballots is noise, so a judge&rsquo;s centre and spread are both
-          shrunk toward the pool by sample size:
+          A median over four ballots carries little information, so we shrink both the
+          centre and the spread toward the pool by the judge&rsquo;s sample size:
         </p>
         <div className="eqn">
           <E block>
@@ -444,13 +446,14 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          <V>w</V> rises with the judge&rsquo;s ballot count. The fallback chain is
-          judge-season, then judge-tournament, then the event pool.
+          <V>w</V> rises with the judge&rsquo;s ballot count. Where a judge has too few
+          ballots across the season we fall back to their ballots at that tournament, and
+          then to the event pool.
         </p>
 
         <h3>Per debater</h3>
         <p>
-          One <V>z</V> per ballot, then the mean of a debater&rsquo;s own:
+          We compute one <V>z</V> per ballot and take the mean of a debater&rsquo;s own:
         </p>
         <div className="eqn">
           <E block>
@@ -463,25 +466,30 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          Averaging the z-scores rather than z-scoring the average is the point: each ballot
-          is compared to the judge who gave it, so the season figure averages across many
-          standards. The top figures rest on 19 to 71 distinct judges apiece. Debaters with
-          fewer than {MIN_BALLOTS} ballots keep every score and are not ranked.
+          Each ballot is compared to the judge who gave it, so a season figure averages
+          across many standards rather than one. Ranked figures rest on 19 to 71 distinct
+          judges each. <Text>CI</Text> is the 95% confidence interval on the mean, and is
+          the ± shown beside every figure. Debaters with fewer than {MIN_BALLOTS} ballots
+          keep every score and are not ranked.
         </p>
 
         <h3>Scale</h3>
         <p>
-          Scale comes from a configuration table per league, never inferred from the
-          observed minimum. The convention is 25&ndash;30; NYPDL runs 23&ndash;30 and YFL 1
-          runs 0&ndash;100. Inferring from the minimum misclassifies most events, because a
-          lone punitive 24 is not a scale. Scores of exactly 0 are forfeit sentinels and are
-          excluded; scores from 1 to 22 on a 25&ndash;30 scale go to review rather than into
-          the arithmetic. The displayed figure is rescaled onto a 25&ndash;30 band centred at
-          27.5; raw, <V>z</V> and display are stored separately and raw is never overwritten.
+          Each league&rsquo;s scale is stored in a configuration table rather than inferred
+          from its scores. Most events run 25&ndash;30, NYPDL runs 23&ndash;30, and YFL 1
+          runs 0&ndash;100. Inferring a scale from the lowest observed score misclassifies
+          most events, since a single punitive 24 on a 25&ndash;30 scale would read as a
+          24&ndash;30 scale.
+        </p>
+        <p>
+          Scores of exactly 0 are forfeit records and are excluded. Scores from 1 to 22 on a
+          25&ndash;30 scale are held for review rather than normalized. The displayed figure
+          is rescaled onto a 25&ndash;30 band centred at 27.5. Raw, <V>z</V> and display
+          values are stored separately, and the raw value is never overwritten.
         </p>
         <p className="defn">
-          There is no lowest-speaks view, no punitive flag and nothing that identifies who
-          received a sanction. See <Link href="/privacy">Privacy</Link>.
+          No view on this site ranks debaters by lowest speaks, flags a punitive score, or
+          identifies who received one. See <Link href="/privacy">Privacy</Link>.
         </p>
       </section>
 
