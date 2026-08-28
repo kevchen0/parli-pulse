@@ -40,10 +40,10 @@ export default async function SpeakersPage(
       <ol className="footnotes">
         <li id="fn1">
           Under {MIN_BALLOTS} ballots a season average says more about which judges a
-          debater drew than about the debater, so those figures are left unranked. Ten is
-          roughly one tournament, which keeps the board useful early in a season rather than
-          empty until January. Everyone keeps every score either way, and the ± beside each
-          figure says how far to trust it.
+          debater drew than about the debater, so those figures are left unranked. A
+          tournament is about five ballots, so ten is two of them: the board fills early in
+          a season rather than sitting empty until January. Everyone keeps every score
+          either way, and the ± beside each figure says how far to trust it.
         </li>
         <li id="fn2">
           <b>Z-score</b> is how far a debater&rsquo;s speaks fell above or below the average

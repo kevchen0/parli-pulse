@@ -61,11 +61,14 @@ export const SHRINKAGE_BALLOTS = 12;
 /**
  * Ballots a debater needs before their season figure is ranked.
  *
- * Ten rather than twenty deliberately. Twenty is about two tournaments and
- * gives a tighter figure, but nobody clears it until months into a season, so
- * a board gated there is empty for the part of the year people most want to
- * look at it. Ten is one tournament, and the interval printed beside every
- * figure says how much to trust it.
+ * Ten rather than twenty deliberately. A tournament is five prelim ballots at
+ * the median -- panels barely move it, at 1.11 ballots per round -- so ten is
+ * two tournaments and twenty is four. Gated at twenty a board is empty until
+ * months into a season, which is the part of the year people most want to look
+ * at it. The interval printed beside every figure says how much to trust it.
+ *
+ * Measured, not assumed: the comment this replaced said twenty was roughly two
+ * tournaments, which was out by a factor of two and had never been checked.
  *
  * A debater below the line keeps every score; the gate decides only who is
  * ranked.
