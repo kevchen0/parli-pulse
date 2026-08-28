@@ -144,33 +144,33 @@ export default async function MethodPage() {
       <section id="rating">
         <h2>2. Rating</h2>
         <p>
-          Glicko-2 over partnerships, one rating period per tournament, every round inside
-          a period judged against the ratings held before it began. Ours, and unrelated to
-          Article XXI.
+          Our rating uses Glicko-2 over partnerships, with one rating period per tournament.
+          Each round within a period is rated against the ratings from the start of it.
         </p>
 
-        <h3 id="why">Why Glicko-2 rather than a point estimate</h3>
+        <h3 id="why">Why Glicko-2</h3>
         <p>
-          A partnership carries a rating <V>r</V> and a deviation <V>RD</V> measuring how
-          well that rating is known. The deviation does two things a single number cannot.
+          A partnership has a rating <V>r</V> and a deviation <V>RD</V> that estimates how
+          tight <V>r</V> is. This deviation solves two problems other rating systems have.
         </p>
         <ul className="plain">
           <li>
-            <b>It widens while a partnership is away.</b> With no result to learn from the
-            rating holds and the deviation grows, so a team last seen in October is not
-            treated as the team it was in October.
+            <b>It widens while a partnership is inactive.</b> Every week that a team does
+            not attend a tournament, ratings hold but deviation grows. This prevents camping
+            with a few good tournaments early in the season.
           </li>
           <li>
-            <b>It sets how far a result moves a rating.</b> The update is weighted by how
-            well each side is already known, so beating a settled opponent on a thin rating
-            moves you a long way and barely moves them.
+            <b>It controls how much a result affects the rating.</b> Each change is
+            proportional to the uncertainty of each team. For example, a victory over a
+            consistent opponent while your deviation is high improves you vastly while
+            barely affecting the other.
           </li>
         </ul>
         <p>
-          Both matter here because the season is sparse: nearly half of partnerships debate
-          fewer than ten open rounds. The cost of dropping them is measured in{' '}
-          <a href="#validation">the comparison below</a> &mdash; Elo, which is the same
-          idea without a deviation, loses 2.8 points of accuracy.
+          Both of these factors are relevant since nearly half of all partnerships debate
+          under ten open rounds. A system that does not measure deviation therefore loses
+          accuracy: Elo loses 2.8 points of it, in{' '}
+          <a href="#validation">the comparison below</a>.
         </p>
 
         <h3 id="standard">The standard part</h3>
