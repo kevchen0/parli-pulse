@@ -45,41 +45,14 @@ export default async function MethodPage() {
 
         <p>
           Every figure is derived from Tabroom&rsquo;s round data through an implementation
-          of Article XXI. Nothing is copied from the league&rsquo;s spreadsheet except the
-          six inputs listed under <a href="#supplied">what the sheet supplies</a>.
+          of Article XXI of the NPDL League Rules, found{' '}
+          <a href="https://docs.google.com/document/d/1xv6klxK9PQPPyAaeJ9Gh9-CGL-nvikRjRAsDTiRYZtw/view">here</a>.
         </p>
 
-        <h3>Order of evaluation</h3>
-        <ol className="split">
-          <li>
-            <b>Tournament eligibility</b> (XXI.1). Open division, invitational or named in
-            XXI.4, at least 5 schools, 10 teams and 3 preliminary rounds. June, July,
-            August and 24 December to 2 January are excluded.
-          </li>
-          <li>
-            <b>Field sizes</b> (XXI.2.A&ndash;B). The open field is the entries in the open
-            division less those that forfeited. Adjusted field size is the open field{' '}
-            <em>plus</em> novice and JV. The elimination field counts distinct entries
-            appearing in any elimination section, not <E><V>sections</V><Op>×</Op><N>2</N></E>,
-            because a bye is a one-team section.
-          </li>
-          <li>
-            <b>Base points.</b> Breaking teams read the elimination points table at the row
-            for their adjusted field size and the column for the highest elimination level
-            reached, taken from the section count. Non-breaking teams read XXI.3.A by
-            record.
-          </li>
-          <li>
-            <b>The points floor</b> (XXI.3.B) lifts the <em>base</em>, not the total.
-          </li>
-          <li>
-            <b>Adjustments</b> apply on top: preliminary count (XXI.2.E), break percentage
-            (XXI.2.D), walkovers and closeouts (XXI.5.C).
-          </li>
-          <li>
-            <b>Season total</b> (XXI.7). The best five tournaments, weighted:
-          </li>
-        </ol>
+        <h3>Season total</h3>
+        <p>
+          A partnership&rsquo;s season total (XXI.7) is its best five tournaments, weighted:
+        </p>
 
         <div className="eqn">
           <E block>
@@ -105,11 +78,12 @@ export default async function MethodPage() {
 
         <h3>Agreement with the league&rsquo;s sheet</h3>
         <p>
-          The league publishes its own figures, and every one of ours is compared against
-          them result by result. Three counts rather than one rate, because they fail for
-          unrelated reasons: a <b>differing</b> figure is a rule read differently or a
-          number the league entered by hand, while an <b>absent</b> one is a result we
-          could not score at all.
+          The league publishes its own official points figures{' '}
+          <a href="https://www.parliamentarydebate.org/rankings">here</a>. Due to Tabroom tournaments not publishing results,
+          differing interpretations of rules, and figures the league enters by hand, our
+          points often disagree with the league&rsquo;s sheet. Our agreement rates on
+          per-entry results, partnership season totals and the league&rsquo;s top 100 are
+          shown below.
         </p>
 
         {scored ? (
@@ -151,26 +125,18 @@ export default async function MethodPage() {
         )}
 
         <p className="defn">
-          Rate is agree ÷ (agree + differ): agreement among the results we produced a figure
-          for. Absent rows are counted separately rather than folded in, since they measure
-          coverage rather than correctness.
+          Rate is agree ÷ (agree + differ). Absent rows in our ranking are counted
+          separately.
         </p>
 
-        <h3 id="supplied">What the sheet supplies</h3>
+        <h3 id="supplied">What still comes from the sheet</h3>
         <p>
-          Six things, of which two are numbers. Which tournaments exist (the Results column
-          of the Tournaments tab); which schools are league members; canonical school names
-          and regions; each tournament&rsquo;s category, which selects the scoring schedule
-          and the speaker scale; which school a result is credited to, where a team entered
-          under a club registration; and the second school of a hybrid entry.
-        </p>
-        <p>
-          The two numbers are state-qualifier placements, which XXI.4.C scores at 8 for a
-          qualifier and 4 for an alternate and which appear nowhere in a payload, and a
-          prelim-only fallback for tournaments that published no pairings. Together they
-          are under 6% of scoring entries. Setting <code>SOURCE=sheet</code> restores the
-          league&rsquo;s own field sizes and adjustments, which raises agreement by about
-          two points and is what the backtests use to isolate the scoring rules.
+          Two figures are taken from the league rather than computed, because Tabroom does
+          not carry them. <b>State-qualifier placements</b>, which XXI.4.C scores at 8 for a
+          qualifier and 4 for an alternate: a placement is not a bracket position and
+          appears nowhere in a payload. And a <b>prelim-only fallback</b> for tournaments
+          that published no pairings, scored from the league&rsquo;s own recorded result.
+          Together they are under 6% of scoring entries.
         </p>
       </section>
 
