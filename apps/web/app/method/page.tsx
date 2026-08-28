@@ -130,14 +130,19 @@ export default async function MethodPage() {
         </p>
 
         <h3 id="supplied">What still comes from the sheet</h3>
-        <p>
-          Two figures are taken from the league rather than computed, because Tabroom does
-          not carry them. <b>State-qualifier placements</b>, which XXI.4.C scores at 8 for a
-          qualifier and 4 for an alternate: a placement is not a bracket position and
-          appears nowhere in a payload. And a <b>prelim-only fallback</b> for tournaments
-          that published no pairings, scored from the league&rsquo;s own recorded result.
-          Together they are under 6% of scoring entries.
-        </p>
+        <p>Two figures come from the league rather than from Tabroom.</p>
+        <ul className="plain">
+          <li>
+            <b>State-qualifier placements.</b> XXI.4.C scores a qualifier at 8 points and an
+            alternate at 4. A placement is not a bracket position, so no payload contains
+            one.
+          </li>
+          <li>
+            <b>Prelim-only results.</b> A few tournaments publish no pairings. Those entries
+            are scored from the record the league recorded.
+          </li>
+        </ul>
+        <p>Together these are under 6% of scoring entries.</p>
       </section>
 
       {/* ------------------------------------------------------------ rating */}
