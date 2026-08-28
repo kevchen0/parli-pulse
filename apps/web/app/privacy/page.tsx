@@ -9,8 +9,7 @@ export default function PrivacyPage() {
       <h1>Privacy</h1>
 
       <p className="lede">
-        Most people named on this site are minors. Nothing here goes beyond what the league
-        and Tabroom already publish.
+        All results posted on this site were calculated from publicly available data.
       </p>
 
       <h2>What is shown</h2>
@@ -27,8 +26,8 @@ export default function PrivacyPage() {
           the school a debater competed for.
         </li>
         <li>
-          Anything that singles out a debater for a low score. There is no lowest-speaks
-          view, no ranking from the bottom, and no flag on an individual figure.
+          A lowest-ranked view for individual debater tabs, such as debater points and
+          speaker points.
         </li>
         <li>Any judge named alongside a decision they made.</li>
       </ul>
