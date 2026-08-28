@@ -57,7 +57,7 @@ async function SchoolsTable({
   return (
     <>
       <p className="meta">
-        <span><b>{schools.length}</b> member schools</span>
+        <span><b>{schools.length}</b> member schools with points</span>
         <span>Hybrid partnerships count half to each school</span>
       </p>
       <TableSearch

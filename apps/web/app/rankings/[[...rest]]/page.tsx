@@ -30,7 +30,7 @@ export default async function LegacyRankings({
   const key = rest?.join('/') ?? '';
   // The rating specification is no longer under a season, so it is the one
   // destination here that must not be prefixed with one.
-  if (key === 'ratings/method') redirect('/method/ratings');
+  if (key === 'ratings/method') redirect('/method#rating');
   // An unrecognised tail lands on Points rather than a 404: the reader followed
   // a link that used to work, and the season's front page is a better answer
   // than an error.

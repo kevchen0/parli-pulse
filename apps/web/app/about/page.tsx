@@ -64,7 +64,7 @@ export default async function AboutPage() {
         ))}
       </ul>
       <p>
-        Seasons before 2025-26 are not loaded. Article XXI has changed materially over the
+        Seasons before 2025&ndash;26 are not loaded. Article XXI has changed materially over the
         years, so points scored under an older version of the rules are not comparable to
         current ones, and recomputing them under today&rsquo;s rules would produce figures
         that never existed.

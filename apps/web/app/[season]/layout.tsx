@@ -59,7 +59,15 @@ export default async function SeasonLayout({
           {status === 'upcoming' && 'Not yet open'}
         </p>
       </div>
-      {freshness && <FreshnessLine freshness={freshness} />}
+      {/*
+        Only a running season can be stale. A finished one is never ingested
+        again, so its timestamp drifts forever and the warning fires on figures
+        that are correct and final -- which is worse than saying nothing, since
+        the one place the site reports a broken pipeline would be crying wolf on
+        every archived season. The header above already says "Complete, last
+        results ...", which is the useful statement for a season that is done.
+      */}
+      {freshness && status !== 'final' && <FreshnessLine freshness={freshness} />}
       <SeasonNav season={season} />
       <main className="wrap">{children}</main>
     </>

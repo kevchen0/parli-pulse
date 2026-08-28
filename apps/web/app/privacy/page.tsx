@@ -57,7 +57,7 @@ export default function PrivacyPage() {
       <h2>Removal</h2>
       <p>
         A debater, or a parent or coach on their behalf, can ask to have their name removed.
-        We do not ask for a reason.
+        I do not ask for a reason.
       </p>
       <p>
         The name is then replaced with &ldquo;Name withheld&rdquo; everywhere it would
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
         Somebody who compares that row against the league&rsquo;s own published standings
         can often work out whose it is. Removing the row instead would move a school&rsquo;s
         total, which would make the request visible in the arithmetic. If that trade does
-        not work for you, say so when you write and we will talk about it.
+        not work for you, say so when you write and I will see what can be done.
       </p>
       <p>
         Email <a href={`mailto:${CONTACT}`}>{CONTACT}</a>, or use the{' '}

@@ -26,7 +26,7 @@ export default function FeedbackPage() {
 
       <h2>Removal requests</h2>
       <p>
-        A debater, or a parent or coach on their behalf, can ask to have a name removed. We
+        A debater, or a parent or coach on their behalf, can ask to have a name removed. I
         do not ask for a reason. Use the form above, or email{' '}
         <a href={`mailto:${CONTACT}`}>{CONTACT}</a>. The{' '}
         <Link href="/privacy">Privacy page</Link> describes what removal changes.
