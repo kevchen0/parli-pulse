@@ -29,8 +29,8 @@ export default async function MethodPage() {
     <main className="wrap method">
       <h1>Method</h1>
       <p className="lede">
-        Three kinds of number appear on this site. Article XXI points are the league&rsquo;s,
-        recomputed here so they can be checked. The rating and the speaker figures are ours.
+        Methodology for recomputing the league&rsquo;s Article XXI points and our ratings
+        and speaker figures.
       </p>
 
       <nav className="method-toc" aria-label="On this page">
