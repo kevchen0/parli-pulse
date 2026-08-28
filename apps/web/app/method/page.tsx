@@ -424,10 +424,9 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          The centre is a median and the spread is a winsorized standard deviation. Scores
-          below a scale&rsquo;s minimum are usually conduct sanctions under Article XIV;
-          they stay in the record, and a mean with a plain standard deviation would let one
-          of them widen a judge&rsquo;s spread and compress every other debater that judge
+          The centre is a median and the spread is a winsorized standard deviation. Both are
+          robust to outliers: a mean with a plain standard deviation would let one unusually
+          low score widen a judge&rsquo;s spread and compress every other debater that judge
           scored. The spread is floored at 0.35, so a judge who gave nearly identical scores
           does not divide by close to zero.
         </p>
@@ -478,8 +477,8 @@ export default async function MethodPage() {
           Each league&rsquo;s scale is stored in a configuration table rather than inferred
           from its scores. Most events run 25&ndash;30, NYPDL runs 23&ndash;30, and YFL 1
           runs 0&ndash;100. Inferring a scale from the lowest observed score misclassifies
-          most events, since a single punitive 24 on a 25&ndash;30 scale would read as a
-          24&ndash;30 scale.
+          most events, since a single unusually low score on a 25&ndash;30 scale would read
+          as a wider scale.
         </p>
         <p>
           Scores of exactly 0 are forfeit records and are excluded. Scores from 1 to 22 on a
@@ -488,8 +487,8 @@ export default async function MethodPage() {
           values are stored separately, and the raw value is never overwritten.
         </p>
         <p className="defn">
-          No view on this site ranks debaters by lowest speaks, flags a punitive score, or
-          identifies who received one. See <Link href="/privacy">Privacy</Link>.
+          No view on this site ranks debaters from the bottom. See{' '}
+          <Link href="/privacy">Privacy</Link>.
         </p>
       </section>
 

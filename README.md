@@ -90,8 +90,12 @@ packages/speaks/   speaker-point normalization
 packages/ingest/   Tabroom client, sheet mirror, entity resolution
 packages/db/       Drizzle schema and migrations
 scripts/           the pipeline, backtests and diagnostics
+docs/              rules text, the elim points table, the writing style guide
 plan/              why every one of the above is the way it is
 ```
+
+Copy the site shows follows [docs/writing-style.md](docs/writing-style.md).
+Read it before editing a page.
 
 All TypeScript, one repo, one deploy target, chosen so a single maintainer never
 context-switches languages. Node runs the `.ts` files directly — no build step,

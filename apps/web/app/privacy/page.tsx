@@ -27,10 +27,9 @@ export default function PrivacyPage() {
           affiliations beyond the school a debater competed for.
         </li>
         <li>
-          Anything identifying a conduct sanction. Sub-scale speaker points are usually
-          equity sanctions under Article XIV. They remain in the data because removing
-          them would distort every other figure, but there is no lowest-speaks view, no
-          punitive flag, and no way to work out who received one.
+          Anything that would single out a debater for a low score. There is no
+          lowest-speaks view, no ranking from the bottom, and no flag on any individual
+          figure.
         </li>
         <li>
           Judge-level detail that would name an individual judge alongside a decision, at
