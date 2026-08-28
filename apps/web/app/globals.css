@@ -677,33 +677,38 @@ abbr.tick.differs { color: var(--bad); }
 
 .footnotes abbr.tick { margin-right: 0.1rem; }
 
-/* --- feedback form --- */
+/* --- feedback form ---
+   One bordered group: name and email share a row above the message, divided by
+   hairlines rather than gaps, so the three fields read as one control. */
 .feedbackform { display: flex; flex-direction: column; gap: 0.9rem; margin: 0 0 2rem; }
-.feedbackform label {
-  display: flex; flex-direction: column; gap: 0.3rem;
-  font-size: 0.8125rem; font-weight: 500; color: var(--muted);
-}
-/* The label text and its "optional" tag share one row; a bare text node beside
-   a span in a column flex container becomes its own row. */
-.feedbackform .lbl { display: block; }
-.feedbackform .opt { font-weight: 400; color: var(--faint); }
-.feedbackform textarea,
-.feedbackform input[type='text'],
-.feedbackform input[type='email'] {
-  font: inherit; font-size: 0.9375rem; color: var(--text);
-  padding: 0.5rem 0.6rem;
+.feedbackform .group {
   border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--surface); width: 100%;
+  background: var(--surface); overflow: hidden;
 }
-.feedbackform textarea { resize: vertical; min-height: 8rem; line-height: 1.55; }
-.feedbackform textarea:focus-visible,
-.feedbackform input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.feedbackform .two { display: flex; gap: 0.9rem; flex-wrap: wrap; }
-.feedbackform .two > label { flex: 1 1 14rem; }
+.feedbackform .row { display: flex; }
+.feedbackform .row > label { flex: 1 1 0; min-width: 0; }
+.feedbackform .row > label + label { border-left: 1px solid var(--border); }
+.feedbackform .msg { border-top: 1px solid var(--border); }
+.feedbackform .group label { display: block; padding: 0.5rem 0.7rem 0.55rem; }
+/* The outer border is clipped by overflow, so focus is shown as a tint. */
+.feedbackform .group label:focus-within { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.feedbackform .lbl {
+  display: block; font-size: 0.6875rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted);
+  margin-bottom: 0.15rem;
+}
+.feedbackform .opt { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--faint); }
+.feedbackform input[type='text'],
+.feedbackform input[type='email'],
+.feedbackform textarea {
+  font: inherit; font-size: 0.9375rem; color: var(--text);
+  border: 0; padding: 0; width: 100%; background: transparent;
+}
+.feedbackform input:focus-visible,
+.feedbackform textarea:focus-visible { outline: none; }
+.feedbackform textarea { resize: vertical; min-height: 7rem; line-height: 1.55; display: block; }
 /* Off-screen rather than display:none, which some bots skip. */
-.feedbackform .hp {
-  position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;
-}
+.feedbackform .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .feedbackform .actions { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; }
 .feedbackform button {
   font: inherit; font-size: 0.875rem; font-weight: 500;

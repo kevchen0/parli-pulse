@@ -12,41 +12,40 @@ export default function FeedbackPage() {
       <h1>Feedback</h1>
 
       <p className="lede">
-        A wrong number is worth reporting even when you are not certain it is wrong. Most
-        errors found so far were found by someone who knew the circuit and thought a result
-        looked odd.
+        Report a wrong number even if you are not sure it is wrong. Several errors on this
+        site were found by people who knew the circuit and thought a result looked odd.
       </p>
 
       <h2>Send a message</h2>
       <p>
-        The most useful report names the tournament, the partnership or debater, what the
-        site says, and what it should say. A link to the page helps. If the league&rsquo;s
-        published figure differs from ours, say so: that points at a specific rule.
+        Name the tournament, the partnership or debater, what the site shows, and what it
+        should show. A link to the page helps. If the league&rsquo;s published figure
+        differs from ours, say which one you are looking at.
       </p>
 
       <FeedbackForm />
 
       <h2>Removal requests</h2>
       <p>
-        A debater, or a parent or coach on their behalf, can ask to have a name removed.
-        Requests are handled without asking for a reason. Use the form above or email{' '}
+        A debater, or a parent or coach on their behalf, can ask to have a name removed. We
+        do not ask for a reason. Use the form above, or email{' '}
         <a href={`mailto:${CONTACT}`}>{CONTACT}</a>. The{' '}
-        <Link href="/privacy">Privacy page</Link> says what removal does and does not change.
+        <Link href="/privacy">Privacy page</Link> describes what removal changes.
       </p>
 
       <h2>Other ways to reach me</h2>
       <ul>
         <li>
-          <a href={`mailto:${CONTACT}`}>{CONTACT}</a>, if you would rather use your own mail.
+          <a href={`mailto:${CONTACT}`}>{CONTACT}</a>, if you prefer your own mail client.
         </li>
         <li>
-          <a href={`${REPO}/issues/new`}>A GitHub issue</a>, for anything you are happy to
-          discuss in public. Issues are visible to anyone, so removal requests should not go
-          here.
+          <a href={`${REPO}/issues/new`}>A GitHub issue</a>, for anything you are willing to
+          discuss in public. Issues are visible to anyone, so do not use one for a removal
+          request.
         </li>
         <li>
-          <a href={REPO}>The repository</a> holds the engine, the rules implementation and
-          every known data problem, if you would rather read the code than describe the bug.
+          <a href={REPO}>The repository</a> holds the engine, the rules implementation, and
+          the list of known data problems.
         </li>
       </ul>
     </main>

@@ -35,7 +35,7 @@ export default function FeedbackForm() {
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? 'That did not send. Please try again.');
+        setError(data.error ?? 'That did not send. Try again in a moment.');
         setState('error');
         return;
       }
@@ -52,51 +52,52 @@ export default function FeedbackForm() {
   if (state === 'sent') {
     return (
       <p className="sent" role="status">
-        Sent. If you left an address I will reply to it.
+        Sent. If you left an email I will reply to it.
       </p>
     );
   }
 
   return (
     <form className="feedbackform" onSubmit={submit}>
-      <label htmlFor="fb-message">
-        <span className="lbl">Message</span>
-        <textarea
-          id="fb-message"
-          name="message"
-          required
-          minLength={10}
-          maxLength={4000}
-          rows={7}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Which page, which figure, and what you think it should be."
-        />
-      </label>
-
-      <div className="two">
-        <label htmlFor="fb-name">
-          <span className="lbl">Name <span className="opt">optional</span></span>
-          <input
-            id="fb-name"
-            name="name"
-            type="text"
-            maxLength={120}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoComplete="name"
-          />
-        </label>
-        <label htmlFor="fb-email">
-          <span className="lbl">Email <span className="opt">optional</span></span>
-          <input
-            id="fb-email"
-            name="email"
-            type="email"
-            maxLength={200}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
+      <div className="group">
+        <div className="row">
+          <label htmlFor="fb-name">
+            <span className="lbl">Name <span className="opt">optional</span></span>
+            <input
+              id="fb-name"
+              name="name"
+              type="text"
+              maxLength={120}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="name"
+            />
+          </label>
+          <label htmlFor="fb-email">
+            <span className="lbl">Email <span className="opt">optional</span></span>
+            <input
+              id="fb-email"
+              name="email"
+              type="email"
+              maxLength={200}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+            />
+          </label>
+        </div>
+        <label className="msg" htmlFor="fb-message">
+          <span className="lbl">Message</span>
+          <textarea
+            id="fb-message"
+            name="message"
+            required
+            minLength={10}
+            maxLength={4000}
+            rows={7}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Which page, which figure, and what it should say."
           />
         </label>
       </div>
@@ -119,7 +120,7 @@ export default function FeedbackForm() {
         <button type="submit" disabled={state === 'sending' || message.trim().length < 10}>
           {state === 'sending' ? 'Sending…' : 'Send'}
         </button>
-        <span className="note">A reply needs an address. Without one the report still arrives.</span>
+        <span className="note">Leave an email if you want a reply.</span>
       </div>
 
       {state === 'error' ? (

@@ -80,14 +80,14 @@ async function deliver(
 
 export async function POST(request: Request): Promise<NextResponse> {
   if (!dbReady()) {
-    return NextResponse.json({ error: 'Messages are unavailable right now.' }, { status: 503 });
+    return NextResponse.json({ error: 'Messages are unavailable right now. Try again shortly.' }, { status: 503 });
   }
 
   let payload: Record<string, unknown>;
   try {
     payload = (await request.json()) as Record<string, unknown>;
   } catch {
-    return NextResponse.json({ error: 'Could not read that message.' }, { status: 400 });
+    return NextResponse.json({ error: 'That message could not be read.' }, { status: 400 });
   }
 
   // A field hidden from people and filled in by anything that submits every
@@ -103,17 +103,17 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   if (message.length < 10) {
     return NextResponse.json(
-      { error: 'Please write a little more so the report is actionable.' },
+      { error: 'That message is too short.' },
       { status: 400 },
     );
   }
   if (message.length > MAX_MESSAGE || name.length > MAX_NAME || email.length > MAX_EMAIL) {
-    return NextResponse.json({ error: 'That message is too long to send.' }, { status: 400 });
+    return NextResponse.json({ error: 'That message is too long.' }, { status: 400 });
   }
   // Deliberately permissive: the field is optional, and rejecting an unusual
   // but valid address is worse than accepting one that bounces.
   if (email !== '' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return NextResponse.json({ error: 'That email address does not look right.' }, { status: 400 });
+    return NextResponse.json({ error: 'That email address is not valid.' }, { status: 400 });
   }
 
   const sender = senderHash(request);
