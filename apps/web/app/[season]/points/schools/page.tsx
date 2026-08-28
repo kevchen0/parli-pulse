@@ -3,6 +3,7 @@ import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
 import TableSkeleton, { SCHOOL_COLUMNS } from '@/app/table-skeleton';
+import FootnoteRef from '@/app/footnote-ref';
 
 export const revalidate = 300;
 
@@ -72,7 +73,7 @@ async function SchoolsTable({
             <tr>
               <th>#</th><th>School</th><th>Region</th>
               <th className="num">
-                Points<sup className="fnref"><a href="#fn-recon">1</a></sup>
+                Points<FootnoteRef notes={['-recon']} />
               </th>
             </tr>
           </thead>

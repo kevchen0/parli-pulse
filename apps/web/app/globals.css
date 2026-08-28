@@ -246,7 +246,12 @@ th.num sup.fnref {
 }
 sup.fnref a { color: var(--accent); text-decoration: none; }
 sup.fnref a:hover { text-decoration: underline; }
-ol.footnotes li:target { color: var(--text); }
+/*
+ * No :target rule: the footnote marker scrolls rather than navigating, so the
+ * URL never carries a fragment and nothing would ever match it. Highlighting
+ * the destination was also doing the reader no favours -- they clicked it, they
+ * know which one it is.
+ */
 
 /* --- methodology page ---
    A reading page rather than a table, so it gets a narrower measure and real

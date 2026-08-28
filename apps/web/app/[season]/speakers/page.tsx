@@ -1,6 +1,7 @@
 import { MIN_BALLOTS } from '@parli-pulse/speaks';
 import { dbReady, getSpeakers, getSpeakerSummary } from '@/lib/db';
 import SpeakerTable from './table';
+import FootnoteRef from '@/app/footnote-ref';
 
 export const revalidate = 300;
 
@@ -29,7 +30,7 @@ export default async function SpeakersPage(
       <p className="meta">
         <span>
           <b>{speakers.length}</b> debaters with {MIN_BALLOTS} or more ballots
-          <sup className="fnref"><a href="#fn1">1</a></sup>
+          <FootnoteRef notes={['1']} />
         </span>
         <span><b>{summary.rankedBallots.toLocaleString()}</b> ballots between them</span>
         <span>Open divisions only</span>
@@ -40,10 +41,12 @@ export default async function SpeakersPage(
       <ol className="footnotes">
         <li id="fn1">
           Under {MIN_BALLOTS} ballots a season average says more about which judges a
-          debater drew than about the debater, so those figures are left unranked. A
-          tournament is about five ballots, so ten is two of them: the board fills early in
-          a season rather than sitting empty until January. Everyone keeps every score
-          either way, and the ± beside each figure says how far to trust it.
+          debater drew than about the debater. A z-score prices the judge, not how
+          consistent a debater has been, so the sample size has to do that work: season
+          averages sit 0.71 standard deviations apart among debaters with ten ballots or
+          fewer, 0.51 by twenty and 0.37 by thirty, after which the curve flattens. Twenty
+          ballots is three or four tournaments, which is a wide enough sample to be sure
+          of. Everyone keeps every score either way; the gate decides only who is ranked.
         </li>
         <li id="fn2">
           <b>Z-score</b> is how far a debater&rsquo;s speaks fell above or below the average

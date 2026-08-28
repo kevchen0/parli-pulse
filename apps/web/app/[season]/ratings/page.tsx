@@ -3,6 +3,7 @@ import { MIN_RATED_ROUNDS } from '@parli-pulse/rating';
 import { seasonHref } from '@/lib/season';
 import { dbReady, getRatingSummary, getRatings } from '@/lib/db';
 import RatingTable from './table';
+import FootnoteRef from '@/app/footnote-ref';
 
 export const revalidate = 300;
 
@@ -29,7 +30,7 @@ export default async function RatingsPage(
       <p className="meta">
         <span>
           <b>{summary.ranked}</b> partnerships with {MIN_RATED_ROUNDS} or more rounds
-          <sup className="fnref"><a href="#fn1">1</a></sup>
+          <FootnoteRef notes={['1']} />
         </span>
         <span><b>{summary.rankedRounds.toLocaleString()}</b> rounds behind them</span>
         <span><b>{summary.periods}</b> tournaments rated</span>

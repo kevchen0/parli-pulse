@@ -61,19 +61,23 @@ export const SHRINKAGE_BALLOTS = 12;
 /**
  * Ballots a debater needs before their season figure is ranked.
  *
- * Ten rather than twenty deliberately. A tournament is five prelim ballots at
- * the median -- panels barely move it, at 1.11 ballots per round -- so ten is
- * two tournaments and twenty is four. Gated at twenty a board is empty until
- * months into a season, which is the part of the year people most want to look
- * at it. The interval printed beside every figure says how much to trust it.
+ * A z-score prices the judge, not the debater's consistency: it says whether a
+ * ballot was generous for that judge, and averaging a handful of them still
+ * leaves an estimate that moves with the draw. Nothing downstream corrects for
+ * that, so the sample size has to.
  *
- * Measured, not assumed: the comment this replaced said twenty was roughly two
- * tournaments, which was out by a factor of two and had never been checked.
+ * Twenty, measured on 2025-26: season averages are spread 0.71 standard
+ * deviations apart among debaters with ten ballots or fewer, 0.51 from eleven
+ * to twenty, 0.37 from twenty-one to thirty, and 0.30 past fifty. The curve
+ * flattens after twenty, so more ballots past that buy little.
+ *
+ * A tournament is five prelim ballots at the median -- panels barely move it,
+ * at 1.11 ballots per round -- so twenty is three or four tournaments.
  *
  * A debater below the line keeps every score; the gate decides only who is
  * ranked.
  */
-export const MIN_BALLOTS = 10;
+export const MIN_BALLOTS = 20;
 
 export const MIN_SPREAD = 0.35;
 

@@ -6,6 +6,7 @@ import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager
 import TableSkeleton, { DEBATER_COLUMNS } from '@/app/table-skeleton';
 import { displayName } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
+import FootnoteRef from '@/app/footnote-ref';
 
 export const revalidate = 300;
 
@@ -65,7 +66,7 @@ async function DebatersTable({
         <span><b>{debaters.length}</b> debaters ranked</span>
         <span>
           <b>{qualified}</b> at or above the {TOC_AUTOQUAL_POINTS}-point
-          autoqualification line<sup className="fnref"><a href="#fn-aq">1</a></sup>
+          autoqualification line<FootnoteRef notes={['-aq']} />
         </span>
       </p>
       <TableSearch
@@ -81,7 +82,7 @@ async function DebatersTable({
             <tr>
               <th>#</th><th>School</th><th>Debater</th>
               <th className="num">
-                Points<sup className="fnref"><a href="#fn-recon">2</a></sup>
+                Points<FootnoteRef notes={['-recon']} />
               </th>
             </tr>
           </thead>

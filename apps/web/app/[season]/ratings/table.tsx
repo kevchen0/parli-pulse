@@ -9,6 +9,7 @@ type Direction = 'desc' | 'asc';
 import { PAGE_SIZE, pageNumbers } from '@/app/pager';
 import { displayName } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
+import FootnoteRef from '@/app/footnote-ref';
 
 /**
  * The rating a partnership has established, as opposed to the one it might
@@ -66,16 +67,7 @@ function SortHeader({
         >
           {label}
         </button>
-        {notes.length > 0 ? (
-          <sup className="fnref">
-            {notes.map((n, i) => (
-              <span key={n}>
-                {i > 0 ? ' ' : ''}
-                <a href={`#fn${n}`}>{n}</a>
-              </span>
-            ))}
-          </sup>
-        ) : null}
+        {notes.length > 0 ? <FootnoteRef notes={notes} /> : null}
         <span className="arrow" aria-hidden onClick={onClick}>
           {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
         </span>
@@ -147,7 +139,7 @@ export default function RatingTable({ rows, season }: { rows: RatingRow[]; seaso
               <th>
                 <span className="sorthead">
                   XXI rank
-                  <sup className="fnref"><a href="#fn4">4</a></sup>
+                  <FootnoteRef notes={[4]} />
                 </span>
               </th>
             </tr>

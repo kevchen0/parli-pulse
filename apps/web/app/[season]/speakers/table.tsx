@@ -9,6 +9,7 @@ type Direction = 'desc' | 'asc';
 import { PAGE_SIZE, pageNumbers } from '@/app/pager';
 import { displayName } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
+import FootnoteRef from '@/app/footnote-ref';
 
 /** Half-width of the 95% interval on the mean, in z units. */
 const marginZ = (r: SpeakerRow): number | null =>
@@ -68,16 +69,7 @@ function SortHeader({
         >
           {label}
         </button>
-        {notes.length > 0 ? (
-          <sup className="fnref">
-            {notes.map((n, i) => (
-              <span key={n}>
-                {i > 0 ? ' ' : ''}
-                <a href={`#fn${n}`}>{n}</a>
-              </span>
-            ))}
-          </sup>
-        ) : null}
+        {notes.length > 0 ? <FootnoteRef notes={notes} /> : null}
         <span className="arrow" aria-hidden onClick={onClick}>
           {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
         </span>

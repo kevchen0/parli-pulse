@@ -6,6 +6,7 @@ import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager
 import TableSkeleton, { TEAM_COLUMNS } from '@/app/table-skeleton';
 import { displayName } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
+import FootnoteRef from '@/app/footnote-ref';
 
 export const revalidate = 300;
 
@@ -94,7 +95,7 @@ async function TeamsTable({
         <span><b>{summary.tournaments}</b> tournaments</span>
         <span>
           <b>{bids}</b> eligible for a TOC bid
-          <sup className="fnref"><a href="#fn-toc">1</a></sup>
+          <FootnoteRef notes={['-toc']} />
         </span>
       </p>
 
@@ -112,7 +113,7 @@ async function TeamsTable({
               <th>#</th><th>School</th><th>Partnership</th>
               <th className="num">Tourns</th>
               <th className="num">
-                Points<sup className="fnref"><a href="#fn-recon">2</a></sup>
+                Points<FootnoteRef notes={['-recon']} />
               </th>
             </tr>
           </thead>
