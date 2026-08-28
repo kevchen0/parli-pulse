@@ -307,15 +307,34 @@ export default async function MethodPage() {
 
         <h3 id="validation">Validation</h3>
         <p>
-          We split the season three ways. Tournaments through December fit each
-          model&rsquo;s parameters, January selects between rating variants, and February
-          onward is used once, at the end. Every model walks forward: it predicts a
-          tournament, then observes it. Each baseline is given a fitted logistic on its own
-          statistic, so each is compared at its best.
+          We split the season by date into three parts, and each part does one job.
+        </p>
+        <ul className="plain">
+          <li>
+            <b>Through December</b> fits parameters. Every constant each model needs is
+            estimated on these tournaments and on no others.
+          </li>
+          <li>
+            <b>January</b> selects between variants. Where a choice existed, such as how
+            much a split panel counts or how wide a new partnership starts, it was made on
+            these rounds.
+          </li>
+          <li>
+            <b>February onward</b> measures the result, and is used once, after every
+            parameter and every choice is fixed.
+          </li>
+        </ul>
+        <p>
+          January exists because selecting a variant on the same rounds that report the
+          result would report a tuning exercise as a validation.
+        </p>
+        <p>
+          Every model walks forward through the season: it predicts a tournament, observes
+          it, then predicts the next. Each baseline is given a fitted logistic on its own
+          statistic, so each is compared at its best rather than at a convenient setting.
         </p>
         <p className="defn">
-          Held out: 2,209 rounds from 1 February 2026. Reproduce with{' '}
-          <code>npm run validate:rating</code>.
+          Held out: 2,209 rounds from 1 February 2026.
         </p>
         <div className="tablewrap">
           <table className="agree">
@@ -334,6 +353,7 @@ export default async function MethodPage() {
               <tr><td>Elo</td><td className="num">60.6%</td><td className="num">0.6559</td></tr>
               <tr><td>Bradley-Terry on pairs</td><td className="num">61.2%</td><td className="num">0.6505</td></tr>
               <tr className="pick"><td><b>Glicko-2</b></td><td className="num"><b>63.4%</b></td><td className="num"><b>0.6380</b></td></tr>
+              <tr><td>Bradley-Terry on people</td><td className="num">64.5%</td><td className="num">0.6290</td></tr>
             </tbody>
           </table>
         </div>
@@ -344,9 +364,16 @@ export default async function MethodPage() {
         </p>
         <p>
           Elo differs from Glicko-2 only in carrying no deviation, and scores 2.8 points
-          lower. Season win rate scores close to Article XXI points at a lower log loss,
-          so points measure strength largely by proxying for wins rather than by accounting
-          for opponents.
+          lower. Season win rate scores close to Article XXI points at a lower log loss, so
+          points measure strength largely by proxying for wins rather than by accounting for
+          opponents.
+        </p>
+        <p>
+          Bradley-Terry on people scores highest and is not what we use. It rates individual
+          debaters and scores a partnership as the sum of its two, which assumes strength is
+          additive: it would assign a rating to a pairing that has never debated together,
+          and it cannot represent two debaters who are better together than apart. For a
+          board whose unit is the partnership, we accept the lower figure.
         </p>
         <p>
           Partnerships below {MIN_RATED_ROUNDS} rated rounds keep a rating and a deviation
@@ -357,12 +384,19 @@ export default async function MethodPage() {
 
         <h3 id="limits">Known limitation</h3>
         <p>
-          Shrinkage discounts thin evidence, not isolated evidence. Evidence is counted in
-          rounds rather than in connections, so a partnership with many rounds inside a pool
-          that rarely debates outside it keeps its rating unadjusted. For 2025-26 no such
-          effect is measurable: among partnerships with forty rounds or more, shrinkage is
-          flat across in-region share. Detecting one would require cross-pool results the
-          league does not currently produce.
+          A rating is only comparable across teams that results connect. Deviation measures
+          how many rounds a partnership has debated, not how many opponents link it to the
+          rest of the field, so a partnership that debates often inside one region is
+          treated as well measured even when it has rarely met teams outside it. If that
+          region&rsquo;s overall strength differs from the league&rsquo;s, its ratings are
+          shifted with it, and nothing in the system detects this.
+        </p>
+        <p>
+          For 2025-26 we measure no such effect: among partnerships with forty rounds or
+          more, the shrinkage applied is flat across in-region share. That is not evidence
+          the problem is absent, only that this season does not show it. Measuring it
+          properly would require more cross-region results than the league currently
+          produces.
         </p>
       </section>
 

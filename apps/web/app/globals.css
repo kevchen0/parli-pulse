@@ -354,6 +354,10 @@ sup.fnref a:hover { text-decoration: underline; }
 }
 .method p.defn b { color: var(--text); }
 /* Agreement and validation tables sit inside prose, so they read narrower. */
+.method .tablewrap { margin: 0 0 0.9rem; }
+/* p.defn carries a negative top margin so it tucks under an equation. After a
+   table that pulls it into the bottom border, so the tuck is cancelled here. */
+.method .tablewrap + p.defn { margin-top: 0; }
 .method table.agree { font-size: 0.8125rem; }
 .method table.agree td.pts { font-weight: 600; }
 .method .empty {
