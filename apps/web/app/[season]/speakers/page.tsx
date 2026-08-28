@@ -40,18 +40,17 @@ export default async function SpeakersPage(
 
       <ol className="footnotes">
         <li id="fn1">
-          Under {MIN_BALLOTS} ballots a season average says more about which judges a
-          debater drew than about the debater. A z-score prices the judge, not how
-          consistent a debater has been, so the sample size has to do that work: season
-          averages sit 0.71 standard deviations apart among debaters with ten ballots or
-          fewer, 0.51 by twenty and 0.37 by thirty, after which the curve flattens. Twenty
-          ballots is three or four tournaments, which is a wide enough sample to be sure
-          of. Everyone keeps every score either way; the gate decides only who is ranked.
+          A z-score measures each ballot against the judge who gave it. It says nothing
+          about how consistent a debater has been, and a handful of ballots can land
+          anywhere. {MIN_BALLOTS} ballots is three or four tournaments, which is enough for
+          an average to settle. Everyone keeps a score either way, but is only ranked after
+          meeting the {MIN_BALLOTS} ballot threshold.
         </li>
         <li id="fn2">
           <b>Z-score</b> is how far a debater&rsquo;s speaks fell above or below the average
-          of the judge who gave them, counted in standard deviations. Tabroom publishes no such figure: every ballot is normalized here
-          against its own judge, and a debater&rsquo;s number is the mean of their ballots.
+          of the judge who gave them, counted in standard deviations. Every ballot is
+          normalized here against its own judge, and a debater&rsquo;s number is the mean of
+          their ballots.
           Zero is exactly average and +1.00 is a full standard deviation above. The ± is the
           95% confidence interval on that mean, wider for a debater with fewer or more
           scattered ballots; where two scores tie, the narrower interval ranks first.
