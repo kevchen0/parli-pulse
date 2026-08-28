@@ -38,25 +38,26 @@ export default async function RatingsPage(
 
       <ol className="footnotes">
         <li id="fn1">
-          <b>Rounds</b> counts rated rounds, not ballots: a three-judge panel is one round,
-          won on a majority. {summary.ranked} partnerships have {MIN_RATED_ROUNDS} or more
-          and are ranked here. Below that the deviation is too wide for a place on the board
-          to mean anything, so those partnerships keep a rating and are left unranked.
+          <b>Rounds.</b> {summary.ranked} partnerships have {MIN_RATED_ROUNDS} or more,
+          and only those are ranked. Under {MIN_RATED_ROUNDS} rounds the deviation stays
+          wide enough that a few lucky results move a rating further than a season of good
+          ones, so a place on the board would report who has been measured least. Every
+          partnership keeps a rating either way; the gate decides only who is ranked.
         </li>
         <li id="fn2">
-          <b>Established</b> is the rating pulled toward the middle of the field, by an amount
-          that depends on how much is known about it. A settled rating barely moves. One
-          resting on a handful of rounds moves most of the way back. It is what the table
-          sorts by, so a partnership climbs by being confirmed as well as by winning. Sorting
-          by <b>Rating</b> shows the raw estimate.{' '}
+          <b>Established</b> is the rating pulled toward the field average by an amount set
+          by its deviation: a narrow deviation keeps almost all of the distance between the
+          rating and the average, a wide one gives up most of it. It is what the table sorts
+          by, so a partnership climbs by being confirmed as well as by winning. Sorting by{' '}
+          <b>Rating</b> shows the raw estimate.{' '}
           <Link href="/method/ratings#prior">The formula &rarr;</Link>
         </li>
         <li id="fn3">
-          <b>Rating</b> is the Glicko-2 estimate. 1500 is where a partnership nobody has seen
-          starts, and 100 points of difference means the stronger side wins about 66% of the
-          time. The ± figure is the rating deviation, or how far the true strength could
-          reasonably sit from the estimate. It narrows as a partnership debates more and
-          widens again while they are away.{' '}
+          <b>Rating</b> is the Glicko-2 estimate. 1500 is the baseline, and 100 points of
+          difference means the stronger side wins about 66% of the time. The ± figure is the
+          rating deviation, or how far the true strength could reasonably sit from the
+          estimate. It narrows with every round debated and widens with the number of weeks
+          since the partnership last competed.{' '}
           <Link href="/method/ratings#reading">Two numbers, two jobs &rarr;</Link>
         </li>
         <li id="fn4">
