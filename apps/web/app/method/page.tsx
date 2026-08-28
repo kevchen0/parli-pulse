@@ -184,14 +184,14 @@ export default async function MethodPage() {
 
         <h3 id="departures">Our edits for Glicko-2</h3>
         <p>
-          Everything below is ours, and each was measured on the January split rather than
-          chosen.
+          We made 4 edits to the Glicko-2 system so it can be better implemented.
         </p>
 
         <h4>1. A round scores by how the panel split</h4>
         <p>
-          Glicko-2 takes a score in {'{'}0, ½, 1{'}'}. A 3&ndash;0 and a 2&ndash;1 are not
-          the same evidence, so with <V>w</V> ballots won of <V>n</V>:
+          Glicko-2 takes a score in {'{'}0, ½, 1{'}'}. Since split panels indicate a
+          different level of confidence than a round win, score <V>s</V> is calculated with{' '}
+          <V>w</V> ballots won of <V>n</V> in:
         </p>
         <div className="eqn">
           <E block>
@@ -200,14 +200,13 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          A 3&ndash;0 scores 1, a 2&ndash;1 scores 0.667, and a single-judge round scores 1
-          because it is unanimous by definition. Worth 0.0015 of log loss.
+          A 3&ndash;0 scores 1, a 2&ndash;1 scores 0.667, and a single-judge win scores 1.
         </p>
 
-        <h4>2. Side is priced inside the expectation</h4>
+        <h4>2. Side skew is accounted for in the expectation</h4>
         <p>
-          Opposition takes about 52% of decided open rounds, and left alone that is credited
-          to skill. With <V>p</V> the proposition win rate over decided rounds:
+          Wins are skewed ~52% opposition in open rounds. With <V>p</V>, the proposition
+          win rate:
         </p>
         <div className="eqn">
           <E block>
@@ -216,10 +215,9 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          About &minus;17 rating points to proposition on 2025-26, estimated from the season
-          each run. It enters only the expectation <V>E</V>, by shifting <V>μ</V> for the
-          round, and never the stored rating &mdash; so drawing more opposition rounds
-          cannot raise anyone&rsquo;s rating. Worth 0.0007 of log loss.
+          About &minus;17 rating points to proposition for 2025-26, estimated from the
+          season each run. It is only counted in the expectation and never in the stored
+          rating.
         </p>
 
         <h4>3. The deviation grows with elapsed time, not periods missed</h4>
@@ -234,24 +232,16 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          The paper advances one rating period at a time. Here <V>t</V> is the gap in
-          periods carried as a fraction, because three tournaments can share one weekend and
-          two months can pass with none: counting tournaments missed would make a quiet
-          October look like an active one.
+          We define <V>t</V> here as the gap in periods as a fraction, because three
+          tournaments can happen on one weekend, which would count a team attending one of
+          these tournaments as missing two periods.
         </p>
 
-        <h4>4. A new partnership starts from its debaters</h4>
+        <h4>4. A new partnership&rsquo;s rating depends on its debaters</h4>
         <p>
-          A new pairing is seeded from the ratings its two debaters already hold rather than
-          at 1500, with the deviation widened to 180 for the fact that a pairing is a new
-          thing. This is the largest of the four, worth 0.008 of log loss &mdash; five times
-          the other adjustments together &mdash; and the only one that addresses sparsity.
-        </p>
-        <p className="defn">
-          The seeded deviation is never narrower than the ratings it came from. Combining
-          two independent estimates of one quantity would narrow it, but a partnership is
-          not the mean of its debaters, it only tends to be. Two debaters nobody has seen
-          produce a partnership nobody has seen, at <V>RD</V> = 350.
+          A new pairing is seeded from the ratings its two debaters already have rather than
+          at 1500, with the deviation widened to 180 for the fact that it is a new
+          partnership.
         </p>
 
         <h3 id="shrink">Established: shrinking to the field</h3>
