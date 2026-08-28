@@ -52,10 +52,20 @@ export default function PrivacyPage() {
       <h2>Removal</h2>
       <p>
         A debater, or a parent or coach on their behalf, can ask to have their name removed.
-        We do not ask for a reason. A removed name appears nowhere on the site, including as
-        a partner or an opponent on somebody else&rsquo;s page, and cannot be found by
-        search. Results still count toward school and partnership totals, which the rules
-        require.
+        We do not ask for a reason.
+      </p>
+      <p>
+        The name is then replaced with &ldquo;Name withheld&rdquo; everywhere it would
+        appear, including as a partner or as an opponent on somebody else&rsquo;s page. It
+        cannot be found by search, and the debater&rsquo;s own page returns not found.
+      </p>
+      <p>
+        The results stay. Points still count toward school and partnership totals, which the
+        rules require, so a row remains showing the school, the partner and the figures.
+        Somebody who compares that row against the league&rsquo;s own published standings
+        can often work out whose it is. Removing the row instead would move a school&rsquo;s
+        total, which would make the request visible in the arithmetic. If that trade does
+        not work for you, say so when you write and we will talk about it.
       </p>
       <p>
         Email <a href={`mailto:${CONTACT}`}>{CONTACT}</a>, or use the{' '}
