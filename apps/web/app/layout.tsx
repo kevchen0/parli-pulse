@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import './globals.css';
 import SiteHeader from './site-header';
+import { Analytics } from '@vercel/analytics/next';
 import { SITE_NAV } from '@/lib/season';
 
 export const metadata: Metadata = {
@@ -53,6 +54,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </p>
           </footer>
         </div>
+        {/*
+          Vercel Web Analytics: page counts only, no cookies, and no identifier
+          that survives the day. Described on /privacy, which committed to
+          saying so before anything shipped.
+        */}
+        <Analytics />
       </body>
     </html>
   );

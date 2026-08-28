@@ -43,9 +43,15 @@ export default function PrivacyPage() {
 
       <h2>Analytics</h2>
       <p>
-        None. The site sets no cookies, runs no tracking script, and collects nothing about
-        who visits. If that changes it will be aggregate page counts with no cookies and no
-        attempt to identify a visitor, and this page will say so before it ships.
+        The site counts page views through Vercel Web Analytics, so I can see which pages
+        are used. It sets no cookies and does not follow anyone across other sites. Visitors
+        are counted using a hash of the request that Vercel rotates daily, so the same
+        person on two days is two counts and there is no identifier that persists.
+      </p>
+      <p>
+        What is recorded is the page, the referrer, and coarse details such as country,
+        browser and whether the device is a phone. No accounts, no advertising, and nothing
+        sold or shared.
       </p>
 
       <h2>Removal</h2>
