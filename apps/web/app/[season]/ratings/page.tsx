@@ -42,10 +42,9 @@ export default async function RatingsPage(
       <ol className="footnotes">
         <li id="fn1">
           Under {MIN_RATED_ROUNDS} rounds a deviation is wide enough that a short lucky
-          run outweighs a season of steady results, so those partnerships are left unranked
-          rather than ordered against teams that have been measured. Most of them appear at
-          a single tournament. They keep a rating either way; the gate decides only who is
-          ranked.
+          run places higher than a season of steady results, so those partnerships are left
+          unranked. Many of them appear at a single tournament. They keep a rating either
+          way, but are only ranked after meeting the {MIN_RATED_ROUNDS} round threshold.
         </li>
         <li id="fn2">
           <b>Established</b> is the rating moved toward the field average, further when the
