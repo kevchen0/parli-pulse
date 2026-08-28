@@ -246,10 +246,13 @@ export default async function MethodPage() {
 
         <h3 id="shrink">Established: shrinking to the field</h3>
         <p>
-          Ranking and prediction want different numbers, so the board is ordered on the
-          rating pulled toward the field average in proportion to its deviation. First the
-          spread of true strengths, by method of moments &mdash; observed spread is true
-          spread plus measurement noise:
+          Ranking and prediction need different numbers. The board is ordered on the rating
+          pulled toward the field average in proportion to its deviation, so a rating built
+          on few rounds sits closer to the middle of the field than one built on many.
+        </p>
+        <p>
+          We first estimate the spread of true strengths. Observed spread is true spread
+          plus measurement noise, so subtracting the mean squared deviation recovers it:
         </p>
         <div className="eqn">
           <E block>
@@ -259,6 +262,11 @@ export default async function MethodPage() {
               <Text>mean</Text><Op>(</Op><Sup><V>RD</V><N>2</N></Sup><Op>)</Op>
             </Sqrt>
           </E>
+        </div>
+        <p>
+          Each rating is then pulled toward 1500 by the share of it that is measured:
+        </p>
+        <div className="eqn">
           <E block>
             <Sub><V>r</V><Text>est</Text></Sub><Op>=</Op><N>1500</N><Op>+</Op>
             <Op>(</Op><V>r</V><Op>−</Op><N>1500</N><Op>)</Op><Op>·</Op>
@@ -270,16 +278,13 @@ export default async function MethodPage() {
         </div>
         <p className="defn">
           The second factor is the share of a rating retained: near 1 when <V>RD</V> is
-          small, near 0 when it is large. Nothing here is tuned &mdash;{' '}
-          <Sub><V>τ</V><V>F</V></Sub> is measured from the field each run and was about 117
-          rating points on 2025-26. Floored at 5% of the observed variance, since a field
-          with more noise than signal would otherwise ask for a negative variance.
+          small, near 0 when it is large. <Sub><V>τ</V><V>F</V></Sub> is measured from the
+          field each run and was about 117 rating points for 2025-26. It is floored at 5% of
+          the observed variance, since a field with more noise than signal would return a
+          negative variance.
         </p>
         <p>
-          Predictions use <V>r</V>, not <Sub><V>r</V><Text>est</Text></Sub>. Shrinking
-          before predicting is worse than not shrinking at all, because the win probability
-          already widens by both deviations and shrinking the estimate counts the same
-          uncertainty twice.
+          Predictions use <V>r</V> rather than <Sub><V>r</V><Text>est</Text></Sub>:
         </p>
         <div className="eqn">
           <E block>
@@ -295,18 +300,18 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          Both deviations widen the answer toward a coin flip. An unrated team is not
-          predicted to lose; it is predicted to be unpredictable.
+          Both deviations widen the result toward 0.5. Shrinking before predicting scores
+          worse than not shrinking at all, 62.6% against 63.4%, because the win probability
+          already accounts for both deviations and shrinking the estimate counts them twice.
         </p>
 
-        <h3 id="validation">Does it earn its place</h3>
+        <h3 id="validation">Validation</h3>
         <p>
-          The commitment was to publish the comparison either way. The season is cut three
-          ways: training through December fits parameters, January chooses between variants,
-          and February onward is touched once. Every model walks forward &mdash; predict a
-          tournament, then learn from it &mdash; and each baseline gets a fitted logistic on
-          its own statistic, so the comparison is against the best version of each rather
-          than a straw one.
+          We split the season three ways. Tournaments through December fit each
+          model&rsquo;s parameters, January selects between rating variants, and February
+          onward is used once, at the end. Every model walks forward: it predicts a
+          tournament, then observes it. Each baseline is given a fitted logistic on its own
+          statistic, so each is compared at its best.
         </p>
         <p className="defn">
           Held out: 2,209 rounds from 1 February 2026. Reproduce with{' '}
@@ -319,52 +324,45 @@ export default async function MethodPage() {
                 <th>Model</th>
                 <th className="num">Accuracy</th>
                 <th className="num">Log loss</th>
-                <th className="num">Brier</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>Coin flip</td><td className="num">50.0%</td><td className="num">0.6931</td><td className="num">0.2500</td></tr>
-              <tr><td>Side only</td><td className="num">50.7%</td><td className="num">0.6915</td><td className="num">0.2492</td></tr>
-              <tr><td>Article XXI points to date</td><td className="num">59.7%</td><td className="num">0.6686</td><td className="num">0.2370</td></tr>
-              <tr><td>Season win rate to date</td><td className="num">60.0%</td><td className="num">0.6543</td><td className="num">0.2313</td></tr>
-              <tr><td>Elo, K swept to 48</td><td className="num">60.6%</td><td className="num">0.6559</td><td className="num">0.2319</td></tr>
-              <tr><td>Bradley-Terry on pairs</td><td className="num">61.2%</td><td className="num">0.6505</td><td className="num">0.2296</td></tr>
-              <tr><td>Glicko-2, shrunk</td><td className="num">62.6%</td><td className="num">0.6638</td><td className="num">0.2356</td></tr>
-              <tr className="pick"><td><b>Glicko-2</b></td><td className="num"><b>63.4%</b></td><td className="num"><b>0.6380</b></td><td className="num"><b>0.2235</b></td></tr>
-              <tr><td>Bradley-Terry on people</td><td className="num">64.5%</td><td className="num">0.6290</td><td className="num">0.2198</td></tr>
+              <tr><td>Coin flip</td><td className="num">50.0%</td><td className="num">0.6931</td></tr>
+              <tr><td>Side only</td><td className="num">50.7%</td><td className="num">0.6915</td></tr>
+              <tr><td>Article XXI points to date</td><td className="num">59.7%</td><td className="num">0.6686</td></tr>
+              <tr><td>Season win rate to date</td><td className="num">60.0%</td><td className="num">0.6543</td></tr>
+              <tr><td>Elo</td><td className="num">60.6%</td><td className="num">0.6559</td></tr>
+              <tr><td>Bradley-Terry on pairs</td><td className="num">61.2%</td><td className="num">0.6505</td></tr>
+              <tr className="pick"><td><b>Glicko-2</b></td><td className="num"><b>63.4%</b></td><td className="num"><b>0.6380</b></td></tr>
             </tbody>
           </table>
         </div>
         <p className="defn">
-          Accuracy gap over the league&rsquo;s ranking is 3.7 points, 95% interval 1.2 to
-          6.1 on a paired bootstrap. The log loss gap of 0.031 is the surer finding and
-          never reversed in two thousand resamples.
+          Accuracy over the league&rsquo;s ranking is 3.7 points higher, 95% interval 1.2 to
+          6.1 on a paired bootstrap. The log loss gap of 0.031 is the more reliable figure
+          and did not reverse in two thousand resamples.
         </p>
         <p>
-          Three things to read off the table. <b>Elo costs 2.8 points of accuracy</b>, which
-          is what the deviation buys. <b>Season win rate nearly matches Article XXI
-          points</b> and is better calibrated, so points buy their accuracy mostly by
-          proxying for winning rather than by knowing who was beaten. <b>Bradley-Terry on
-          people predicts best</b> and is not what ships: it scores a partnership as the sum
-          of its two debaters, so it assumes strength is additive and will rate a pairing
-          that never debated a round. For a board whose unit is the partnership, that is the
-          wrong measure however well it fits.
+          Elo differs from Glicko-2 only in carrying no deviation, and scores 2.8 points
+          lower. Season win rate scores close to Article XXI points at a lower log loss,
+          so points measure strength largely by proxying for wins rather than by accounting
+          for opponents.
         </p>
         <p>
           Partnerships below {MIN_RATED_ROUNDS} rated rounds keep a rating and a deviation
-          and are not ranked. No elimination-round multiplier and no field-size weighting:
-          elimination opponents average 53% more season points, so an opponent-adjusted
-          rating already pays more for beating them, and a multiplier would count that
-          twice.
+          but are not ranked. We apply no elimination-round multiplier and no field-size
+          weighting: elimination opponents average 53% more season points, so an
+          opponent-adjusted rating already awards more for beating them.
         </p>
-        <p className="defn">
-          <b>A limitation, stated rather than papered over.</b> Shrinkage discounts thin
-          evidence, not isolated evidence. Evidence is counted in rounds, not in
-          connections, so a well-measured partnership inside a pool that never plays outside
-          itself keeps its rating and nothing warns anyone. On 2025-26 no such effect is
-          visible &mdash; among partnerships with forty rounds or more the shrinkage applied
-          is flat across in-region share &mdash; but detecting one would need cross-pool
-          results the league does not generate.
+
+        <h3 id="limits">Known limitation</h3>
+        <p>
+          Shrinkage discounts thin evidence, not isolated evidence. Evidence is counted in
+          rounds rather than in connections, so a partnership with many rounds inside a pool
+          that rarely debates outside it keeps its rating unadjusted. For 2025-26 no such
+          effect is measurable: among partnerships with forty rounds or more, shrinkage is
+          flat across in-region share. Detecting one would require cross-pool results the
+          league does not currently produce.
         </p>
       </section>
 
