@@ -388,6 +388,72 @@ export async function getDiagnosticSummary(season: SeasonId): Promise<Diagnostic
   };
 }
 
+export interface AgreementRow {
+  label: string;
+  /** Figures we produced that match the league's, to within half a tenth. */
+  agree: number;
+  /** Figures we produced that do not. */
+  differ: number;
+  /** Rows the league published where we produced nothing at all. */
+  absent: number;
+}
+
+/**
+ * Agreement with the league's published sheet, by unit of comparison.
+ *
+ * Three counts rather than one percentage, because they fail differently. A
+ * differing figure is a rule we implemented differently or a number the league
+ * entered by hand; an absent one is a partnership or tournament we could not
+ * score at all. Collapsing them into a single rate hides which of the two is
+ * moving, and they are fixed by unrelated work.
+ *
+ * Read from `standing_diagnostics`, the same table the reconciliation page
+ * renders, so this page and that one cannot disagree.
+ */
+export async function getAgreement(season: SeasonId): Promise<AgreementRow[]> {
+  const { db } = handle();
+  const rows = await db.execute(sql`
+    with rows as (
+      select * from ${t.standingDiagnostics} where season_id = ${season}
+    ),
+    res as (
+      select (e->>'official')::numeric as official, (e->>'ours')::numeric as ours
+      from rows r, jsonb_array_elements(r.results) e
+      where e->>'official' is not null
+    )
+    select 'Per-entry results' as label, 1 as ord,
+           count(*) filter (where ours is not null and abs(official - ours) < 0.051)::int as agree,
+           count(*) filter (where ours is not null and abs(official - ours) >= 0.051)::int as differ,
+           count(*) filter (where ours is null)::int as absent
+    from res
+    union all
+    select 'Partnership season totals', 2,
+           count(*) filter (where delta is not null and abs(delta) < 0.051)::int,
+           count(*) filter (where delta is not null and abs(delta) >= 0.051)::int,
+           count(*) filter (where our_points is null)::int
+    from rows
+    union all
+    select 'Top 100 partnerships', 3,
+           count(*) filter (where delta is not null and abs(delta) < 0.051)::int,
+           count(*) filter (where delta is not null and abs(delta) >= 0.051)::int,
+           count(*) filter (where our_points is null)::int
+    from rows where official_rank <= 100
+    union all
+    select 'Top 100, within two points', 4,
+           count(*) filter (where delta is not null and abs(delta) <= 2)::int,
+           count(*) filter (where delta is not null and abs(delta) > 2)::int,
+           count(*) filter (where our_points is null)::int
+    from rows where official_rank <= 100
+    order by ord
+  `);
+  return (rows.rows as unknown as (AgreementRow & { ord: number })[]).map((r) => ({
+    label: r.label,
+    agree: Number(r.agree ?? 0),
+    differ: Number(r.differ ?? 0),
+    absent: Number(r.absent ?? 0),
+  }));
+}
+
 export interface TournamentDiagnostic {
   tournament: string;
   differing: number;

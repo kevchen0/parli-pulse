@@ -313,34 +313,47 @@ sup.fnref a:hover { text-decoration: underline; }
 
 /* Equation blocks: the equation left, what it is right, aligned down the page
    so a reader can scan either column on its own. */
+/* --- equations ---
+   MathML, laid out by the browser's own math engine. The container only
+   provides the frame and horizontal scrolling; nothing here positions a
+   fraction bar or a radical, because doing that by hand is what the previous
+   span-based equations got wrong. */
 .method .eqn {
   margin: 0 0 1rem;
+  padding: 0.9rem 1rem;
   border: 1px solid var(--border);
   background: var(--surface);
   border-radius: var(--radius);
   overflow-x: auto;
 }
-.method .eqn > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 0.6rem 0.9rem;
-  border-bottom: 1px solid var(--border);
+.method math.eq {
+  display: block;
+  margin: 0.35rem 0;
+  font-size: 1.05rem;
+  /* Let the engine set fractions at display size rather than inline size. */
+  math-style: normal;
 }
-.method .eqn > div:last-child { border-bottom: none; }
-.method .eqn code {
-  font-size: 0.9375rem;
-  white-space: nowrap;
-  background: none;
-  padding: 0;
-}
-.method .eqn span {
-  font-size: 0.75rem;
+.method math.eq:first-child { margin-top: 0; }
+.method math.eq:last-child { margin-bottom: 0; }
+.method math.eqi { font-size: 1em; }
+/* A definition of the symbols in the equation above it. */
+.method p.defn {
+  font-size: 0.8125rem;
   color: var(--muted);
-  text-align: right;
-  white-space: nowrap;
-  flex-shrink: 0;
+  line-height: 1.6;
+  margin: -0.4rem 0 1.2rem;
+}
+.method p.defn b { color: var(--text); }
+/* Agreement and validation tables sit inside prose, so they read narrower. */
+.method table.agree { font-size: 0.8125rem; }
+.method table.agree td.pts { font-weight: 600; }
+.method .empty {
+  padding: 1.6rem 1rem;
+  text-align: center;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  margin: 0 0 1rem;
 }
 .method .eqn.wide code { white-space: normal; }
 @media (max-width: 34rem) {

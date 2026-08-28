@@ -20,7 +20,7 @@ import FootnoteRef from '@/app/footnote-ref';
  * not making the same claim, and ordering on the rating alone puts the twelve
  * first -- which reports how little is known, not who is better. Computed by
  * `npm run rate` and stored, so the site and the pipeline cannot disagree about
- * the order; the method is at /method/ratings.
+ * the order; the method is at /method#rating.
  */
 const shown = (r: RatingRow): number => Number(r.shrunk ?? r.rating);
 

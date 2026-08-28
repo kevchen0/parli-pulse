@@ -12,5 +12,5 @@ import { permanentRedirect } from 'next/navigation';
  * current and must not be cached, while this destination does not move.
  */
 export default function MovedRatingMethod() {
-  permanentRedirect('/method/ratings');
+  permanentRedirect('/method#rating');
 }

@@ -35,7 +35,7 @@ export default async function RatingsPage(
         <span><b>{summary.rankedRounds.toLocaleString()}</b> rounds behind them</span>
         <span><b>{summary.periods}</b> tournaments rated</span>
         <span>Open divisions only</span>
-        <span className="methodlink"><Link href="/method/ratings">How this is calculated &rarr;</Link></span>
+        <span className="methodlink"><Link href="/method#rating">How this is calculated &rarr;</Link></span>
       </p>
 
       <RatingTable rows={ratings} season={season} />
@@ -53,7 +53,7 @@ export default async function RatingsPage(
           rating; one with a wide deviation shows a number close to the average. It is what
           the table sorts by, so a partnership climbs by being confirmed as well as by
           winning. Sorting by <b>Rating</b> shows the raw estimate.{' '}
-          <Link href="/method/ratings#prior">The formula &rarr;</Link>
+          <Link href="/method#prior">The formula &rarr;</Link>
         </li>
         <li id="fn3">
           <b>Rating</b> is the Glicko-2 estimate. 1500 is the baseline, and 100 points of
@@ -61,7 +61,7 @@ export default async function RatingsPage(
           rating deviation, or how far the true strength could reasonably sit from the
           estimate. It narrows with every round debated and widens with the number of weeks
           since the partnership last competed.{' '}
-          <Link href="/method/ratings#reading">Two numbers, two jobs &rarr;</Link>
+          <Link href="/method#shrink">Two numbers, two jobs &rarr;</Link>
         </li>
         <li id="fn4">
           <b>XXI rank</b> is the partnership&rsquo;s place in the official season standings,
