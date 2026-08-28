@@ -12,7 +12,8 @@ export default function FeedbackPage() {
       <h1>Feedback</h1>
 
       <p className="lede">
-        Report a wrong number even if you are not sure it is wrong.
+        Report a wrong number, a missing partnership, or leave suggestions for features
+        to add.
       </p>
 
       <h2>Send a message</h2>
