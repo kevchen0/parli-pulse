@@ -73,7 +73,7 @@ async function SchoolsTable({
             <tr>
               <th>#</th><th>School</th><th>Region</th>
               <th className="num">
-                Points<FootnoteRef notes={['-recon']} />
+                Points<FootnoteRef notes={[1]} />
               </th>
             </tr>
           </thead>
@@ -114,7 +114,7 @@ async function SchoolsTable({
       />
 
       <ol className="footnotes">
-        <li id="fn-recon">
+        <li id="fn1">
           An asterisk beside a total means it disagrees with the league&rsquo;s published
           sheet.{' '}
           <abbr className="tick pending">*</abbr>{' '}

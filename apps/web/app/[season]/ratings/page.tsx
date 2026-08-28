@@ -30,7 +30,7 @@ export default async function RatingsPage(
       <p className="meta">
         <span>
           <b>{summary.ranked}</b> partnerships with {MIN_RATED_ROUNDS} or more rounds
-          <FootnoteRef notes={['1']} />
+          <FootnoteRef notes={[1]} />
         </span>
         <span><b>{summary.rankedRounds.toLocaleString()}</b> rounds behind them</span>
         <span><b>{summary.periods}</b> tournaments rated</span>

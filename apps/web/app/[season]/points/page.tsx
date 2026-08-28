@@ -95,7 +95,7 @@ async function TeamsTable({
         <span><b>{summary.tournaments}</b> tournaments</span>
         <span>
           <b>{bids}</b> eligible for a TOC bid
-          <FootnoteRef notes={['-toc']} />
+          <FootnoteRef notes={[1]} />
         </span>
       </p>
 
@@ -113,7 +113,7 @@ async function TeamsTable({
               <th>#</th><th>School</th><th>Partnership</th>
               <th className="num">Tourns</th>
               <th className="num">
-                Points<FootnoteRef notes={['-recon']} />
+                Points<FootnoteRef notes={[2]} />
               </th>
             </tr>
           </thead>
@@ -175,7 +175,7 @@ async function TeamsTable({
       />
 
       <ol className="footnotes">
-        <li id="fn-toc">
+        <li id="fn1">
           <b>AQ</b> means both partners are at or above the {TOC_AUTOQUAL_POINTS}-point
           autoqualification line. Under XXII.1.A an individual autoqualifies at that
           threshold, and under XXII.1.E a partnership may accept a bid only when both
@@ -188,7 +188,7 @@ async function TeamsTable({
             allocations that are not modelled here.
           </em>
         </li>
-        <li id="fn-recon">
+        <li id="fn2">
           An asterisk beside a total means it disagrees with the league&rsquo;s published
           sheet.{' '}
           <abbr className="tick pending">*</abbr>{' '}

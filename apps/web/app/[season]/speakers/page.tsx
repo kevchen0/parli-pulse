@@ -30,7 +30,7 @@ export default async function SpeakersPage(
       <p className="meta">
         <span>
           <b>{speakers.length}</b> debaters with {MIN_BALLOTS} or more ballots
-          <FootnoteRef notes={['1']} />
+          <FootnoteRef notes={[1]} />
         </span>
         <span><b>{summary.rankedBallots.toLocaleString()}</b> ballots between them</span>
         <span>Open divisions only</span>

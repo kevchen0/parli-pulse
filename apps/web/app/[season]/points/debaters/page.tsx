@@ -66,7 +66,7 @@ async function DebatersTable({
         <span><b>{debaters.length}</b> debaters ranked</span>
         <span>
           <b>{qualified}</b> at or above the {TOC_AUTOQUAL_POINTS}-point
-          autoqualification line<FootnoteRef notes={['-aq']} />
+          autoqualification line<FootnoteRef notes={[1]} />
         </span>
       </p>
       <TableSearch
@@ -82,7 +82,7 @@ async function DebatersTable({
             <tr>
               <th>#</th><th>School</th><th>Debater</th>
               <th className="num">
-                Points<FootnoteRef notes={['-recon']} />
+                Points<FootnoteRef notes={[2]} />
               </th>
             </tr>
           </thead>
@@ -133,12 +133,12 @@ async function DebatersTable({
       />
 
       <ol className="footnotes">
-        <li id="fn-aq">
+        <li id="fn1">
           <b>AQ</b> means the debater is at or above the {TOC_AUTOQUAL_POINTS}-point
           autoqualification line. Under XXII.1.A an individual with at least{' '}
           {TOC_AUTOQUAL_POINTS} points on March 1 autoqualifies for the TOC.
         </li>
-        <li id="fn-recon">
+        <li id="fn2">
           The league publishes no per-debater table, and our points are derived from
           partnership data. An asterisk beside a total means it disagrees with the
           league&rsquo;s published sheet.{' '}
