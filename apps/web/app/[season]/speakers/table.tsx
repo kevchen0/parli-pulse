@@ -51,11 +51,14 @@ function SortHeader({
   direction: Direction;
   onClick: () => void;
 }) {
-  // The footnote links sit outside the button: an anchor nested inside one is
-  // invalid, and it would also mean a click on the reference sorted the table.
+  // Same shape as the ratings table: the footnote link sits outside the button
+  // because an anchor nested inside one is invalid and would sort on click, and
+  // the arrow moves out with it so the marker can sit against the word rather
+  // than trailing the whole control. The arrow stays clickable for a mouse and
+  // hidden from assistive technology, which has the button.
   return (
     <th>
-      <span className="sorthead">
+      <span className="sorthead" data-active={active}>
         <button
           type="button"
           className="sort"
@@ -64,18 +67,20 @@ function SortHeader({
           aria-label={`Sort by ${label}, ${active && direction === 'desc' ? 'ascending' : 'descending'}`}
         >
           {label}
-          <span className="arrow" aria-hidden>
-            {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
-          </span>
         </button>
-        <sup className="fnref">
-          {notes.map((n, i) => (
-            <span key={n}>
-              {i > 0 ? ' ' : ''}
-              <a href={`#fn${n}`}>{n}</a>
-            </span>
-          ))}
-        </sup>
+        {notes.length > 0 ? (
+          <sup className="fnref">
+            {notes.map((n, i) => (
+              <span key={n}>
+                {i > 0 ? ' ' : ''}
+                <a href={`#fn${n}`}>{n}</a>
+              </span>
+            ))}
+          </sup>
+        ) : null}
+        <span className="arrow" aria-hidden onClick={onClick}>
+          {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
+        </span>
       </span>
     </th>
   );
@@ -138,7 +143,7 @@ export default function SpeakerTable({ rows, season }: { rows: SpeakerRow[]; sea
               <th>School</th>
               <th>Debater</th>
               <th>Ballots</th>
-              <SortHeader label="Z-score" notes={[1, 2]} active={sort === 'z'} direction={direction} onClick={() => toggle('z')} />
+              <SortHeader label="Z-score" notes={[2]} active={sort === 'z'} direction={direction} onClick={() => toggle('z')} />
               <SortHeader label="Raw" notes={[3]} active={sort === 'raw'} direction={direction} onClick={() => toggle('raw')} />
             </tr>
           </thead>
