@@ -25,6 +25,11 @@ export default function FeedbackForm() {
 
   async function submit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
+    if (message.trim().length < 10) {
+      setError('That message is too short.');
+      setState('error');
+      return;
+    }
     setState('sending');
     setError('');
     try {
@@ -91,8 +96,6 @@ export default function FeedbackForm() {
           <textarea
             id="fb-message"
             name="message"
-            required
-            minLength={10}
             maxLength={4000}
             rows={7}
             value={message}
@@ -117,7 +120,7 @@ export default function FeedbackForm() {
       </div>
 
       <div className="actions">
-        <button type="submit" disabled={state === 'sending' || message.trim().length < 10}>
+        <button type="submit" disabled={state === 'sending'}>
           {state === 'sending' ? 'Sending…' : 'Send'}
         </button>
         <span className="note">Leave an email if you want a reply.</span>

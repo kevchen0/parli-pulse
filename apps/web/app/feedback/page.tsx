@@ -12,8 +12,7 @@ export default function FeedbackPage() {
       <h1>Feedback</h1>
 
       <p className="lede">
-        Report a wrong number even if you are not sure it is wrong. Several errors on this
-        site were found by people who knew the circuit and thought a result looked odd.
+        Report a wrong number even if you are not sure it is wrong.
       </p>
 
       <h2>Send a message</h2>
