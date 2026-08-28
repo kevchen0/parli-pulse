@@ -281,6 +281,47 @@ class WinRate implements Model {
   }
 }
 
+/**
+ * Plain Elo: one rating per partnership, fixed step size, no uncertainty.
+ *
+ * Here to price what Glicko-2's extra machinery buys. Elo carries a point
+ * estimate and nothing else, so it cannot widen a rating for a partnership
+ * that has not competed in two months, and it moves a settled rating and a
+ * brand new one by the same amount after the same result. Whatever Glicko-2
+ * gains over this is what the deviation is worth.
+ *
+ * K is swept on the training split like every other fitted parameter, so this
+ * is Elo at its best rather than Elo at its most convenient.
+ */
+class EloModel implements Model {
+  readonly name: string;
+  private beta: number[] = [0, 0];
+  private readonly rating = new Map<string, number>();
+  // Declared and assigned rather than a parameter property: Node strips types
+  // without compiling, and `constructor(private readonly k: number)` is a
+  // runtime syntax error there while tsc accepts it happily. Mistake 28.
+  private readonly k: number;
+  constructor(k: number, name = `Elo (K=${k})`) { this.k = k; this.name = name; }
+
+  private at(subject: string): number { return this.rating.get(subject) ?? 1500; }
+  features(round: RatedRound): number[] {
+    return [(this.at(round.a) - this.at(round.b)) / 400, sideFeature(round)];
+  }
+  predict(round: RatedRound): number { return logistic(this.beta, this.features(round)); }
+  setBeta(beta: number[]): void { this.beta = beta; }
+  observe(period: RatingPeriod): void {
+    for (const round of period.rounds) {
+      const ra = this.at(round.a);
+      const rb = this.at(round.b);
+      const expected = 1 / (1 + 10 ** ((rb - ra) / 400));
+      // Graded like the Glicko path, so a 2-1 panel is not a 3-0.
+      const score = ballotScore(round.wonA, round.ballots, DEFAULT_OPTIONS.marginWeight);
+      this.rating.set(round.a, ra + this.k * (score - expected));
+      this.rating.set(round.b, rb + this.k * ((1 - score) - (1 - expected)));
+    }
+  }
+}
+
 /** Glicko-2 on partnerships, under one particular set of options. */
 class GlickoModel implements Model {
   readonly name: string;
@@ -701,6 +742,20 @@ async function main(): Promise<void> {
       }
       return rows[0]!.lambda;
     };
+    // Elo's one parameter, swept the same way, so the comparison is against
+    // Elo at its best rather than Elo at a conventional K.
+    const eloRows = [8, 16, 24, 32, 48, 64].map((k) => {
+      const m = new EloModel(k);
+      fit(m, train);
+      return { k, s: score(evaluate(m, dev, counterOver(train))) };
+    });
+    eloRows.sort((a, b) => a.s.logLoss - b.s.logLoss);
+    console.log('\nElo: K swept on dev');
+    for (const r of eloRows) {
+      console.log(`  K ${String(r.k).padEnd(6)} ${pct(r.s.accuracy)}    ${num(r.s.logLoss)}`);
+    }
+    const eloK = eloRows[0]!.k;
+
     const btLambda = sweepLambda('Bradley-Terry (pairs)', (s) => [s]);
     const btPeopleLambda = sweepLambda(
       'Bradley-Terry (people)',
@@ -716,6 +771,7 @@ async function main(): Promise<void> {
       new SideOnly(),
       new WinRate(),
       new ArticleXxiPoints(pointsByPeriod),
+      new EloModel(eloK, 'Elo'),
       new GlickoModel('Glicko-2', chosen.options, data.members),
       new ShrunkGlickoModel('Glicko-2 + field prior', chosen.options, data.members),
       new BradleyTerryModel('Bradley-Terry (pairs)', btLambda, 1, (s) => [s]),
