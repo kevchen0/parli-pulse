@@ -81,7 +81,7 @@ export default async function AboutPage() {
           little or nothing, and those are entered by hand or missing.
         </li>
         <li>
-          Team, school and tournament pages, and head-to-head records. I am working on
+          Team, school and tournament pages, and head-to-head records. We are working on
           these.
         </li>
         <li>Judge statistics.</li>

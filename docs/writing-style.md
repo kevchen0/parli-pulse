@@ -47,6 +47,10 @@ reproducible from the pipeline or the database. Prefer rendering a constant
 **Say who did it.** "We define `t` here as..." for our choices. The league's
 figures are the league's.
 
+**"We" everywhere except the biography.** The site speaks as a project, the way
+a paper does, even though one person maintains it. The only first person
+singular is the "About me" section, which is somebody introducing themselves.
+
 ## Do not write
 
 Each of these was in the copy at some point and was cut.

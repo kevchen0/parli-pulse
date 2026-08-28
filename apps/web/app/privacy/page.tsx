@@ -34,7 +34,7 @@ export default function PrivacyPage() {
 
       <h2>Messages you send</h2>
       <p>
-        The feedback form saves your message and forwards it to one mailbox that only I
+        The feedback form saves your message and forwards it to one mailbox that only we
         read. Name and email are optional. To limit abuse the form counts recent
         submissions from the same network address, using a salted hash: the address is
         never stored, and the hash cannot be turned back into one. Messages are used for
@@ -43,7 +43,7 @@ export default function PrivacyPage() {
 
       <h2>Analytics</h2>
       <p>
-        The site counts page views through Vercel Web Analytics, so I can see which pages
+        The site counts page views through Vercel Web Analytics, so we can see which pages
         are used. It sets no cookies and does not follow anyone across other sites. Visitors
         are counted using a hash of the request that Vercel rotates daily, so the same
         person on two days is two counts and there is no identifier that persists.
@@ -57,7 +57,7 @@ export default function PrivacyPage() {
       <h2>Removal</h2>
       <p>
         A debater, or a parent or coach on their behalf, can ask to have their name removed.
-        I do not ask for a reason.
+        We do not ask for a reason.
       </p>
       <p>
         The name is then replaced with &ldquo;Name withheld&rdquo; everywhere it would
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
         Somebody who compares that row against the league&rsquo;s own published standings
         can often work out whose it is. Removing the row instead would move a school&rsquo;s
         total, which would make the request visible in the arithmetic. If that trade does
-        not work for you, say so when you write and I will see what can be done.
+        not work for you, say so when you write and we will see what can be done.
       </p>
       <p>
         Email <a href={`mailto:${CONTACT}`}>{CONTACT}</a>, or use the{' '}
