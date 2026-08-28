@@ -37,6 +37,15 @@ export default function PrivacyPage() {
         </li>
       </ul>
 
+      <h2>Messages you send</h2>
+      <p>
+        The feedback form stores your message so it is not lost if email delivery fails, and
+        forwards it to one mailbox that only I read. Name and email are optional and blank
+        unless you fill them in. To limit abuse the form counts recent submissions against a
+        salted hash of your network address; the address itself is never stored and the hash
+        cannot be turned back into one. Messages are not used for anything else.
+      </p>
+
       <h2>Analytics</h2>
       <p>
         Aggregate page counts only, with no cookies, no cross-site tracking and no

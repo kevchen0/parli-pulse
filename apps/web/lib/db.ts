@@ -388,6 +388,41 @@ export async function getDiagnosticSummary(season: SeasonId): Promise<Diagnostic
   };
 }
 
+/** How many messages this sender has sent inside a Postgres interval. */
+export async function recentFeedbackCount(senderHash: string, window: string): Promise<number> {
+  const { db } = handle();
+  const r = await db.execute(sql`
+    select count(*)::int as n from ${t.feedbackMessages}
+    where sender_hash = ${senderHash}
+      and created_at > now() - ${sql.raw(`interval '${window}'`)}
+  `);
+  return Number((r.rows[0] as { n: number } | undefined)?.n ?? 0);
+}
+
+export interface FeedbackInput {
+  id: string;
+  name: string | null;
+  email: string | null;
+  message: string;
+  senderHash: string;
+  deliveredAt: Date | null;
+  deliveryError: string | null;
+}
+
+/** Stores one message. The only write the web role is granted. */
+export async function saveFeedback(input: FeedbackInput): Promise<void> {
+  const { db } = handle();
+  await db.insert(t.feedbackMessages).values({
+    id: input.id,
+    name: input.name,
+    email: input.email,
+    message: input.message,
+    senderHash: input.senderHash,
+    deliveredAt: input.deliveredAt,
+    deliveryError: input.deliveryError,
+  });
+}
+
 export interface AgreementRow {
   label: string;
   /** Figures we produced that match the league's, to within half a tenth. */

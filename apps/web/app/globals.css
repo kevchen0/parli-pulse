@@ -677,6 +677,49 @@ abbr.tick.differs { color: var(--bad); }
 
 .footnotes abbr.tick { margin-right: 0.1rem; }
 
+/* --- feedback form --- */
+.feedbackform { display: flex; flex-direction: column; gap: 0.9rem; margin: 0 0 2rem; }
+.feedbackform label {
+  display: flex; flex-direction: column; gap: 0.3rem;
+  font-size: 0.8125rem; font-weight: 500; color: var(--muted);
+}
+/* The label text and its "optional" tag share one row; a bare text node beside
+   a span in a column flex container becomes its own row. */
+.feedbackform .lbl { display: block; }
+.feedbackform .opt { font-weight: 400; color: var(--faint); }
+.feedbackform textarea,
+.feedbackform input[type='text'],
+.feedbackform input[type='email'] {
+  font: inherit; font-size: 0.9375rem; color: var(--text);
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); width: 100%;
+}
+.feedbackform textarea { resize: vertical; min-height: 8rem; line-height: 1.55; }
+.feedbackform textarea:focus-visible,
+.feedbackform input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.feedbackform .two { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+.feedbackform .two > label { flex: 1 1 14rem; }
+/* Off-screen rather than display:none, which some bots skip. */
+.feedbackform .hp {
+  position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;
+}
+.feedbackform .actions { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; }
+.feedbackform button {
+  font: inherit; font-size: 0.875rem; font-weight: 500;
+  padding: 0.45rem 1.1rem; cursor: pointer;
+  color: var(--surface); background: var(--accent);
+  border: 1px solid var(--accent); border-radius: var(--radius);
+}
+.feedbackform button:disabled { opacity: 0.5; cursor: not-allowed; }
+.feedbackform .note { font-size: 0.75rem; color: var(--muted); }
+.feedbackform .formerror { font-size: 0.8125rem; color: var(--differs, #a33); margin: 0; }
+.prose .sent {
+  padding: 0.9rem 1rem; margin: 0 0 2rem;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); font-size: 0.9375rem;
+}
+
 /* --- table search and page jump --- */
 
 .tablesearch { display: flex; gap: 0.4rem; align-items: center; margin: 0 0 0.9rem; flex-wrap: wrap; }

@@ -465,6 +465,34 @@ export const ratings = pgTable('ratings', {
  * whole point: a failed run otherwise leaves the site quietly stale, serving
  * figures that look current, and colours a square in a tab nobody opens.
  */
+/**
+ * Messages sent from the feedback form.
+ *
+ * Stored as well as emailed, for two reasons. A message is a record of a
+ * request -- a removal request especially -- and email delivery is the one
+ * part of this that depends on a third party, so the row survives the provider
+ * being down, misconfigured, or removed. And the same table rate-limits the
+ * form: counting recent rows for a sender is a distributed limit that needs no
+ * infrastructure beyond the database already here.
+ *
+ * `senderHash` is a salted hash of the client address, never the address
+ * itself. It exists to count submissions and cannot be read back into an IP.
+ */
+export const feedbackMessages = pgTable('feedback_messages', {
+  id: text('id').primaryKey(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  /** Both optional: a reader may report a wrong figure without identifying themselves. */
+  name: text('name'),
+  email: text('email'),
+  message: text('message').notNull(),
+  senderHash: text('sender_hash').notNull(),
+  /** Null until an email provider accepts it; stays null when none is configured. */
+  deliveredAt: timestamp('delivered_at', { withTimezone: true }),
+  deliveryError: text('delivery_error'),
+}, (t) => [
+  index('feedback_sender_idx').on(t.senderHash, t.createdAt),
+]);
+
 export const ingestRuns = pgTable('ingest_runs', {
   seasonId: text('season_id').primaryKey().references(() => seasons.id),
   finishedAt: timestamp('finished_at', { withTimezone: true }).notNull().defaultNow(),
