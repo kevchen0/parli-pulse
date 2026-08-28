@@ -41,18 +41,18 @@ export default async function RatingsPage(
 
       <ol className="footnotes">
         <li id="fn1">
-          <b>Rounds.</b> {summary.ranked} partnerships have {MIN_RATED_ROUNDS} or more,
-          and only those are ranked. Under {MIN_RATED_ROUNDS} rounds the deviation stays
-          wide enough that a few lucky results move a rating further than a season of good
-          ones, so a place on the board would report who has been measured least. Every
-          partnership keeps a rating either way; the gate decides only who is ranked.
+          Under {MIN_RATED_ROUNDS} rounds a deviation is wide enough that a short lucky
+          run outweighs a season of steady results, so those partnerships are left unranked
+          rather than ordered against teams that have been measured. Most of them appear at
+          a single tournament. They keep a rating either way; the gate decides only who is
+          ranked.
         </li>
         <li id="fn2">
-          <b>Established</b> is the rating pulled toward the field average by an amount set
-          by its deviation: a narrow deviation keeps almost all of the distance between the
-          rating and the average, a wide one gives up most of it. It is what the table sorts
-          by, so a partnership climbs by being confirmed as well as by winning. Sorting by{' '}
-          <b>Rating</b> shows the raw estimate.{' '}
+          <b>Established</b> is the rating moved toward the field average, further when the
+          deviation is wider. A partnership with a narrow deviation shows close to its full
+          rating; one with a wide deviation shows a number close to the average. It is what
+          the table sorts by, so a partnership climbs by being confirmed as well as by
+          winning. Sorting by <b>Rating</b> shows the raw estimate.{' '}
           <Link href="/method/ratings#prior">The formula &rarr;</Link>
         </li>
         <li id="fn3">
