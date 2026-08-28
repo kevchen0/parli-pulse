@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { dbReady, getSeasons } from '@/lib/db';
-import { seasonLabel, seasonStatus } from '@/lib/season';
+import { currentSeason, seasonLabel, seasonStatus } from '@/lib/season';
 
 export const metadata = { title: 'About — Parli Pulse' };
 
@@ -19,22 +19,31 @@ export const revalidate = 300;
  */
 export default async function AboutPage() {
   const seasons = dbReady() ? await getSeasons() : [];
-  const withResults = seasons.filter((s) => s.tournaments > 0);
+  // The live season belongs in the list before it holds anything: "open, nothing
+  // scored yet" is a state a reader needs, and dropping the row reads as though
+  // the season does not exist.
+  const current = currentSeason();
+  const listed = seasons.some((s) => s.id === current)
+    ? seasons
+    : [{ id: current, tournaments: 0, lastResultOn: null }, ...seasons];
 
   return (
     <main className="wrap prose">
       <h1>About</h1>
 
       <p className="lede">
-        Parli Pulse shows NPDL rankings for high school parliamentary debate, with a
-        strength rating and judge-adjusted speaker points that the league does not publish.
+        parli-pulse is an independent, open-sourced project to bring more analytics to
+        parliamentary debate.
       </p>
 
-      <h2>Who made it</h2>
+      <h2>About me</h2>
       <p>
-        Kevin Chen, who debated for Nueva. It started as a way to answer a question the
-        official standings cannot: not who has accumulated the most points, but who is
-        actually strong.
+        I&rsquo;m Kevin Chen, an ex-parli debater who debated for Nueva from 2023 to 2026.
+        Ever since I was introduced to debate.land and DebateDrills rankings for Public
+        Forum debate, I&rsquo;ve always wanted more in-depth data visualization for
+        parliamentary debate. We can&rsquo;t let the PF kids have everything! This project
+        is entirely developed and maintained by me (and Claude), and I appreciate any
+        comments and suggestions about how to improve it.
       </p>
       <p>
         My own results are in the data. They are computed by the same code as everyone
@@ -42,19 +51,18 @@ export default async function AboutPage() {
       </p>
 
       <h2>What it covers</h2>
-      {withResults.length > 0 ? (
-        <ul>
-          {withResults.map((s) => (
-            <li key={s.id}>
-              <b>{seasonLabel(s.id)}</b> &mdash; {s.tournaments} tournament
-              {s.tournaments === 1 ? '' : 's'}
-              {seasonStatus(s.id) === 'final' ? ', complete' : ', in progress'}.
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No season holds results yet.</p>
-      )}
+      <ul>
+        {listed.map((s) => (
+          <li key={s.id}>
+            <b>{seasonLabel(s.id)}</b>{' '}
+            {seasonStatus(s.id) === 'final'
+              ? `— ${s.tournaments} tournaments, complete.`
+              : s.tournaments > 0
+                ? `— the live season. ${s.tournaments} tournament${s.tournaments === 1 ? '' : 's'} so far.`
+                : '— the live season. Nothing scored yet.'}
+          </li>
+        ))}
+      </ul>
       <p>
         Seasons before 2025-26 are not loaded. Article XXI has changed materially over the
         years, so points scored under an older version of the rules are not comparable to
@@ -69,14 +77,17 @@ export default async function AboutPage() {
       <h2>What it does not have</h2>
       <ul>
         <li>
-          Results from tournaments that published nothing to Tabroom, unless they have been
-          entered by hand. A few every season publish little or nothing.
+          Results from tournaments that never posted to Tabroom. A few every season post
+          little or nothing, and those are entered by hand or missing.
         </li>
-        <li>Team, school and tournament pages, and head-to-head records. Planned.</li>
-        <li>Judge statistics of any kind.</li>
         <li>
-          Ratings that carry between seasons. Each season is rated on its own rounds and
-          starts from scratch, so a board in September is thin by construction.
+          Team, school and tournament pages, and head-to-head records. I am working on
+          these.
+        </li>
+        <li>Judge statistics.</li>
+        <li>
+          Ratings carried over from a previous season. Each season is rated on its own
+          rounds, so early in a season most teams have not debated enough to be ranked.
         </li>
       </ul>
 
@@ -91,8 +102,8 @@ export default async function AboutPage() {
           and how to have a name removed.
         </li>
         <li>
-          <Link href="/feedback">Feedback</Link> &mdash; report a wrong number, a missing
-          partnership, or suggest a feature.
+          <Link href="/feedback">Feedback</Link> &mdash; report a wrong number or a bug, or
+          suggest a feature.
         </li>
       </ul>
     </main>
