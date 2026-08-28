@@ -172,29 +172,17 @@ export default async function MethodPage() {
           accuracy: Elo loses 2.8 points of it, in{' '}
           <a href="#validation">the comparison below</a>.
         </p>
-
-        <h3 id="standard">The standard part</h3>
-        <p>
-          The update itself is Glicko-2 as published, and there is no value in restating it
-          here: the conversion to and from the Glicko-2 scale, the opponent weighting{' '}
-          <V>g</V><Op>(</Op><V>φ</V><Op>)</Op>, the expectation <V>E</V>, the variance{' '}
-          <V>v</V>, the improvement <V>Δ</V>, the Illinois iteration that solves for the new
-          volatility, and the updated <Sup><V>φ</V><Op>′</Op></Sup> and{' '}
-          <Sup><V>μ</V><Op>′</Op></Sup> are all exactly Glickman&rsquo;s.
-        </p>
-        <p className="defn">
+        <p className="defn" id="standard">
           Mark Glickman,{' '}
           <a href="https://www.glicko.net/glicko/glicko2.pdf">
             Example of the Glicko-2 system
           </a>{' '}
-          (PDF). Constants here are the paper&rsquo;s defaults: scale 173.7178, rating 1500,
-          deviation 350, volatility 0.06. <V>τ</V> = 0.4, swept and left alone &mdash; it
-          moves nothing at four decimal places, because with periods one tournament long the
-          volatility has no time to change. Deviation is capped at 350, so a partnership
-          away for a year is unknown rather than more-than-unknown.
+          (PDF). We use the paper&rsquo;s default constants, except <V>τ</V> = 0.4, which
+          the paper leaves to the implementer and recommends between 0.3 and 1.2. Deviation
+          is capped at a maximum of 350.
         </p>
 
-        <h3 id="departures">Four departures from it</h3>
+        <h3 id="departures">Our edits for Glicko-2</h3>
         <p>
           Everything below is ours, and each was measured on the January split rather than
           chosen.
