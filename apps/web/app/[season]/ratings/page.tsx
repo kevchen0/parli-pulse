@@ -24,18 +24,13 @@ export default async function RatingsPage(
   return (
     <>
       <h1>Ratings</h1>
-      <p className="lede">
-        A strength rating, not a season total. Article XXI points measure what a partnership
-        accumulated — five wins at a small local outscore four at Stanford — while this measures
-        how good they have looked against whoever they actually debated. The two disagree on
-        purpose; the league&rsquo;s ranking is the official one.
-      </p>
+      <p className="lede">Glicko-2 rating adjusted for deviation.</p>
 
       <p className="meta">
         <span><b>{summary.ranked}</b> partnerships with {MIN_RATED_ROUNDS} or more rounds</span>
         <span><b>{summary.rankedRounds.toLocaleString()}</b> rounds behind them</span>
         <span><b>{summary.periods}</b> tournaments rated</span>
-        <span>open divisions only<sup className="fnref"><a href="#fn5">5</a></sup></span>
+        <span>Open divisions only</span>
         <span className="methodlink"><Link href="/method/ratings">How this is calculated &rarr;</Link></span>
       </p>
 
@@ -43,42 +38,31 @@ export default async function RatingsPage(
 
       <ol className="footnotes">
         <li id="fn1">
-          <b>Established</b> is the rating pulled back toward the middle of the field, by an
-          amount that depends on how little is known about it &mdash; a settled rating barely
-          moves, one resting on a handful of rounds moves most of the way back. It is what the
-          table sorts by, so a partnership climbs it by being confirmed as well as by winning:
-          twelve excellent rounds do not outrank ninety nearly as good, and a team that has
-          only ever debated its own region cannot ride a thin rating to the top.
-          Sorting by <b>Rating</b> instead shows the raw estimate.{' '}
-          <Link href="/method/ratings#prior">The formula and why it is needed &rarr;</Link>
+          <b>Rounds</b> counts rated rounds, not ballots: a three-judge panel is one round,
+          won on a majority. {summary.ranked} partnerships have {MIN_RATED_ROUNDS} or more
+          and are ranked here. Below that the deviation is too wide for a place on the board
+          to mean anything, so those partnerships keep a rating and are left unranked.
         </li>
         <li id="fn2">
-          <b>Rating.</b> A Glicko-2 rating: 1500 is the starting point for a partnership nobody
-          has seen, and roughly 100 points of difference means the stronger side wins about
-          two rounds in three. The ± figure is the rating deviation — how far the true strength
-          could reasonably sit from the estimate. It narrows as a partnership debates more and
-          widens again while they are away. This is the number a prediction should use; the
-          uncertainty belongs in the width of the answer rather than in the estimate.{' '}
-          <Link href="/method/ratings#reading">Two numbers, two jobs &rarr;</Link>
+          <b>Established</b> is the rating pulled toward the middle of the field, by an amount
+          that depends on how much is known about it. A settled rating barely moves. One
+          resting on a handful of rounds moves most of the way back. It is what the table
+          sorts by, so a partnership climbs by being confirmed as well as by winning. Sorting
+          by <b>Rating</b> shows the raw estimate.{' '}
+          <Link href="/method/ratings#prior">The formula &rarr;</Link>
         </li>
         <li id="fn3">
-          <b>Rounds.</b> Rated rounds, not ballots: a three-judge panel is one round, won on a
-          majority, and counted a little more heavily when the panel was unanimous. Partnerships
-          below ten rounds still have a rating but are not ranked on it, because under ten the
-          uncertainty is doing most of the talking.
+          <b>Rating</b> is the Glicko-2 estimate. 1500 is where a partnership nobody has seen
+          starts, and 100 points of difference means the stronger side wins about 66% of the
+          time. The ± figure is the rating deviation, or how far the true strength could
+          reasonably sit from the estimate. It narrows as a partnership debates more and
+          widens again while they are away.{' '}
+          <Link href="/method/ratings#reading">Two numbers, two jobs &rarr;</Link>
         </li>
         <li id="fn4">
-          <b>XXI rank</b> is the partnership&rsquo;s place in the official season standings, for
-          comparison. The two columns measure different things and are expected to differ; where
-          they do, the league&rsquo;s figure is the one that counts.
-        </li>
-        <li id="fn5">
-          Open divisions only. A win from the opposition is worth slightly more than the same win
-          from proposition, because opposition takes about 52% of decided rounds. Elimination
-          rounds carry no bonus of their own — beating a stronger opponent is already worth more,
-          and elim opponents are stronger, so a multiplier would count that twice. This is our
-          own measure; the league publishes nothing like it.{' '}
-          <Link href="/method/ratings">Full methodology &rarr;</Link>
+          <b>XXI rank</b> is the partnership&rsquo;s place in the official season standings,
+          shown for comparison. The two columns measure different things and are expected to
+          disagree.
         </li>
       </ol>
     </>

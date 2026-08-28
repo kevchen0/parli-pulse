@@ -49,11 +49,14 @@ function SortHeader({
   direction: Direction;
   onClick: () => void;
 }) {
-  // The footnote links sit outside the button: an anchor nested inside one is
-  // invalid, and a click on the reference would also sort the table.
+  // The footnote link sits outside the button, because an anchor nested inside
+  // one is invalid and a click on the reference would also sort the table. The
+  // arrow moves out with it so the marker can sit against the word it belongs
+  // to rather than trailing the whole control; it stays clickable for a mouse
+  // and is hidden from assistive technology, which has the button.
   return (
     <th>
-      <span className="sorthead">
+      <span className="sorthead" data-active={active}>
         <button
           type="button"
           className="sort"
@@ -62,9 +65,6 @@ function SortHeader({
           aria-label={`Sort by ${label}, ${active && direction === 'desc' ? 'ascending' : 'descending'}`}
         >
           {label}
-          <span className="arrow" aria-hidden>
-            {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
-          </span>
         </button>
         {notes.length > 0 ? (
           <sup className="fnref">
@@ -76,6 +76,9 @@ function SortHeader({
             ))}
           </sup>
         ) : null}
+        <span className="arrow" aria-hidden onClick={onClick}>
+          {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
+        </span>
       </span>
     </th>
   );
@@ -138,9 +141,9 @@ export default function RatingTable({ rows, season }: { rows: RatingRow[]; seaso
               <th>#</th>
               <th>School</th>
               <th>Partnership</th>
-              <SortHeader label="Rounds" notes={[3]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} />
-              <SortHeader label="Established" notes={[1]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} />
-              <SortHeader label="Rating" notes={[2]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} />
+              <SortHeader label="Rounds" notes={[1]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} />
+              <SortHeader label="Established" notes={[2]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} />
+              <SortHeader label="Rating" notes={[3]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} />
               <th>
                 <span className="sorthead">
                   XXI rank

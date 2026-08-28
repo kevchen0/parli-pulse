@@ -209,8 +209,20 @@ button.sort {
 }
 button.sort:hover { color: var(--text); }
 button.sort[data-active='true'] { color: var(--text); }
-button.sort .arrow { font-size: 0.7em; opacity: 0.45; }
-button.sort[data-active='true'] .arrow { opacity: 1; color: var(--accent); }
+/*
+ * The arrow sits beside the button rather than inside it, so the footnote
+ * marker can sit against the word it annotates instead of trailing the whole
+ * control. It keeps the button's own colour and spacing here.
+ */
+.sorthead .arrow {
+  font-size: 0.7em; opacity: 0.45; margin-left: 0.3rem;
+  color: var(--muted); cursor: pointer;
+}
+.sorthead[data-active='true'] .arrow { opacity: 1; color: var(--accent); }
+.sorthead:hover .arrow { color: var(--text); }
+.sorthead[data-active='true']:hover .arrow { color: var(--accent); }
+/* A flex item loses the raised position <sup> normally has, so ask for it. */
+.sorthead sup.fnref { align-self: flex-start; }
 
 /* Keep one long school name from stretching the column for everyone else. */
 td.school {
