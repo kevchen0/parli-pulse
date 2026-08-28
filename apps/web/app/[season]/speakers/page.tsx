@@ -1,3 +1,4 @@
+import { MIN_BALLOTS } from '@parli-pulse/speaks';
 import { dbReady, getSpeakers, getSpeakerSummary } from '@/lib/db';
 import SpeakerTable from './table';
 
@@ -27,7 +28,7 @@ export default async function SpeakersPage(
 
       <p className="meta">
         <span>
-          <b>{speakers.length}</b> debaters with 20 or more ballots
+          <b>{speakers.length}</b> debaters with {MIN_BALLOTS} or more ballots
           <sup className="fnref"><a href="#fn1">1</a></sup>
         </span>
         <span><b>{summary.rankedBallots.toLocaleString()}</b> ballots between them</span>
@@ -38,16 +39,15 @@ export default async function SpeakersPage(
 
       <ol className="footnotes">
         <li id="fn1">
-          Twenty is where extra ballots stop buying precision. Among debaters with ten
-          ballots or fewer, season averages are spread 0.71 standard deviations apart, and
-          most of that is the draw rather than the debater; from eleven to twenty it is
-          0.51, from twenty-one to thirty 0.37, and past fifty 0.30. A debater below the
-          line keeps every score but is not ranked.
+          Under {MIN_BALLOTS} ballots a season average says more about which judges a
+          debater drew than about the debater, so those figures are left unranked. Ten is
+          roughly one tournament, which keeps the board useful early in a season rather than
+          empty until January. Everyone keeps every score either way, and the ± beside each
+          figure says how far to trust it.
         </li>
         <li id="fn2">
           <b>Z-score</b> is how far a debater&rsquo;s speaks fell above or below the average
-          of the judge who gave them, counted in standard deviations of that judge&rsquo;s
-          own scores. Tabroom publishes no such figure: every ballot is normalized here
+          of the judge who gave them, counted in standard deviations. Tabroom publishes no such figure: every ballot is normalized here
           against its own judge, and a debater&rsquo;s number is the mean of their ballots.
           Zero is exactly average and +1.00 is a full standard deviation above. The ± is the
           95% confidence interval on that mean, wider for a debater with fewer or more

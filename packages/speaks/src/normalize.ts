@@ -58,6 +58,20 @@ export function robustStats(values: readonly number[]): Robust {
 export const SHRINKAGE_BALLOTS = 12;
 
 /** A floor on spread, so a judge who gave identical scores cannot divide by zero. */
+/**
+ * Ballots a debater needs before their season figure is ranked.
+ *
+ * Ten rather than twenty deliberately. Twenty is about two tournaments and
+ * gives a tighter figure, but nobody clears it until months into a season, so
+ * a board gated there is empty for the part of the year people most want to
+ * look at it. Ten is one tournament, and the interval printed beside every
+ * figure says how much to trust it.
+ *
+ * A debater below the line keeps every score; the gate decides only who is
+ * ranked.
+ */
+export const MIN_BALLOTS = 10;
+
 export const MIN_SPREAD = 0.35;
 
 export interface Normalizer {

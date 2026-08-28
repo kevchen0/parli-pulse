@@ -22,17 +22,12 @@ import {
   robustStats,
   scaleFor,
   toCanonical,
+  MIN_BALLOTS as DEFAULT_MIN_BALLOTS,
 } from '../packages/speaks/src/index.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
-/**
- * Below this, a season mean says more about the draw than the debater. Chosen
- * from the data: the spread of season means is 0.75 standard deviations among
- * debaters with ten ballots or fewer, 0.52 by twenty, and 0.41 by thirty.
- * Twenty is roughly two tournaments and halves the noise against twelve
- * without emptying the board -- 439 debaters clear it.
- */
-const MIN_BALLOTS = Number(process.env.MIN_BALLOTS ?? 20);
+/** Overridable for sweeps; the default is the shared constant. */
+const MIN_BALLOTS = Number(process.env.MIN_BALLOTS ?? DEFAULT_MIN_BALLOTS);
 
 interface Row {
   id: string;
