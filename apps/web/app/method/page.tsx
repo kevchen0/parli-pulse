@@ -183,113 +183,61 @@ export default async function MethodPage() {
           Article XXI.
         </p>
 
-        <h3 id="why">Why Glicko-2</h3>
+        <h3 id="why">Why Glicko-2 rather than a point estimate</h3>
         <p>
-          A partnership carries a rating <V>r</V> and a deviation <V>φ</V> measuring how
-          well that rating is known. Two properties decide the choice.
+          A partnership carries a rating <V>r</V> and a deviation <V>RD</V> measuring how
+          well that rating is known. The deviation does two things a single number cannot.
         </p>
         <ul className="plain">
           <li>
-            <b>The deviation widens with time away.</b> Between periods, with no result to
-            learn from, the rating holds and only the deviation moves:
+            <b>It widens while a partnership is away.</b> With no result to learn from the
+            rating holds and the deviation grows, so a team last seen in October is not
+            treated as the team it was in October.
           </li>
-        </ul>
-        <div className="eqn">
-          <E block>
-            <Sup><V>φ</V><Op>∗</Op></Sup>
-            <Op>=</Op>
-            <Sqrt>
-              <Sup><V>φ</V><N>2</N></Sup><Op>+</Op>
-              <Sup><V>σ</V><N>2</N></Sup><Op>·</Op><V>t</V>
-            </Sqrt>
-          </E>
-        </div>
-        <p className="defn">
-          <V>σ</V> is the volatility and <V>t</V> the elapsed time, carried as a fraction
-          rather than a count of tournaments missed &mdash; three tournaments can share one
-          weekend, and a partnership that has not competed since October is not the
-          partnership last seen. A rating without a deviation cannot express this.
-        </p>
-        <ul className="plain">
           <li>
-            <b>A result moves an uncertain rating further.</b> The update is inversely
-            weighted by how well each side is already known, so beating a settled opponent
-            with a thin rating of your own moves you a long way, and the reverse barely
-            moves them.
+            <b>It sets how far a result moves a rating.</b> The update is weighted by how
+            well each side is already known, so beating a settled opponent on a thin rating
+            moves you a long way and barely moves them.
           </li>
         </ul>
-
-        <h3 id="update">The update</h3>
         <p>
-          Ratings are converted to the Glicko-2 scale, updated, and converted back.
-          With <Sub><V>μ</V><V>i</V></Sub> and <Sub><V>φ</V><V>i</V></Sub> the opponent&rsquo;s
-          converted rating and deviation:
-        </p>
-        <div className="eqn">
-          <E block>
-            <V>μ</V><Op>=</Op><Frac><Row><V>r</V><Op>−</Op><N>1500</N></Row><N>173.7178</N></Frac>
-            <Op>,</Op>
-            <V>φ</V><Op>=</Op><Frac><V>RD</V><N>173.7178</N></Frac>
-          </E>
-          <E block>
-            <V>g</V><Op>(</Op><V>φ</V><Op>)</Op><Op>=</Op>
-            <Frac>
-              <N>1</N>
-              <Sqrt><N>1</N><Op>+</Op><Frac><Row><N>3</N><Sup><V>φ</V><N>2</N></Sup></Row><Sup><V>π</V><N>2</N></Sup></Frac></Sqrt>
-            </Frac>
-          </E>
-          <E block>
-            <V>E</V><Op>=</Op>
-            <Frac>
-              <N>1</N>
-              <Row>
-                <N>1</N><Op>+</Op><Text>exp</Text>
-                <Op>(</Op><Op>−</Op><V>g</V><Op>(</Op><Sub><V>φ</V><V>i</V></Sub><Op>)</Op>
-                <Op>(</Op><V>μ</V><Op>−</Op><Sub><V>μ</V><V>i</V></Sub><Op>+</Op><V>h</V><Op>)</Op><Op>)</Op>
-              </Row>
-            </Frac>
-          </E>
-        </div>
-        <p className="defn">
-          <V>g</V> discounts an opponent in proportion to their own uncertainty: beating a
-          team nobody has measured says less than beating a team everyone has.{' '}
-          <V>h</V> is the side correction below, applied inside <V>E</V> only, so drawing
-          more opposition rounds cannot raise a rating.
-        </p>
-        <div className="eqn">
-          <E block>
-            <V>v</V><Op>=</Op>
-            <Sup>
-              <Row><Op>[</Op><Row><Sup><V>g</V><N>2</N></Sup><V>E</V><Op>(</Op><N>1</N><Op>−</Op><V>E</V><Op>)</Op></Row><Op>]</Op></Row>
-              <Row><Op>−</Op><N>1</N></Row>
-            </Sup>
-            <Op>,</Op>
-            <V>Δ</V><Op>=</Op><V>v</V><Row><V>g</V><Op>(</Op><Sub><V>s</V><V>i</V></Sub><Op>−</Op><V>E</V><Op>)</Op></Row>
-          </E>
-          <E block>
-            <Sup><V>φ</V><Op>′</Op></Sup><Op>=</Op>
-            <Sup>
-              <Row><Op>(</Op><Frac><N>1</N><Sup><Row><Op>(</Op><Sup><V>φ</V><Op>∗</Op></Sup><Op>)</Op></Row><N>2</N></Sup></Frac><Op>+</Op><Frac><N>1</N><V>v</V></Frac><Op>)</Op></Row>
-              <Row><Op>−</Op><N>1</N><Op>/</Op><N>2</N></Row>
-            </Sup>
-            <Op>,</Op>
-            <Sup><V>μ</V><Op>′</Op></Sup><Op>=</Op><V>μ</V><Op>+</Op>
-            <Sup><Row><Op>(</Op><Sup><V>φ</V><Op>′</Op></Sup><Op>)</Op></Row><N>2</N></Sup>
-            <Row><Op>·</Op><Op>∑</Op><V>g</V><Op>(</Op><Sub><V>s</V><V>i</V></Sub><Op>−</Op><V>E</V><Op>)</Op></Row>
-          </E>
-        </div>
-        <p className="defn">
-          <V>v</V> is the variance of the rating estimate given this period&rsquo;s
-          opponents, and <V>Δ</V> the improvement the results suggest. The volatility{' '}
-          <V>σ</V> is solved by the Illinois iteration from Glickman&rsquo;s paper, with{' '}
-          <V>τ</V> = 0.4. <V>τ</V> was swept and moves nothing at four decimal places: with
-          periods one tournament long the volatility has no time to change.
+          Both matter here because the season is sparse: nearly half of partnerships debate
+          fewer than ten open rounds. The cost of dropping them is measured in{' '}
+          <a href="#validation">the comparison below</a> &mdash; Elo, which is the same
+          idea without a deviation, loses 2.8 points of accuracy.
         </p>
 
-        <h3 id="score">What a round scores</h3>
+        <h3 id="standard">The standard part</h3>
         <p>
-          <Sub><V>s</V><V>i</V></Sub> is graded by how the panel split rather than being
-          1 or 0. With <V>w</V> ballots won of <V>n</V>:
+          The update itself is Glicko-2 as published, and there is no value in restating it
+          here: the conversion to and from the Glicko-2 scale, the opponent weighting{' '}
+          <V>g</V><Op>(</Op><V>φ</V><Op>)</Op>, the expectation <V>E</V>, the variance{' '}
+          <V>v</V>, the improvement <V>Δ</V>, the Illinois iteration that solves for the new
+          volatility, and the updated <Sup><V>φ</V><Op>′</Op></Sup> and{' '}
+          <Sup><V>μ</V><Op>′</Op></Sup> are all exactly Glickman&rsquo;s.
+        </p>
+        <p className="defn">
+          Mark Glickman,{' '}
+          <a href="https://www.glicko.net/glicko/glicko2.pdf">
+            Example of the Glicko-2 system
+          </a>{' '}
+          (PDF). Constants here are the paper&rsquo;s defaults: scale 173.7178, rating 1500,
+          deviation 350, volatility 0.06. <V>τ</V> = 0.4, swept and left alone &mdash; it
+          moves nothing at four decimal places, because with periods one tournament long the
+          volatility has no time to change. Deviation is capped at 350, so a partnership
+          away for a year is unknown rather than more-than-unknown.
+        </p>
+
+        <h3 id="departures">Four departures from it</h3>
+        <p>
+          Everything below is ours, and each was measured on the January split rather than
+          chosen.
+        </p>
+
+        <h4>1. A round scores by how the panel split</h4>
+        <p>
+          Glicko-2 takes a score in {'{'}0, ½, 1{'}'}. A 3&ndash;0 and a 2&ndash;1 are not
+          the same evidence, so with <V>w</V> ballots won of <V>n</V>:
         </p>
         <div className="eqn">
           <E block>
@@ -298,14 +246,14 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          A 3&ndash;0 scores 1, a 2&ndash;1 scores 0.667, a single-judge round scores 1.
-          Worth 0.0015 of log loss, measured on the January split.
+          A 3&ndash;0 scores 1, a 2&ndash;1 scores 0.667, and a single-judge round scores 1
+          because it is unanimous by definition. Worth 0.0015 of log loss.
         </p>
 
-        <h3 id="side">Side</h3>
+        <h4>2. Side is priced inside the expectation</h4>
         <p>
-          Opposition takes about 52% of decided open rounds. Left uncorrected that is
-          credited to skill. With <V>p</V> the proposition win rate over decided rounds:
+          Opposition takes about 52% of decided open rounds, and left alone that is credited
+          to skill. With <V>p</V> the proposition win rate over decided rounds:
         </p>
         <div className="eqn">
           <E block>
@@ -314,32 +262,50 @@ export default async function MethodPage() {
           </E>
         </div>
         <p className="defn">
-          About &minus;17 rating points to proposition on 2025-26. Estimated from the
-          season rather than fixed, and re-estimated each run.
+          About &minus;17 rating points to proposition on 2025-26, estimated from the season
+          each run. It enters only the expectation <V>E</V>, by shifting <V>μ</V> for the
+          round, and never the stored rating &mdash; so drawing more opposition rounds
+          cannot raise anyone&rsquo;s rating. Worth 0.0007 of log loss.
         </p>
 
-        <h3 id="prior">A new partnership&rsquo;s prior</h3>
+        <h4>3. The deviation grows with elapsed time, not periods missed</h4>
+        <div className="eqn">
+          <E block>
+            <Sup><V>φ</V><Op>∗</Op></Sup>
+            <Op>=</Op>
+            <Sqrt>
+              <Sup><V>φ</V><N>2</N></Sup><Op>+</Op>
+              <Sup><V>σ</V><N>2</N></Sup><V>t</V>
+            </Sqrt>
+          </E>
+        </div>
+        <p className="defn">
+          The paper advances one rating period at a time. Here <V>t</V> is the gap in
+          periods carried as a fraction, because three tournaments can share one weekend and
+          two months can pass with none: counting tournaments missed would make a quiet
+          October look like an active one.
+        </p>
+
+        <h4>4. A new partnership starts from its debaters</h4>
         <p>
-          A new pairing starts from its debaters&rsquo; existing ratings rather than at
-          1500, with the deviation widened for the fact that a pairing is a new thing.
-          This is the single largest departure from stock Glicko-2, worth 0.008 of log
-          loss, five times the other two adjustments together, and the only lever that
-          addresses sparsity: nearly half of partnerships debate fewer than ten open rounds
-          in a season.
+          A new pairing is seeded from the ratings its two debaters already hold rather than
+          at 1500, with the deviation widened to 180 for the fact that a pairing is a new
+          thing. This is the largest of the four, worth 0.008 of log loss &mdash; five times
+          the other adjustments together &mdash; and the only one that addresses sparsity.
         </p>
         <p className="defn">
-          The deviation of the seeded pair is never narrower than that of the ratings it
-          came from. Combining two independent estimates of one quantity would narrow it;
-          a partnership is not the mean of its debaters, it only tends to be. Two debaters
-          nobody has seen produce a partnership nobody has seen, at{' '}
-          <V>RD</V> = 350.
+          The seeded deviation is never narrower than the ratings it came from. Combining
+          two independent estimates of one quantity would narrow it, but a partnership is
+          not the mean of its debaters, it only tends to be. Two debaters nobody has seen
+          produce a partnership nobody has seen, at <V>RD</V> = 350.
         </p>
 
         <h3 id="shrink">Established: shrinking to the field</h3>
         <p>
-          The board is ordered on the rating pulled toward the field average in proportion
-          to its deviation. First the spread of true strengths, by method of moments &mdash;
-          observed spread is true spread plus measurement noise:
+          Ranking and prediction want different numbers, so the board is ordered on the
+          rating pulled toward the field average in proportion to its deviation. First the
+          spread of true strengths, by method of moments &mdash; observed spread is true
+          spread plus measurement noise:
         </p>
         <div className="eqn">
           <E block>
@@ -361,15 +327,15 @@ export default async function MethodPage() {
         <p className="defn">
           The second factor is the share of a rating retained: near 1 when <V>RD</V> is
           small, near 0 when it is large. Nothing here is tuned &mdash;{' '}
-          <Sub><V>τ</V><V>F</V></Sub> is measured from the field each run, and was about
-          117 rating points on 2025-26. Floored at 5% of the observed variance, since a
-          field with more noise than signal would otherwise ask for a negative variance.
+          <Sub><V>τ</V><V>F</V></Sub> is measured from the field each run and was about 117
+          rating points on 2025-26. Floored at 5% of the observed variance, since a field
+          with more noise than signal would otherwise ask for a negative variance.
         </p>
         <p>
-          Ranking uses <Sub><V>r</V><Text>est</Text></Sub> and prediction uses <V>r</V>.
-          Shrinking before predicting is worse than not shrinking at all, because the win
-          probability already widens by both deviations and shrinking the estimate counts
-          the same uncertainty twice.
+          Predictions use <V>r</V>, not <Sub><V>r</V><Text>est</Text></Sub>. Shrinking
+          before predicting is worse than not shrinking at all, because the win probability
+          already widens by both deviations and shrinking the estimate counts the same
+          uncertainty twice.
         </p>
         <div className="eqn">
           <E block>
@@ -379,20 +345,24 @@ export default async function MethodPage() {
               <Row>
                 <N>1</N><Op>+</Op><Text>exp</Text><Op>(</Op><Op>−</Op>
                 <V>g</V><Op>(</Op><Sqrt><Sup><Sub><V>φ</V><V>A</V></Sub><N>2</N></Sup><Op>+</Op><Sup><Sub><V>φ</V><V>B</V></Sub><N>2</N></Sup></Sqrt><Op>)</Op>
-                <Op>(</Op><Sub><V>μ</V><V>A</V></Sub><Op>−</Op><Sub><V>μ</V><V>B</V></Sub><Op>)</Op><Op>)</Op>
+                <Op>(</Op><Sub><V>μ</V><V>A</V></Sub><Op>−</Op><Sub><V>μ</V><V>B</V></Sub><Op>+</Op><V>h</V><Op>)</Op><Op>)</Op>
               </Row>
             </Frac>
           </E>
         </div>
+        <p className="defn">
+          Both deviations widen the answer toward a coin flip. An unrated team is not
+          predicted to lose; it is predicted to be unpredictable.
+        </p>
 
         <h3 id="validation">Does it earn its place</h3>
         <p>
           The commitment was to publish the comparison either way. The season is cut three
-          ways: training through December fits parameters, January chooses between
-          variants, and February onward is touched once. Every model walks forward &mdash;
-          predict a tournament, then learn from it &mdash; and each baseline gets a fitted
-          logistic on its own statistic, so the comparison is against the best version of
-          each rather than a straw one.
+          ways: training through December fits parameters, January chooses between variants,
+          and February onward is touched once. Every model walks forward &mdash; predict a
+          tournament, then learn from it &mdash; and each baseline gets a fitted logistic on
+          its own statistic, so the comparison is against the best version of each rather
+          than a straw one.
         </p>
         <p className="defn">
           Held out: 2,209 rounds from 1 February 2026. Reproduce with{' '}
@@ -427,16 +397,14 @@ export default async function MethodPage() {
           never reversed in two thousand resamples.
         </p>
         <p>
-          Three results worth reading off the table. <b>Elo costs 2.8 points of accuracy</b>{' '}
-          against Glicko-2, which is what the deviation buys: Elo cannot widen a rating for
-          a partnership that has not competed since October, and moves a settled rating and
-          a new one equally. <b>Season win rate nearly matches Article XXI points</b> and is
-          better calibrated, so points buy their accuracy mostly by proxying for winning
-          rather than by knowing who was beaten. <b>Bradley-Terry on people predicts
-          best</b> and is not what ships: it scores a partnership as the sum of its two
-          debaters, so it assumes strength is additive and will rate a pairing that never
-          debated a round. For a board whose unit is the partnership, that is the wrong
-          measure however well it fits.
+          Three things to read off the table. <b>Elo costs 2.8 points of accuracy</b>, which
+          is what the deviation buys. <b>Season win rate nearly matches Article XXI
+          points</b> and is better calibrated, so points buy their accuracy mostly by
+          proxying for winning rather than by knowing who was beaten. <b>Bradley-Terry on
+          people predicts best</b> and is not what ships: it scores a partnership as the sum
+          of its two debaters, so it assumes strength is additive and will rate a pairing
+          that never debated a round. For a board whose unit is the partnership, that is the
+          wrong measure however well it fits.
         </p>
         <p>
           Partnerships below {MIN_RATED_ROUNDS} rated rounds keep a rating and a deviation
@@ -448,11 +416,11 @@ export default async function MethodPage() {
         <p className="defn">
           <b>A limitation, stated rather than papered over.</b> Shrinkage discounts thin
           evidence, not isolated evidence. Evidence is counted in rounds, not in
-          connections, so a well-measured partnership inside a pool that never plays
-          outside itself keeps its rating and nothing warns anyone. On 2025-26 no such
-          effect is visible &mdash; among partnerships with forty rounds or more the
-          shrinkage applied is flat across in-region share &mdash; but detecting one would
-          need cross-pool results the league does not generate.
+          connections, so a well-measured partnership inside a pool that never plays outside
+          itself keeps its rating and nothing warns anyone. On 2025-26 no such effect is
+          visible &mdash; among partnerships with forty rounds or more the shrinkage applied
+          is flat across in-region share &mdash; but detecting one would need cross-pool
+          results the league does not generate.
         </p>
       </section>
 
