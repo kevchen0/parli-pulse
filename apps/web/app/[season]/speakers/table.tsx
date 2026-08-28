@@ -7,7 +7,7 @@ type SortKey = 'z' | 'raw';
 type Direction = 'desc' | 'asc';
 
 import { PAGE_SIZE, pageNumbers } from '@/app/pager';
-import { displayName } from '@/lib/names';
+import { displayName, nameMatches } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
 import FootnoteRef from '@/app/footnote-ref';
 
@@ -96,7 +96,7 @@ export default function SpeakerTable({ rows, season }: { rows: SpeakerRow[]; sea
     const filtered = needle
       ? rows.filter(
           (r) =>
-            displayName(r.name).toLowerCase().includes(needle) ||
+            nameMatches(r.name, needle) ||
             (r.school ?? '').toLowerCase().includes(needle),
         )
       : rows;

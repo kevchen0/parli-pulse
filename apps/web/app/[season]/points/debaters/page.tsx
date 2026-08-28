@@ -4,7 +4,7 @@ import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
 import TableSkeleton, { DEBATER_COLUMNS } from '@/app/table-skeleton';
-import { displayName } from '@/lib/names';
+import { displayName, nameMatches } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
 import FootnoteRef from '@/app/footnote-ref';
 
@@ -53,7 +53,7 @@ async function DebatersTable({
   const matches = needle
     ? debaters.filter(
         (d) =>
-          displayName(d.name).toLowerCase().includes(needle) ||
+          nameMatches(d.name, needle) ||
           (d.school ?? '').toLowerCase().includes(needle),
       )
     : debaters;

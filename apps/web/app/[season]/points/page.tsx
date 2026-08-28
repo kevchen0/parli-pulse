@@ -4,7 +4,7 @@ import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
 import TableSkeleton, { TEAM_COLUMNS } from '@/app/table-skeleton';
-import { displayName } from '@/lib/names';
+import { displayName, nameMatches } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
 import FootnoteRef from '@/app/footnote-ref';
 
@@ -78,8 +78,8 @@ async function TeamsTable({
   const matches = needle
     ? teams.filter(
         (x) =>
-          displayName(x.debater1).toLowerCase().includes(needle) ||
-          displayName(x.debater2).toLowerCase().includes(needle) ||
+          nameMatches(x.debater1, needle) ||
+          nameMatches(x.debater2, needle) ||
           (x.school ?? '').toLowerCase().includes(needle),
       )
     : teams;

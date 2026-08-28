@@ -22,3 +22,14 @@ export const displayName = (name: string | null | undefined): string => name ?? 
 /** Whether a name came back suppressed, for styling or for gating a link. */
 export const isWithheld = (name: string | null | undefined): boolean =>
   name === null || name === undefined;
+
+/**
+ * Whether a name matches a search, for the tables' filter boxes.
+ *
+ * A withheld name never matches. Filtering on the displayed string would make
+ * every suppressed debater findable by typing "withheld", which lists together
+ * exactly the people who asked not to be listed. Their rows stay on the board,
+ * because the results still count; they are simply not reachable by searching.
+ */
+export const nameMatches = (name: string | null | undefined, needle: string): boolean =>
+  !isWithheld(name) && name!.toLowerCase().includes(needle);

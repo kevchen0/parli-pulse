@@ -7,7 +7,7 @@ type SortKey = 'shown' | 'rating' | 'rounds';
 type Direction = 'desc' | 'asc';
 
 import { PAGE_SIZE, pageNumbers } from '@/app/pager';
-import { displayName } from '@/lib/names';
+import { displayName, nameMatches } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
 import FootnoteRef from '@/app/footnote-ref';
 
@@ -94,8 +94,8 @@ export default function RatingTable({ rows, season }: { rows: RatingRow[]; seaso
     const filtered = needle
       ? rows.filter(
           (r) =>
-            displayName(r.debater1).toLowerCase().includes(needle) ||
-            displayName(r.debater2).toLowerCase().includes(needle) ||
+            nameMatches(r.debater1, needle) ||
+            nameMatches(r.debater2, needle) ||
             (r.school ?? '').toLowerCase().includes(needle),
         )
       : rows;
