@@ -27,7 +27,10 @@ export default async function RatingsPage(
       <p className="lede">Glicko-2 rating adjusted for deviation.</p>
 
       <p className="meta">
-        <span><b>{summary.ranked}</b> partnerships with {MIN_RATED_ROUNDS} or more rounds</span>
+        <span>
+          <b>{summary.ranked}</b> partnerships with {MIN_RATED_ROUNDS} or more rounds
+          <sup className="fnref"><a href="#fn1">1</a></sup>
+        </span>
         <span><b>{summary.rankedRounds.toLocaleString()}</b> rounds behind them</span>
         <span><b>{summary.periods}</b> tournaments rated</span>
         <span>Open divisions only</span>

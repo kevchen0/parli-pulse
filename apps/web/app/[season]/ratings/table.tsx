@@ -141,7 +141,7 @@ export default function RatingTable({ rows, season }: { rows: RatingRow[]; seaso
               <th>#</th>
               <th>School</th>
               <th>Partnership</th>
-              <SortHeader label="Rounds" notes={[1]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} />
+              <SortHeader label="Rounds" notes={[]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} />
               <SortHeader label="Established" notes={[2]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} />
               <SortHeader label="Rating" notes={[3]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} />
               <th>
