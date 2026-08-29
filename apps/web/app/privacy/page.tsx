@@ -32,6 +32,15 @@ export default function PrivacyPage() {
         <li>Any judge named alongside a decision they made.</li>
       </ul>
 
+      <h2>Search engines</h2>
+      <p>
+        The rankings, and the pages describing them, can be found through a search
+        engine. Individual debater pages cannot: they are excluded in{' '}
+        <a href="/robots.txt">robots.txt</a> and marked not to be indexed, so a
+        debater&rsquo;s name does not become a search result. A profile is reachable by
+        following a link from a table, not by searching for the person.
+      </p>
+
       <h2>Messages you send</h2>
       <p>
         The feedback form saves your message and forwards it to one mailbox that only we

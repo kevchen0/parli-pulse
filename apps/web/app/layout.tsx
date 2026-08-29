@@ -25,13 +25,12 @@ export const metadata: Metadata = {
   },
   twitter: { card: 'summary_large_image', title: 'parli-pulse', description: DESCRIPTION },
   /**
-   * Belt and braces with app/robots.ts, which do different jobs: robots.txt
-   * asks a crawler not to fetch, and this tells one that fetched anyway not to
-   * index. A page nobody crawls can still be indexed from an inbound link, so
-   * the header is the half that actually keeps a debater's name out of a
-   * search result.
+   * Indexable, except where a route overrides it. `/<season>/debater/*` sends
+   * `noindex` from its own generateMetadata, because a profile is a page about
+   * one minor and a search result for their name is not something this site
+   * should create.
    */
-  robots: { index: false, follow: false },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
