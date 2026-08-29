@@ -1,5 +1,7 @@
 # Writing style
 
+Deploying is in [deploying.md](deploying.md). This is about the words.
+
 For everything a reader sees: page copy, footnotes, table labels, empty
 states. Not for code comments or `plan/`, which are written for whoever
 maintains this.

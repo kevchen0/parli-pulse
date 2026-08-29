@@ -166,10 +166,51 @@ them deliberately is unresolved, and worth asking the Reporting Director.
 16. **Does the provisional marker come off correctly?** Points are marked amber
    until the league's sheet carries the tournament. That transition has never
    been observed, because no season has been live since the marker existed.
+17. **Should a rating carry across seasons?** Today none does: `loadRatingData`
+   reads one season's ballots, `SeasonRun` starts empty, and `rate` rewrites
+   only that season's rows. So every partnership starts a September at 1500 with
+   a 350 deviation and the board is empty until teams have two tournaments.
+
+   The seeding prior already solves the *within*-season version of exactly this
+   — a new pairing starts from its debaters' ratings rather than at 1500, worth
+   0.008 of log loss, the largest single gain in the model — and it stops dead
+   at the season boundary. A returning partnership with ninety rated rounds
+   behind it is treated as two complete unknowns.
+
+   Extending it needs no new machinery: `decay` already takes fractional periods
+   and would widen the deviation across a July-to-September gap. Against it:
+   seniors graduate, partners change, and the gap may be long enough that the
+   widening swallows the signal. **Not decidable by argument** — it needs a
+   held-out comparison, which cannot run until 2026-27 has enough rounds.
+   Deliberately deferred, and stated on the About page so a thin September board
+   is explained rather than mysterious.
 
 ---
 
 ## Answered
+
+- **Minimum ballots to rank a speaker** — 20, revisited and confirmed. Moved to
+  10 to fill the board earlier in a season, then moved back: the spread of
+  season means is 0.71 sd among debaters with ten ballots or fewer, 0.51 from
+  eleven to twenty, 0.37 from twenty-one to thirty, and flat after that. A
+  z-score prices the judge and says nothing about a debater's consistency, so
+  the sample size has to. **A tournament is five prelim ballots at the median**
+  — panels barely move it, at 1.11 ballots per round — so 20 is three or four
+  tournaments and 10 is two. The comment this replaced said 20 was "roughly two
+  tournaments", which was out by a factor of two and had never been measured.
+- **What Glicko-2 is worth over a point estimate** — 2.8 points of accuracy and
+  0.018 of log loss, against Elo with K swept on the same splits. See
+  [05-metrics.md](05-metrics.md).
+- **Can the sheet dependencies be dropped once enough is accumulated?** Partly,
+  and the line is between facts about events and facts the league decided. A
+  hybrid's second school is recoverable from its debaters' own records today.
+  Club registrations accumulate, though each new academy needs one observation.
+  **Membership cannot ever be**: a school can compete without being a member,
+  XXI.9.A tables members only, and history tells you last year's roll. Regions
+  for new schools, state-qualifier placements and the prelim-only fallback are
+  the same shape. Dropping `School` and `SchoolList` would also be independence
+  theatre — they feed neither side of the comparison being made, and
+  self-maintaining membership fails silently when the league admits a school.
 
 - **What a debater profile page may hold** — results, partners, the best-five
   weighting, speaker figures, partnership ratings, and rounds with the opponent

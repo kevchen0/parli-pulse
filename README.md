@@ -85,30 +85,17 @@ league writes it up.
 `main` is what is live at [parli-pulse.vercel.app](https://parli-pulse.vercel.app).
 Nothing is committed to it directly.
 
-`dev` is where day-to-day work happens, one page at a time. It starts each
-cycle identical to `main`, so squash-merging it ships only what you edited.
+`dev` is day-to-day work, one page at a time, and starts each cycle identical
+to `main`. `method-rewrite` holds the methodology page while it is rewritten;
+`main` and `dev` show "Coming soon!" there.
 
-`method-rewrite` is a long-running branch holding the full methodology page
-while it is rewritten. `main` and `dev` show "Coming soon!" there. It stays
-separate so footnote edits can ship weekly without dragging an unfinished page
-back into production with them.
-
-Every branch gets its own preview URL, so a change can be read on a real page
-before it ships.
-
-```bash
-git checkout dev
-# ... edit, commit, push ...
-gh pr create --base main --head dev      # or open it on GitHub
-```
-
-Merging the pull request is the deploy. **Squash-merge it**, so `main` gains one
-commit per shipped change and its history reads as a list of what went live
-rather than a list of edits.
+Merging a pull request into `main` is the deploy. Full workflow, including
+where the merge note goes and why `dev` is reset afterwards, in
+[docs/deploying.md](docs/deploying.md).
 
 One thing branches do not isolate: the database. `drizzle-kit migrate` and the
-pipeline scripts read `DATABASE_URL`, which is production on every branch. Treat
-a migration or a `load` as a deploy in itself, and snapshot first.
+pipeline scripts read `DATABASE_URL`, which is production on every branch.
+Treat a migration or a `load` as a deploy in itself, and snapshot first.
 
 ## Layout
 
