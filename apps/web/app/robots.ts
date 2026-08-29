@@ -1,22 +1,41 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Nothing is indexed while the site is being shown around.
+ * Search engines are excluded; link-preview bots are not.
  *
- * The pages name minors. Most of what they say is already on Tabroom, but a
- * search result is a different kind of exposure from a page someone navigated
- * to: it puts a debater's name and record in front of anyone who searches the
- * name for any reason at all. That is a decision to make deliberately rather
- * than by leaving the default in place, and the default is to allow.
+ * These do different things. A search crawler builds an index, so a debater's
+ * name becomes a result for anyone who searches that name for any reason. A
+ * preview bot fetches one page because somebody deliberately pasted its link,
+ * and renders a card in that conversation. Blocking the first is the privacy
+ * decision; blocking the second only means a link somebody chose to share looks
+ * broken.
  *
- * This blocks the whole site rather than the profile pages alone, because
- * during a demo the audience is people who were given the link.
+ * Debater profiles stay closed to both. A card naming one person, generated
+ * from a link, is the same exposure this exists to avoid.
  *
- * Reversing it is one file. If it is ever relaxed, `/<season>/debater/*` is
- * the part to keep disallowed, and the Privacy page has to say so first.
+ * `noindex` in the root layout is unaffected and still covers everything, so a
+ * preview bot that also indexes is told not to.
  */
+const PREVIEW_BOTS = [
+  'LinkedInBot',
+  'Twitterbot',
+  'facebookexternalhit',
+  'Slackbot-LinkExpanding',
+  'Discordbot',
+  'WhatsApp',
+  'TelegramBot',
+  'redditbot',
+];
+
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: '*', disallow: '/' }],
+    rules: [
+      ...PREVIEW_BOTS.map((userAgent) => ({
+        userAgent,
+        allow: '/',
+        disallow: '/*/debater/',
+      })),
+      { userAgent: '*', disallow: '/' },
+    ],
   };
 }

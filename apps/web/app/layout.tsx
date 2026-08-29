@@ -5,10 +5,25 @@ import SiteHeader from './site-header';
 import { Analytics } from '@vercel/analytics/next';
 import { SITE_NAV } from '@/lib/season';
 
+const DESCRIPTION =
+  'Rankings for American high school parliamentary debate, with a strength rating and '
+  + 'judge-adjusted speaker points. Unofficial, not affiliated with the NPDL.';
+
 export const metadata: Metadata = {
-  title: 'Parli Pulse — NPDL rankings',
-  description:
-    'Rankings for American high school parliamentary debate. Unofficial, not affiliated with the NPDL.',
+  // Absolute URLs are required for a card; without this every og: URL is
+  // relative and the crawler resolves it against its own host.
+  metadataBase: new URL('https://parli-pulse.vercel.app'),
+  title: 'parli-pulse — NPDL rankings',
+  description: DESCRIPTION,
+  openGraph: {
+    title: 'parli-pulse',
+    description: DESCRIPTION,
+    url: '/',
+    siteName: 'parli-pulse',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: { card: 'summary_large_image', title: 'parli-pulse', description: DESCRIPTION },
   /**
    * Belt and braces with app/robots.ts, which do different jobs: robots.txt
    * asks a crawler not to fetch, and this tells one that fetched anyway not to
