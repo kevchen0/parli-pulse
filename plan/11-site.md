@@ -31,34 +31,46 @@ When everything is bold, nothing is.
 
 ---
 
-**Status:** A, B, C and D landed, and a second pass on top of them: tables page
-at fifty rows with search and a page-jump, totals carry amber and red marks where
-the league's sheet has not settled, TOC standing splits into AQ and AL, and
-navigation shows a skeleton on the page you clicked rather than holding you on
-the one you left.
+**Status:** A through F landed, plus a launch pass that took the site public.
 
-E is analytics only — the security headers are in `next.config.mjs` and TLS
-never needed anything. What remains is in *Still to be specified* below.
+**Phase F, profiles.** Debater pages at `/<season>/debater/<id>`, linked from
+all four tables: the three figures the site holds about a person, every
+tournament with the five Article XXI counts marked, partnership ratings, and
+every round with the opponent, the panel split and their own speaks.
 
-**Phase F, profiles, has started.** Debater pages at `/<season>/debater/<id>`,
-linked from all four tables: the three figures the site holds about a person,
-every tournament with the five Article XXI counts marked, partnership ratings,
-and every round with the opponent, the panel split and their own speaks. Three
-things they forced that were not on this list:
+**The launch pass (2026-08-28).** What it took to be publishable rather than
+correct:
 
-- **The loading boundary moved down.** It sat at `[season]/`, which put a
-  Suspense boundary over every page under a season — and a page that streams has
-  already sent its status, so a profile could not answer 404 for a debater who
-  does not exist. It now sits in each of the four table segments that wanted it.
-- **Suppression became real.** The Privacy page under Phase C promised a removal
-  path and `debaters.suppressed` was read by nothing. A profile is the wrong
-  place to discover that, so it was built first: one SQL fragment, one
-  component, and a name that is withheld everywhere it appears rather than only
-  on its own page.
-- **Zero-point results do not reach a table.** Under Tabroom-driven entries the
-  data holds every team that competed, 3,302 results of which 1,587 are worth
-  points. `rollup` aggregates only what scores, so a team that earned nothing is
-  a fact the data keeps and the tables never show.
+- **Nothing is indexed.** `robots.txt` disallows everything and every page sends
+  `noindex, nofollow`. Two mechanisms because they do different jobs.
+- **The reconciliation view is unlisted**, at `/<season>/internal/reconciliation`
+  with its six public links removed.
+- **A contact route that exists.** `parlipulse@gmail.com` in one constant, plus
+  a form at `/feedback` that stores to Postgres and emails through Resend,
+  rate-limited from the same table. Before this the Privacy page promised a
+  removal path and there was no `mailto:` in the app.
+- **Suppression exercised for real**, on one debater, across every surface, with
+  every figure unmoved. First time the flag had ever been true.
+- **Search never matches a withheld name.** Filtering on the displayed string
+  had made "withheld" list exactly the people who asked not to be listed.
+- **Footnote markers scroll rather than navigate**, sit against the word rather
+  than trailing the sort arrow, and no longer bold their target.
+- **Analytics**, cookieless, disclosed on the Privacy page in the same commit —
+  that page had committed to saying so before any shipped.
+- **The whole site rewritten** against [../docs/writing-style.md](../docs/writing-style.md).
+- **The methodology page is held back.** Rebuilt with three sections, MathML
+  equations and a live agreement table, then replaced on `main` with "Coming
+  soon!" because parts of it were not clear enough to publish. The full version
+  is on the `method-rewrite` branch.
+
+**What the launch pass found.** A finished season was six hours from
+permanently displaying "These figures may be out of date" over correct figures,
+because the nightly ingest runs the live season and a completed one's timestamp
+never advances. Reachable only once a complete season sat beside a live one —
+mistake 45.
+
+E is analytics-and-headers, both now done. What remains is in *Still to be
+specified* below.
 
 ## Phase A — Information architecture
 
@@ -195,7 +207,10 @@ precede it.
 
 Where further changes go as they arrive. Nothing here is decided.
 
-- Choice between the two visual directions in Phase B.
+- ~~Choice between the two visual directions in Phase B~~ — ink and slate.
+- Whether Method stays in the masthead while it reads "Coming soon!". It is
+  advertised in the header, the footer and from About, and all three lead to a
+  placeholder.
 - Whether `/rankings` keeps forwarding once the nav is restructured, or whether
   Points gets its own path.
 - ~~Pagination for the debaters table~~ — done; every table pages at fifty,

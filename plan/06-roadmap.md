@@ -5,6 +5,15 @@ profiles are live, team/school/tournament pages are not. The season ingests
 itself nightly, and its points are computed from Tabroom rather than mirrored
 from the league.
 
+**The site is public** at [parli-pulse.vercel.app](https://parli-pulse.vercel.app),
+closed to search engines, with a working removal path and contact form. Work now
+happens on `dev` and reaches production through a squash-merged pull request;
+see [../docs/deploying.md](../docs/deploying.md).
+
+**The methodology page reads "Coming soon!"** on `main`. It was rebuilt this
+session and held back for a rewrite, which lives on `method-rewrite` and is the
+next substantial piece of work.
+
 The 2026-27 season's first points-eligible tournament is Harvard, Sept 5-6
 (August tournaments are excluded by XXI.1.H). Before then, run the seasonal
 checklist in [09-data-quality.md](09-data-quality.md).
@@ -62,7 +71,7 @@ both centre and spread shrunk toward the field by sample size.
 ### Phase 5 — Glicko-2 with a field prior
 Partnership ratings at `/<season>/ratings`, ordered on the rating shrunk toward
 the field by its deviation, gated at ten rated rounds. Method written for a
-reader at `/<season>/method/ratings`.
+reader at `/method#rating`, now behind the placeholder.
 
 The gate was that it beat "higher Article XXI points wins" on held-out rounds
 or be reported as a failure. On 2,209 rounds from February 2026 onward it
@@ -196,8 +205,8 @@ generosity, side bias. Shrunk by sample size with visible confidence intervals,
 launched aggregate-first. See [08-risks-policy.md](08-risks-policy.md).
 
 ### Smaller, ready when wanted
-- **Analytics.** Held deliberately until the Privacy page existed. Aggregate,
-  cookieless, described there before it ships.
+- ~~**Analytics**~~ — done. Vercel Web Analytics, cookieless, disclosed on the
+  Privacy page in the same commit that shipped it.
 - **A Seasons page.** The picker covers two; a third will want a list.
 - **Gating the reconciliation view** to maintainers. Honest and public today.
 - **Analysis scripts that hardcode `rankings.zip`.** Correct for the season

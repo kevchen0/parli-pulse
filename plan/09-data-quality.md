@@ -8,6 +8,13 @@ Current standing accuracy against the league's published figures: per-entry
 **96%** (1532/1588), the league's top 100 teams **89% exact** and 95% within two
 points, schools 50% exact.
 
+The public site no longer prints these. The method page carried them and now
+reads "Coming soon!"; when it returns, the agreement table is **read from
+`standing_diagnostics`** rather than typed, and reports three counts per
+comparison — agree, differ, and absent — because a differing figure is a rule
+read differently and an absent one is a result we could not score, and those are
+fixed by unrelated work.
+
 Points are computed from Tabroom, not read from the league. `SOURCE=sheet`
 scores the old way and reaches 98% per-entry — the measure of what independence
 costs, not of a better engine. What the sheet still supplies is audited in
@@ -269,6 +276,15 @@ During and after:
    silent identity churn were caught this way and by nothing else. Speaker
    totals and ratings should not move when only points change; canonical ids
    should not move at all.
+
+   **This is the only protection there is.** Branches do not isolate the
+   database: `drizzle-kit migrate` and every pipeline script read
+   `DATABASE_URL`, which is production on every branch and from the
+   maintainer's laptop. A migration or a `load` reaches the live site the moment
+   it runs. The snapshot-and-diff habit is what stands between a routine rerun
+   and a silent loss, and it has now also confirmed a deliberate change: moving
+   the speaker floor altered exactly one number, ranked debaters, and left
+   scored z-values, their sum, ratings rows and team totals byte-identical.
 
 The first tournament of a season is its own case. Everything here has been
 exercised against an empty season and a complete one; a season holding exactly

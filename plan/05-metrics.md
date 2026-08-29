@@ -80,10 +80,24 @@ Held-out test, 2,209 rounds from February 2026 on:
 | | accuracy | log loss | Brier |
 |---|---|---|---|
 | Coin flip | 50.0% | 0.6931 | 0.2500 |
-| Side alone | 53.7% | 0.6909 | 0.2489 |
-| Season win rate to date | 61.3% | 0.6539 | 0.2311 |
-| **Article XXI points to date** | **59.8%** | **0.6667** | **0.2362** |
-| **Glicko-2** | **63.4%** | **0.6378** | **0.2234** |
+| Side alone | 50.7% | 0.6915 | 0.2492 |
+| **Article XXI points to date** | **59.7%** | **0.6686** | **0.2370** |
+| Season win rate to date | 60.0% | 0.6543 | 0.2313 |
+| **Elo, K swept to 48** | **60.6%** | **0.6559** | **0.2319** |
+| Bradley-Terry on pairs | 61.2% | 0.6505 | 0.2296 |
+| Glicko-2, shrunk | 62.6% | 0.6638 | 0.2356 |
+| **Glicko-2** | **63.4%** | **0.6380** | **0.2235** |
+| Bradley-Terry on people | 64.5% | 0.6290 | 0.2198 |
+
+**Elo is the row that prices the design.** Added 2026-08-28, because Glicko-2
+had been measured against the league's points, a win rate and Bradley-Terry but
+not against the obvious simpler rating — so the choice rested on an argument
+rather than a number. Elo carries a point estimate and nothing else: it cannot
+widen a rating for a partnership that has not competed since October, and it
+moves a settled rating and a new one equally after the same result. K was swept
+on the training split like every other fitted parameter, so this is Elo at its
+best. It costs **2.8 points of accuracy and 0.018 of log loss**, and that gap is
+what the deviation buys.
 
 The accuracy gap is 3.6 points, 95% interval 1.2 to 6.0 on a paired bootstrap —
 real but not comfortable. The log loss gap of 0.029 is the surer finding and

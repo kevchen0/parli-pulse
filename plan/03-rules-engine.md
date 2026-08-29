@@ -109,6 +109,12 @@ to be captured from the league before Phase 3 finishes. See
 - **TOC qualification** (XXII.1.A) — individual-based, 40 points on March 1,
   excluding post-March-1 qualifier points.
 
+## Where this is published
+
+The reader-facing version of this spec was a page at `/method`. It is held back
+behind "Coming soon!" while it is rewritten on the `method-rewrite` branch; the
+engine and its constants are unchanged. Nothing in this document moved.
+
 ## Verification
 
 - Unit tests per subsection, with fixtures at every band boundary (AFS

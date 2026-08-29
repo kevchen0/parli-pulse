@@ -360,6 +360,55 @@ merges that were right, the guard is not the thing that needed generalising.
 Diff the identities, not the count: 288 merges and 286 merges look equally
 plausible and one of them had two people in one.
 
+### Found taking the site public
+
+44. **A component rendered its anchor name as its visible label.** Footnote
+    markers moved into a `FootnoteRef` component, which uses its `notes` value
+    for two things: the href suffix `#fn{n}` and the number the reader sees.
+    That is fine while a footnote is `fn1` and wrong when it is `fn-recon` — the
+    regex that converted the old markup captured `-recon` out of `#fn-recon` and
+    passed it as the label, so three pages printed `-toc`, `-recon` and `-aq`
+    where 1 and 2 belonged. Every footnote id is numeric now, so the two uses
+    cannot diverge. *It shipped because the conversion was applied to all five
+    tables and then verified on the two that happened to use numbers already.*
+
+45. **A finished season warned that it was out of date.** The nightly ingest
+    runs the live season, so a completed season's `ingest_runs` timestamp stops
+    advancing the moment the season ends. Its age crosses the 36-hour staleness
+    threshold and never comes back, so the page would have displayed **"These
+    figures may be out of date"** over figures that are correct and final —
+    permanently, on the season being shown to people, about six hours after it
+    was found. The freshness line now renders only while a season is running.
+
+    **It had never been reachable before.** The warning needs a *completed*
+    season sitting beside a *live* one, and until 2026-27 opened there had never
+    been two seasons at all. A whole class of bug arrives with the second of
+    anything.
+
+46. **A constructor parameter property, again.** Adding the Elo baseline used
+    `constructor(private readonly k: number)`. `tsc --build` passed; Node's type
+    stripping rejected it at runtime and the script would not start. This is
+    **mistake 28 verbatim**, in a file written months after the rule was written
+    down, by someone who had read it that morning.
+
+47. **Two figures reported from field names belonging to another layer.**
+    `parseEntryTab` returns `school2`; `EntryCase` renames it to `hybridSchool`
+    one layer later. A check written against the raw parser rows filtered on
+    `x.hybridSchool`, which is `undefined` on every row, and printed **"0
+    hybrids"** — for a season with 35. It was raised as a possible bug in the
+    XXI.9.C half-value split, which was working the whole time.
+
+    The same shape produced a claimed 0 rows in an earlier query against a
+    column that had been renamed. JavaScript returns `undefined` for a property
+    that does not exist rather than throwing, so a filter on a misspelled field
+    silently matches nothing and the count looks like a finding.
+
+**Rule:** a count of zero is a claim like any other. Before reporting one,
+print a row of the thing being filtered and confirm the field exists on it. And
+when a value is used for two purposes, make it impossible for those to differ —
+`FootnoteRef` and the suppression fragment in `db.ts` are the same lesson from
+opposite directions.
+
 ---
 
 ## What actually caught these
@@ -395,3 +444,11 @@ Ranked by yield:
    looked at the rendered page, which was correct throughout. One `curl -w
    '%{http_code}'` found it. The same habit would have found #39 years earlier:
    the Privacy page said what it did, and nobody grepped for the column.
+10. **Reading every page of the site in one sitting.** #45 was six hours from
+    firing and nothing would have reported it: the ingest was succeeding, the
+    figures were right, and the warning was about to appear anyway. It surfaced
+    because a full read compared a rendered line against what the pipeline
+    actually does. Four smaller inconsistencies came out of the same pass —
+    mixed first person across three pages, a count labelled as something it was
+    not, a redirect that hopped twice, and one season written two ways in
+    adjacent sentences.
