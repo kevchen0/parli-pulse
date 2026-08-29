@@ -677,6 +677,17 @@ abbr.tick.differs { color: var(--bad); }
 
 .footnotes abbr.tick { margin-right: 0.1rem; }
 
+/* A placeholder page: one line, centred in the space a page would occupy. */
+.comingsoon {
+  color: var(--faint);
+  font-size: clamp(2.25rem, 7vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin: 0;
+  padding: 7rem 1rem 9rem;
+}
+
 /* --- feedback form ---
    One bordered group: name and email share a row above the message, divided by
    hairlines rather than gaps, so the three fields read as one control. */
