@@ -80,6 +80,28 @@ the points rules, so a mismatch can never be a field-size mismatch in disguise â
 and the wrong default for a pipeline that has to score a tournament before the
 league writes it up.
 
+## Branches
+
+`main` is what is live at [parli-pulse.vercel.app](https://parli-pulse.vercel.app).
+Nothing is committed to it directly.
+
+`dev` is where work happens, one page at a time. Vercel builds it to its own
+preview URL, so a change can be read on a real page before it ships.
+
+```bash
+git checkout dev
+# ... edit, commit, push ...
+gh pr create --base main --head dev      # or open it on GitHub
+```
+
+Merging the pull request is the deploy. **Squash-merge it**, so `main` gains one
+commit per shipped change and its history reads as a list of what went live
+rather than a list of edits.
+
+One thing branches do not isolate: the database. `drizzle-kit migrate` and the
+pipeline scripts read `DATABASE_URL`, which is production on every branch. Treat
+a migration or a `load` as a deploy in itself, and snapshot first.
+
 ## Layout
 
 ```
