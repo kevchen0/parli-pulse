@@ -40,17 +40,24 @@ export async function generateMetadata({
 }: {
   params: Promise<{ season: string; id: string }>;
 }) {
+  // Never indexed, on every branch. The rest of the site is open to search
+  // engines; a profile is a page about one minor, and a search result for their
+  // name is a different exposure from a page somebody navigated to. robots.txt
+  // also disallows this route -- that stops the fetch, this stops an index
+  // built from an inbound link.
+  const noindex = { robots: { index: false, follow: false } } as const;
   const { season, id } = await params;
-  if (!dbReady()) return { title: 'Parli Pulse' };
+  if (!dbReady()) return { title: 'Parli Pulse', ...noindex };
   const canonical = await resolveDebaterId(id);
-  if (!canonical) return { title: 'Not found — Parli Pulse' };
+  if (!canonical) return { title: 'Not found — Parli Pulse', ...noindex };
   const p = await getDebaterProfile(season, canonical);
-  if (!p) return { title: 'Not found — Parli Pulse' };
+  if (!p) return { title: 'Not found — Parli Pulse', ...noindex };
   return {
     title: `${p.name} — ${seasonLabel(season)} — Parli Pulse`,
     description: p.school
       ? `${p.name} of ${p.school}: Article XXI points, speaker points and partnership ratings for ${seasonLabel(season)}.`
       : undefined,
+    ...noindex,
   };
 }
 

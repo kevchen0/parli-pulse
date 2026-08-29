@@ -1,41 +1,27 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Search engines are excluded; link-preview bots are not.
+ * The site is open to search engines. Debater profiles are not.
  *
- * These do different things. A search crawler builds an index, so a debater's
- * name becomes a result for anyone who searches that name for any reason. A
- * preview bot fetches one page because somebody deliberately pasted its link,
- * and renders a card in that conversation. Blocking the first is the privacy
- * decision; blocking the second only means a link somebody chose to share looks
- * broken.
+ * A table is a page about a competition. A profile is a page about one minor,
+ * and indexing it makes their name a search result for anyone who looks up that
+ * name for any reason — which is a different kind of exposure from a page
+ * somebody navigated to, and the one this project has no business creating.
  *
- * Debater profiles stay closed to both. A card naming one person, generated
- * from a link, is the same exposure this exists to avoid.
- *
- * `noindex` in the root layout is unaffected and still covers everything, so a
- * preview bot that also indexes is told not to.
+ * Two mechanisms again, because they do different jobs: this asks a crawler not
+ * to fetch, and `generateMetadata` on the profile route sends `noindex` for a
+ * crawler that fetched anyway. A page nobody crawls is still indexable from an
+ * inbound link.
  */
-const PREVIEW_BOTS = [
-  'LinkedInBot',
-  'Twitterbot',
-  'facebookexternalhit',
-  'Slackbot-LinkExpanding',
-  'Discordbot',
-  'WhatsApp',
-  'TelegramBot',
-  'redditbot',
-];
-
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      ...PREVIEW_BOTS.map((userAgent) => ({
-        userAgent,
+      {
+        userAgent: '*',
         allow: '/',
-        disallow: '/*/debater/',
-      })),
-      { userAgent: '*', disallow: '/' },
+        disallow: ['/*/debater/', '/*/internal/', '/api/'],
+      },
     ],
+    sitemap: 'https://parli-pulse.vercel.app/sitemap.xml',
   };
 }
