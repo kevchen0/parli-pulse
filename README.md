@@ -80,6 +80,19 @@ the points rules, so a mismatch can never be a field-size mismatch in disguise �
 and the wrong default for a pipeline that has to score a tournament before the
 league writes it up.
 
+## Licence
+
+The code is MIT, in [LICENSE](LICENSE).
+
+**That covers the code and not the data.** Results, names and schools belong to
+the league and to Tabroom, and appear here because both publish them. Nothing
+in the licence grants anyone the right to redistribute records about minors.
+
+If you run your own instance, the removal requests honoured here do not travel
+with a fork — `debaters.suppressed` is a column in this database, not a fact in
+the source — so you are responsible for your own. See
+[plan/08-risks-policy.md](plan/08-risks-policy.md) for what that involves.
+
 ## Branches
 
 `main` is what is live at [parli-pulse.vercel.app](https://parli-pulse.vercel.app).
