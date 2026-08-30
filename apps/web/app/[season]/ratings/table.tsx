@@ -44,13 +44,15 @@ function compare(a: RatingRow, b: RatingRow, key: SortKey, dir: Direction): numb
 }
 
 function SortHeader({
-  label, notes, active, direction, onClick,
+  label, notes, active, direction, onClick, num,
 }: {
   label: string;
   notes: number[];
   active: boolean;
   direction: Direction;
   onClick: () => void;
+  /** Right-aligns the heading with the figures under it, as `.num` does. */
+  num?: boolean;
 }) {
   // The footnote link sits outside the button, because an anchor nested inside
   // one is invalid and a click on the reference would also sort the table. The
@@ -58,7 +60,7 @@ function SortHeader({
   // to rather than trailing the whole control; it stays clickable for a mouse
   // and is hidden from assistive technology, which has the button.
   return (
-    <th>
+    <th className={num ? 'num' : undefined}>
       <span className="sorthead" data-active={active}>
         <button
           type="button"
@@ -71,7 +73,7 @@ function SortHeader({
         </button>
         {notes.length > 0 ? <FootnoteRef notes={notes} /> : null}
         <span className="arrow" aria-hidden onClick={onClick}>
-          {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
+          {active && direction === 'asc' ? '▲' : '▼'}
         </span>
       </span>
     </th>
@@ -140,10 +142,10 @@ export default function RatingTable({
               <th>#</th>
               <th>School</th>
               <th>Partnership</th>
-              <SortHeader label="Rounds" notes={[]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} />
-              <SortHeader label="Established" notes={[2]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} />
-              <SortHeader label="Rating" notes={[3]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} />
-              <th>
+              <SortHeader label="Rounds" notes={[]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} num />
+              <SortHeader label="Established" notes={[2]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} num />
+              <SortHeader label="Rating" notes={[3]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} num />
+              <th className="num">
                 <span className="sorthead">
                   XXI rank
                   <FootnoteRef notes={[4]} />
@@ -164,13 +166,13 @@ export default function RatingTable({
                   {' & '}
                   <DebaterLink season={season} id={r.subjectId.split('|')[1]!} name={r.debater2} />
                 </td>
-                <td className="region">{r.rounds}</td>
-                <td className="pts">{Math.round(shown(r))}</td>
-                <td>
+                <td className="region num">{r.rounds}</td>
+                <td className="pts num">{Math.round(shown(r))}</td>
+                <td className="num">
                   {Math.round(Number(r.rating))}
                   <span className="margin"> ± {Math.round(Number(r.deviation))}</span>
                 </td>
-                <td className="region">{r.pointsRank ?? '—'}</td>
+                <td className="region num">{r.pointsRank ?? '—'}</td>
               </tr>
             ))}
           </tbody>

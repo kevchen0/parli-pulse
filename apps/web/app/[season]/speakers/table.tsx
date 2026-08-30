@@ -45,7 +45,7 @@ function compare(a: SpeakerRow, b: SpeakerRow, key: SortKey, dir: Direction): nu
 }
 
 function SortHeader({
-  label, notes, active, direction, onClick,
+  label, notes, active, direction, onClick, num,
 }: {
   label: string;
   /** Footnote numbers explaining this column, linked to the list below. */
@@ -53,6 +53,8 @@ function SortHeader({
   active: boolean;
   direction: Direction;
   onClick: () => void;
+  /** Right-aligns the heading with the figures under it, as `.num` does. */
+  num?: boolean;
 }) {
   // Same shape as the ratings table: the footnote link sits outside the button
   // because an anchor nested inside one is invalid and would sort on click, and
@@ -60,7 +62,7 @@ function SortHeader({
   // than trailing the whole control. The arrow stays clickable for a mouse and
   // hidden from assistive technology, which has the button.
   return (
-    <th>
+    <th className={num ? 'num' : undefined}>
       <span className="sorthead" data-active={active}>
         <button
           type="button"
@@ -73,7 +75,7 @@ function SortHeader({
         </button>
         {notes.length > 0 ? <FootnoteRef notes={notes} /> : null}
         <span className="arrow" aria-hidden onClick={onClick}>
-          {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
+          {active && direction === 'asc' ? '▲' : '▼'}
         </span>
       </span>
     </th>
@@ -141,9 +143,9 @@ export default function SpeakerTable({
               <th>#</th>
               <th>School</th>
               <th>Debater</th>
-              <th>Ballots</th>
-              <SortHeader label="Z-score" notes={[2]} active={sort === 'z'} direction={direction} onClick={() => toggle('z')} />
-              <SortHeader label="Raw" notes={[3]} active={sort === 'raw'} direction={direction} onClick={() => toggle('raw')} />
+              <th className="num">Ballots</th>
+              <SortHeader label="Z-score" notes={[2]} active={sort === 'z'} direction={direction} onClick={() => toggle('z')} num />
+              <SortHeader label="Raw" notes={[3]} active={sort === 'raw'} direction={direction} onClick={() => toggle('raw')} num />
             </tr>
           </thead>
           <tbody>
@@ -157,12 +159,12 @@ export default function SpeakerTable({
                     {s.region ? <span className="region"> · {s.region}</span> : null}
                   </td>
                   <td><DebaterLink season={season} id={s.id} name={s.name} /></td>
-                  <td className="region">{s.ballots}</td>
-                  <td className="pts">
+                  <td className="region num">{s.ballots}</td>
+                  <td className="pts num">
                     {Number(s.meanZ) > 0 ? '+' : ''}{Number(s.meanZ).toFixed(2)}
                     {m === null ? null : <span className="margin"> ± {m.toFixed(2)}</span>}
                   </td>
-                  <td>{s.meanRaw === null ? '—' : Number(s.meanRaw).toFixed(2)}</td>
+                  <td className="num">{s.meanRaw === null ? '—' : Number(s.meanRaw).toFixed(2)}</td>
                 </tr>
               );
             })}
