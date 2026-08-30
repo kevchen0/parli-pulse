@@ -6,7 +6,9 @@ itself nightly, and its points are computed from Tabroom rather than mirrored
 from the league.
 
 **The site is public** at [parli-pulse.vercel.app](https://parli-pulse.vercel.app),
-closed to search engines, with a working removal path and contact form. Work now
+indexed by search engines except for debater profiles, with a working removal
+path, a contact form, an MIT licence and link previews that render the ratings
+board. Work now
 happens on `dev` and reaches production through a squash-merged pull request;
 see [../docs/deploying.md](../docs/deploying.md).
 
