@@ -14,8 +14,9 @@ import DebaterLink from '@/app/debater-link';
 import FootnoteRef from '@/app/footnote-ref';
 
 /**
- * The rating a partnership has established, as opposed to the one it might
- * have: the rating pulled toward the field in proportion to its deviation.
+ * The rating the board shows: the raw Glicko-2 estimate pulled toward the field
+ * in proportion to its deviation, which is what a partnership has confirmed as
+ * opposed to what it might be worth.
  *
  * This is what the table sorts on by default. A partnership that has won a
  * great deal over twelve rounds and one that has won as much over ninety are
@@ -143,8 +144,8 @@ export default function RatingTable({
               <th>School</th>
               <th>Partnership</th>
               <SortHeader label="Rounds" notes={[]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} num />
-              <SortHeader label="Established" notes={[2]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} num />
-              <SortHeader label="Rating" notes={[3]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} num />
+              <SortHeader label="Rating" notes={[2]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} num />
+              <SortHeader label="Raw estimate" notes={[3]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} num />
               <th className="num">
                 <span className="sorthead">
                   XXI rank

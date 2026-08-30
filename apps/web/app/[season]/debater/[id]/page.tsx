@@ -134,22 +134,21 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
           href={seasonHref(season, '/speakers')}
         />
         {/*
-          The established figure rather than the raw rating, so the number and
-          the place beneath it are the same claim: the board is ordered on the
-          established figure, and a card reading 1934 above "1st" was pairing a
-          rating with a rank that rating did not earn.
+          The figure the board is ordered on, so the number and the place under
+          it are the same claim. A card reading the raw estimate above "1st" was
+          pairing a figure with a rank that figure did not earn.
 
           `best` needs no change to follow it. The partnerships come back
-          ordered on the established figure already, so the first ranked one was
-          always the one this card meant.
+          ordered on this figure already, so the first ranked one was always the
+          one the card meant.
 
-          No ± here. The deviation belongs to the raw rating, and printing it
-          beside the established number would offer it as an interval on a
-          figure it is not an interval on -- the board does not print one in its
-          Established column either. Rounds carry the weight of evidence.
+          No ± here. The deviation belongs to the raw estimate, and printing it
+          beside this number would offer it as an interval on a figure it is not
+          an interval on -- the board prints none in its Rating column either.
+          Rounds carry the weight of evidence.
         */}
         <Figure
-          label={p.partnerships.length > 1 ? 'Best established rating' : 'Established rating'}
+          label={p.partnerships.length > 1 ? 'Best rating' : 'Rating'}
           value={best ? Math.round(best.shrunk).toString() : '—'}
           note={
             best
@@ -203,9 +202,9 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
             <b>Points</b> are the league&rsquo;s: this partnership&rsquo;s Article XXI season
             total, on a different scale from the individual figure above, which pools a
             debater&rsquo;s results across every partner. The other two are ours.{' '}
-            <b>Rating</b> is the Glicko-2 estimate, with the deviation saying how far the
-            true strength could reasonably sit from it. <b>Established</b> is that rating
-            moved toward the field average in proportion to the deviation, so a rating
+            <b>Raw estimate</b> is the Glicko-2 figure, with the deviation saying how far
+            the true strength could reasonably sit from it. <b>Rating</b> is that estimate
+            moved toward the field average in proportion to the deviation, so a figure
             built on few rounds sits nearer the middle of the field than one built on
             many, and it is what the ratings board is ordered on. A partnership under{' '}
             {MIN_RATED_ROUNDS} rated rounds keeps both figures but is not placed on the
@@ -218,8 +217,8 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
                 <tr>
                   <th>With</th>
                   <th className="num">Points</th>
-                  <th className="num">Established</th>
                   <th className="num">Rating</th>
+                  <th className="num">Raw estimate</th>
                   <th className="num">Rounds</th>
                 </tr>
               </thead>

@@ -66,16 +66,16 @@ async function RatingsBoard({ season, initialQuery }: { season: string; initialQ
           way, but are only ranked after meeting the {MIN_RATED_ROUNDS} round threshold.
         </li>
         <li id="fn2">
-          <b>Established</b> is the rating moved toward the field average, further when the
-          deviation is wider. A partnership with a narrow deviation shows close to its full
-          rating; one with a wide deviation shows a number close to the average. It is what
-          the table sorts by, so a partnership climbs by being confirmed as well as by
-          winning. Sorting by <b>Rating</b> shows the raw estimate.{' '}
+          <b>Rating</b> is the raw estimate moved toward the field average, further when
+          the deviation is wider. A partnership with a narrow deviation shows close to its
+          full estimate; one with a wide deviation shows a number close to the average. It
+          is what the table sorts by, so a partnership climbs by being confirmed as well as
+          by winning. Sorting by <b>Raw estimate</b> shows the figure before the move.{' '}
           <Link href="/method#prior">The formula &rarr;</Link>
         </li>
         <li id="fn3">
-          <b>Rating</b> is the Glicko-2 estimate. 1500 is the baseline, and 100 points of
-          difference means the stronger side wins about 66% of the time. The ± figure is the
+          <b>Raw estimate</b> is the Glicko-2 figure itself. 1500 is the baseline, and 100
+          points of difference means the stronger side wins about 66% of the time. The ± is the
           rating deviation, or how far the true strength could reasonably sit from the
           estimate. It narrows with every round debated and widens with the number of weeks
           since the partnership last competed.{' '}
