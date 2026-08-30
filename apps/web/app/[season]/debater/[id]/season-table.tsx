@@ -8,6 +8,8 @@ import DebaterLink from '@/app/debater-link';
 import {
   entryResultLabel,
   panelLabel,
+  prelimRecord,
+  recordLabel,
   roundLabel,
   roundOutcome,
   sideLabel,
@@ -116,8 +118,16 @@ export default function SeasonTable({
                       ) : null}
                     </button>
                   </td>
+                  {/*
+                    Counted from the rounds rather than read from the stored
+                    pair, which folds a tied panel into the losses. Where the
+                    tournament published no rounds there is nothing to count, so
+                    the stored figures stand.
+                  */}
                   <td className="rec">
-                    {t.prelimWins}–{t.prelimLosses}
+                    {t.rounds.length > 0
+                      ? recordLabel(prelimRecord(t.rounds))
+                      : `${t.prelimWins}–${t.prelimLosses}`}
                   </td>
                   <td>{entryResultLabel(t.elimLevel) ?? <span className="faint">Did not break</span>}</td>
                   <td className="with">

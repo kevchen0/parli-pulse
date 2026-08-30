@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   compareRounds,
+  prelimRecord,
+  recordLabel,
   entryResultLabel,
   panelLabel,
   roundLabel,
@@ -152,5 +154,61 @@ describe('walkoverDirection', () => {
   it('says nothing when a school is unknown on either side', () => {
     expect(walkoverDirection({ ...base, mySchool: null })).toBeNull();
     expect(walkoverDirection({ ...base, theirSchool: null })).toBeNull();
+  });
+});
+
+describe('prelimRecord', () => {
+  const r = (kind: string, ballotsWon: number, ballots: number, bye = false) =>
+    ({ kind, ballotsWon, ballots, bye });
+
+  it('counts a majority as a win and a minority as a loss', () => {
+    expect(prelimRecord([r('prelim', 2, 3), r('prelim', 1, 3)])).toEqual({
+      wins: 1, losses: 1, ties: 0,
+    });
+  });
+
+  // The bug this was written for: a two-judge panel splitting 1-1 was counted
+  // as a defeat, so a 6-1 at the TOC was published as 3-4.
+  it('keeps an evenly split panel out of the losses', () => {
+    expect(prelimRecord([r('prelim', 1, 2)])).toEqual({ wins: 0, losses: 0, ties: 1 });
+  });
+
+  it('reads Georgatos at the 2025-26 TOC as 3-1-3', () => {
+    const rounds = [
+      r('prelim', 1, 2), r('prelim', 1, 2), r('prelim', 1, 2),
+      r('prelim', 2, 2), r('prelim', 0, 2), r('prelim', 2, 2), r('prelim', 2, 2),
+      r('elim', 1, 3),
+    ];
+    expect(prelimRecord(rounds)).toEqual({ wins: 3, losses: 1, ties: 3 });
+  });
+
+  it('ignores elims, as the stored figures do', () => {
+    expect(prelimRecord([r('elim', 3, 3), r('elim', 0, 3)])).toEqual({
+      wins: 0, losses: 0, ties: 0,
+    });
+  });
+
+  it('counts a bye as a win', () => {
+    expect(prelimRecord([r('prelim', 0, 0, true)])).toEqual({ wins: 1, losses: 0, ties: 0 });
+  });
+
+  it('does not count a round holding no ballots', () => {
+    expect(prelimRecord([r('prelim', 0, 0)])).toEqual({ wins: 0, losses: 0, ties: 0 });
+  });
+
+  it('reads a single-judge round on its one ballot', () => {
+    expect(prelimRecord([r('prelim', 1, 1), r('prelim', 0, 1)])).toEqual({
+      wins: 1, losses: 1, ties: 0,
+    });
+  });
+});
+
+describe('recordLabel', () => {
+  it('keeps the two-part shape where nothing tied', () => {
+    expect(recordLabel({ wins: 6, losses: 1, ties: 0 })).toBe('6–1');
+  });
+
+  it('shows ties as a third figure', () => {
+    expect(recordLabel({ wins: 3, losses: 1, ties: 3 })).toBe('3–1–3');
   });
 });

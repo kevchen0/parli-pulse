@@ -72,6 +72,61 @@ export function roundOutcome(
   return { text: 'Split', state: 'none' };
 }
 
+/**
+ * A prelim record counted off the ballots, ties kept apart from losses.
+ *
+ * The stored `prelim_wins`/`prelim_losses` fold a tie into the losses: the
+ * ingest asks `won * 2 > total` and sends everything else to `losses++`, which
+ * is right on an odd panel and wrong on an even one. Three tournaments in
+ * 2025-26 ran two-judge prelims -- the TOC, the CHSSA qualifier and the TCFL
+ * qualifier -- and 318 rounds across 133 entries deadlocked 1-1 and were
+ * recorded as defeats.
+ *
+ * Counting here rather than reading the stored pair also stops the summary
+ * disagreeing with the rounds underneath it, which is how this surfaced: the
+ * round list said Split three times while the record above it said 3-4.
+ *
+ * Elims are excluded, as they are from the stored figures. A bye is a win, the
+ * same reading the ingest takes. A round holding no ballots is not counted at
+ * all: it was never debated, or its result was never entered, and neither is a
+ * result.
+ */
+export interface PrelimRecord {
+  wins: number;
+  losses: number;
+  /** Panels that split evenly. Real on a two-judge panel, impossible on three. */
+  ties: number;
+}
+
+export function prelimRecord(
+  rounds: readonly {
+    kind: string;
+    bye: boolean;
+    ballotsWon: number;
+    ballots: number;
+  }[],
+): PrelimRecord {
+  const out: PrelimRecord = { wins: 0, losses: 0, ties: 0 };
+  for (const r of rounds) {
+    if (r.kind !== 'prelim') continue;
+    if (r.bye) { out.wins++; continue; }
+    if (r.ballots === 0) continue;
+    if (r.ballotsWon * 2 > r.ballots) out.wins++;
+    else if (r.ballotsWon * 2 < r.ballots) out.losses++;
+    else out.ties++;
+  }
+  return out;
+}
+
+/**
+ * "6-1", or "3-1-3" where rounds were tied.
+ *
+ * The third figure appears only when there is one, so the ordinary record keeps
+ * the two-part shape everybody reads it in.
+ */
+export const recordLabel = (r: PrelimRecord): string =>
+  r.ties > 0 ? `${r.wins}–${r.losses}–${r.ties}` : `${r.wins}–${r.losses}`;
+
 /** "3-0" or "2-1" where a panel divided, and nothing for a single judge. */
 export const panelLabel = (ballotsWon: number, ballots: number): string | null =>
   ballots > 1 ? `${ballotsWon}–${ballots - ballotsWon}` : null;
