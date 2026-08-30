@@ -202,12 +202,14 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
           <p className="note">
             <b>Points</b> are the league&rsquo;s: this partnership&rsquo;s Article XXI season
             total, on a different scale from the individual figure above, which pools a
-            debater&rsquo;s results across every partner. <b>Rating</b> is ours — a
-            Glicko-2 strength estimate, with the deviation saying how much it has been
-            confirmed. A partnership under {MIN_RATED_ROUNDS} rated rounds keeps a rating
-            but is not placed on the board — and the board is ordered on the rating pulled
-            toward the field by that deviation, not on the rating itself, so a place on it
-            and the figure here do not move together.{' '}
+            debater&rsquo;s results across every partner. The other two are ours.{' '}
+            <b>Rating</b> is the Glicko-2 estimate, with the deviation saying how far the
+            true strength could reasonably sit from it. <b>Established</b> is that rating
+            moved toward the field average in proportion to the deviation, so a rating
+            built on few rounds sits nearer the middle of the field than one built on
+            many, and it is what the ratings board is ordered on. A partnership under{' '}
+            {MIN_RATED_ROUNDS} rated rounds keeps both figures but is not placed on the
+            board.{' '}
             <Link href="/method#rating">How it works</Link>.
           </p>
           <div className="tablewrap">
@@ -216,6 +218,7 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
                 <tr>
                   <th>With</th>
                   <th className="num">Points</th>
+                  <th className="num">Established</th>
                   <th className="num">Rating</th>
                   <th className="num">Rounds</th>
                 </tr>
@@ -237,6 +240,7 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
                         x.points.toFixed(1)
                       )}
                     </td>
+                    <td className="num">{Math.round(x.shrunk)}</td>
                     <td className="num">
                       {Math.round(x.rating)}
                       <span className="margin"> ± {Math.round(x.deviation)}</span>
