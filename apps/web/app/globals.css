@@ -958,7 +958,7 @@ tfoot td.total { font-size: 0.9375rem; font-weight: 600; color: var(--text); }
 }
 .rowtoggle::before {
   content: '▸'; display: inline-block;
-  margin-right: 0.4rem; font-size: 0.85em; color: var(--muted);
+  margin-right: 0.4rem; font-size: 1.05em; color: var(--muted);
 }
 .rowtoggle[aria-expanded='true']::before { content: '▾'; }
 .rowtoggle:hover, .rowtoggle:hover::before { color: var(--accent); }
@@ -986,7 +986,6 @@ td.with { white-space: nowrap; }
    results is not visually punctuated by the tournaments that published none. */
 abbr.noresult {
   color: var(--faint);
-  font-size: 0.78em;
   text-decoration: none;
   cursor: help;
   white-space: nowrap;

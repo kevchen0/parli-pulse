@@ -127,10 +127,16 @@ export default function SeasonTable({
                       <span className="faint">—</span>
                     )}
                   </td>
-                  <td className="pts num">
+                  <td className="num">
                     {t.points === null ? (
+                      /*
+                        A dash, like every other empty cell on the page. The
+                        reason stays on the title, and the row opens onto the
+                        longer version of it where the tournament published no
+                        rounds at all.
+                      */
                       <abbr className="noresult" title={noResultReason(t)}>
-                        No result
+                        —
                       </abbr>
                     ) : (
                       t.points.toFixed(0)
