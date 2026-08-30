@@ -165,13 +165,6 @@ td.rank { text-align: left; }
 .margin { color: var(--muted); font-size: 0.78em; font-weight: 400; white-space: nowrap; }
 
 /* --- controls --- */
-.controls { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 0 0 0.85rem; }
-.controls input[type='search'] {
-  flex: 1 1 16rem; min-width: 0; padding: 0.45rem 0.7rem; font: inherit; font-size: 0.875rem;
-  color: var(--text); background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--radius);
-}
-.controls input[type='search']:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .segmented { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .segmented button {
   padding: 0.45rem 0.9rem; font: inherit; font-size: 0.875rem; cursor: pointer;
@@ -736,33 +729,56 @@ abbr.tick.differs { color: var(--bad); }
   background: var(--surface); font-size: 0.9375rem;
 }
 
-/* --- table search and page jump --- */
+/* --- table search and page jump ---
+   A ruled line rather than a box. The field was a bordered, filled, rounded
+   input with a Search button beside it -- three pieces of chrome around one
+   word of typing, sat above a table drawn almost entirely in hairlines. It
+   filters as you type now, so the button is gone, and what is left is the rule
+   the text sits on: the same line weight as the table under it.
 
-.tablesearch { display: flex; gap: 0.4rem; align-items: center; margin: 0 0 0.9rem; flex-wrap: wrap; }
+   The rule is the focus indicator too. It takes the accent and doubles, which
+   is a clearer change than an outline drawn around a shape that has no edges. */
+
+.tablesearch {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.9rem;
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--border-firm);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.tablesearch:focus-within {
+  border-bottom-color: var(--accent);
+  box-shadow: 0 1px 0 var(--accent);
+}
+.searchicon {
+  width: 0.875rem; height: 0.875rem; flex: none;
+  align-self: center; color: var(--faint);
+}
+.tablesearch:focus-within .searchicon { color: var(--accent); }
 .tablesearch input {
   font: inherit;
-  font-size: 0.875rem;
-  padding: 0.35rem 0.55rem;
-  min-width: min(20rem, 100%);
-  flex: 1 1 14rem;
+  font-size: 0.9375rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.4rem 0;
   color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border-firm);
-  border-radius: var(--radius);
+  background: none;
+  border: none;
 }
-.tablesearch button {
-  font: inherit;
+/* The wrapper shows focus, so an outline on the input would draw a second box
+   around the one shape this design is trying not to have. */
+.tablesearch input:focus { outline: none; }
+.tablesearch input::placeholder { color: var(--faint); }
+/* Safari draws its own clear button, which sits oddly on a field with no box. */
+.tablesearch input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.searchcount {
   font-size: 0.8125rem;
-  padding: 0.35rem 0.7rem;
-  color: var(--text);
-  background: var(--sunk);
-  border: 1px solid var(--border-firm);
-  border-radius: var(--radius);
-  cursor: pointer;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-.tablesearch button:hover { background: var(--surface); }
-.clearsearch { font-size: 0.8125rem; color: var(--muted); text-decoration: none; }
-.clearsearch:hover { color: var(--text); }
 
 /* The gap in the pager takes a page number instead of stating that pages are
    missing: with eight hundred rows, the gap is exactly where a reader acts. */

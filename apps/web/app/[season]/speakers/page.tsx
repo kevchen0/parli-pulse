@@ -12,10 +12,15 @@ export const revalidate = 300;
  * They render at once and the board streams in under them, which is what lets
  * the fallback be a bar rather than a drawing of the table.
  */
-export default async function SpeakersPage(
-  { params }: { params: Promise<{ season: string }> },
-) {
+export default async function SpeakersPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ season: string }>;
+  searchParams: Promise<{ q?: string }>;
+}) {
   const { season } = await params;
+  const sp = await searchParams;
   if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
 
   return (
@@ -26,13 +31,13 @@ export default async function SpeakersPage(
         more, so a raw average depends heavily on the draw.
       </p>
       <Suspense fallback={<LoadingBar label="Loading the speaker standings" />}>
-        <SpeakersBoard season={season} />
+        <SpeakersBoard season={season} initialQuery={(sp.q ?? '').trim()} />
       </Suspense>
     </>
   );
 }
 
-async function SpeakersBoard({ season }: { season: string }) {
+async function SpeakersBoard({ season, initialQuery }: { season: string; initialQuery: string }) {
   const [speakers, summary] = await Promise.all([getSpeakers(season), getSpeakerSummary(season)]);
   if (speakers.length === 0) {
     return (
@@ -53,7 +58,7 @@ async function SpeakersBoard({ season }: { season: string }) {
         <span>Open divisions only</span>
       </p>
 
-      <SpeakerTable rows={speakers} season={season} />
+      <SpeakerTable rows={speakers} season={season} initialQuery={initialQuery} />
 
       <ol className="footnotes">
         <li id="fn1">

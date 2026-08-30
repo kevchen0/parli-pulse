@@ -6,7 +6,9 @@ import type { RatingRow } from '@/lib/db';
 type SortKey = 'shown' | 'rating' | 'rounds';
 type Direction = 'desc' | 'asc';
 
-import { PAGE_SIZE, pageNumbers } from '@/app/pager';
+import { pageSlice } from '@/lib/paging';
+import TableSearch from '@/app/table-search';
+import TablePager from '@/app/table-pager';
 import { displayName, nameMatches } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
 import FootnoteRef from '@/app/footnote-ref';
@@ -76,8 +78,17 @@ function SortHeader({
   );
 }
 
-export default function RatingTable({ rows, season }: { rows: RatingRow[]; season: string }) {
-  const [query, setQuery] = useState('');
+export default function RatingTable({
+  rows,
+  season,
+  initialQuery = '',
+}: {
+  rows: RatingRow[];
+  season: string;
+  /** `?q=` as the page was served, so a shared search arrives filtered. */
+  initialQuery?: string;
+}) {
+  const [query, setQuery] = useState(initialQuery);
   const [sort, setSort] = useState<SortKey>('shown');
   const [direction, setDirection] = useState<Direction>('desc');
   const [page, setPage] = useState(1);
@@ -110,21 +121,17 @@ export default function RatingTable({ rows, season }: { rows: RatingRow[]; seaso
   // Sorting or searching puts the reader at the top of a new result set, so the
   // page resets with them rather than stranding them on page seven of a list
   // that no longer has seven pages.
-  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
-  const current = Math.min(page, totalPages);
-  const visible = sorted.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const { current, totalPages, shown: visible } = pageSlice(sorted, page);
 
   return (
     <>
-      <div className="controls">
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search debater or school"
-          aria-label="Search debater or school"
-        />
-      </div>
+      <TableSearch
+        value={query}
+        onChange={(next) => { setQuery(next); setPage(1); }}
+        placeholder="Search debater or school"
+        shown={sorted.length}
+        total={rows.length}
+      />
 
       <div className="tablewrap">
         <table>
@@ -170,56 +177,7 @@ export default function RatingTable({ rows, season }: { rows: RatingRow[]; seaso
         </table>
       </div>
 
-      {sorted.length > PAGE_SIZE && (
-        <nav className="pager" aria-label="Pages">
-          <span className="pagerrange">
-            {(current - 1) * PAGE_SIZE + 1}–{Math.min(current * PAGE_SIZE, sorted.length)} of{' '}
-            {sorted.length}
-          </span>
-          <span className="pagerpages">
-            {current > 1 && (
-              <button type="button" onClick={() => setPage(current - 1)} aria-label="Previous page">
-                ‹
-              </button>
-            )}
-            {pageNumbers(current, totalPages).map((p, i) =>
-              p === '…' ? (
-                <span key={`gap-${i}`} className="pagergap" aria-hidden>…</span>
-              ) : (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setPage(p)}
-                  data-current={p === current || undefined}
-                  aria-current={p === current ? 'page' : undefined}
-                >
-                  {p}
-                </button>
-              ),
-            )}
-            {current < totalPages && (
-              <button type="button" onClick={() => setPage(current + 1)} aria-label="Next page">
-                ›
-              </button>
-            )}
-          </span>
-            {totalPages > 3 && (
-              <input
-                className="pagerjumpinline"
-                type="number"
-                min={1}
-                max={totalPages}
-                placeholder={String(totalPages)}
-                aria-label={`Go to a page between 1 and ${totalPages}`}
-                onChange={(e) => {
-                  const n = Number(e.target.value);
-                  if (Number.isFinite(n) && n >= 1 && n <= totalPages) setPage(n);
-                }}
-              />
-            )}
-
-        </nav>
-      )}
+      <TablePager page={current} totalPages={totalPages} rows={sorted.length} onPage={setPage} />
       {sorted.length === 0 ? <p className="empty">No partnerships match “{query}”.</p> : null}
     </>
   );

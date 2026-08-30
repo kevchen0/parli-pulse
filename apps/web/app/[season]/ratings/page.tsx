@@ -14,10 +14,15 @@ export const revalidate = 300;
  * They render at once and the board streams in under them, which is what lets
  * the fallback be a bar rather than a drawing of the table.
  */
-export default async function RatingsPage(
-  { params }: { params: Promise<{ season: string }> },
-) {
+export default async function RatingsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ season: string }>;
+  searchParams: Promise<{ q?: string }>;
+}) {
   const { season } = await params;
+  const sp = await searchParams;
   if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
 
   return (
@@ -25,13 +30,13 @@ export default async function RatingsPage(
       <h1>Ratings</h1>
       <p className="lede">Glicko-2 rating adjusted for deviation.</p>
       <Suspense fallback={<LoadingBar label="Loading the ratings" />}>
-        <RatingsBoard season={season} />
+        <RatingsBoard season={season} initialQuery={(sp.q ?? '').trim()} />
       </Suspense>
     </>
   );
 }
 
-async function RatingsBoard({ season }: { season: string }) {
+async function RatingsBoard({ season, initialQuery }: { season: string; initialQuery: string }) {
   const [ratings, summary] = await Promise.all([getRatings(season), getRatingSummary(season)]);
   if (ratings.length === 0) {
     return (
@@ -55,7 +60,7 @@ async function RatingsBoard({ season }: { season: string }) {
         <span className="methodlink"><Link href="/method#rating">How this is calculated &rarr;</Link></span>
       </p>
 
-      <RatingTable rows={ratings} season={season} />
+      <RatingTable rows={ratings} season={season} initialQuery={initialQuery} />
 
       <ol className="footnotes">
         <li id="fn1">
