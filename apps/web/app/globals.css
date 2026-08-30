@@ -128,7 +128,7 @@ thead th {
 tbody td { padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--border); }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
-td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.num, th.num { text-align: left; font-variant-numeric: tabular-nums; }
 td.rank { color: var(--muted); font-variant-numeric: tabular-nums; width: 3.5rem; }
 td.pts { font-weight: 600; font-variant-numeric: tabular-nums; }
 .region { color: var(--muted); font-size: 0.8125rem; }
@@ -157,18 +157,15 @@ tbody tr.off td { background: color-mix(in srgb, var(--accent) 8%, transparent);
 .counted { color: var(--accent); font-size: 0.75rem; }
 
 /* --- table alignment ---
-   The rank column is left-aligned. It labels a row rather than measuring it,
-   and a reader runs down it rather than comparing its values.
+   Everything is left-aligned, figures included, so a value sits under the first
+   letter of its heading rather than drifting to an edge away from the word that
+   names it. Tabular figures keep the digits in line down the column, which is
+   the part right alignment is usually reached for.
 
-   Every other numeric column right-aligns its figures and its heading together
-   -- that is what `.num` does on both the th and the td -- so the digits line
-   up on the column's edge and the word sits over them. A column drifting away
-   from its heading is the failure that gets blamed on right alignment, and it
-   only happens when the heading is left where the figures are not.
-
-   Ratings and Speakers never marked their columns, so their figures sat left
-   while the three points boards sat right and the two families disagreed about
-   where a number goes. Tabular figures keep the digits in line either way. */
+   `.num` therefore does not move a column. It marks one as numeric and asks for
+   tabular figures, and it is on every numeric column across all five boards, so
+   there is one convention rather than the two that were here before -- points
+   right, ratings and speakers left, and a comment for each. */
 td.pts, td.rank { font-variant-numeric: tabular-nums; }
 td.rank { text-align: left; }
 .margin { color: var(--muted); font-size: 0.78em; font-weight: 400; white-space: nowrap; }
@@ -239,23 +236,10 @@ td.school {
 
 /* --- footnote references --- */
 sup.fnref { font-size: 0.62em; margin-left: 0.15em; letter-spacing: 0.02em; }
-/*
- * A footnote marker in a right-aligned column header must not take width.
- * The header labels the figures beneath it and they line up on the column's
- * right edge; a marker sitting in the line box pushes the word left by its own
- * width, so "Points" stops sitting over the points. Zero-width, it renders
- * into the cell's 0.9rem padding instead and the label keeps its alignment.
- *
- * Direct children only. A sortable header wraps its label, marker and arrow in
- * a `.sorthead` flex row, where a zero-width marker would sit on top of the
- * arrow instead of beside it.
- */
-th.num > sup.fnref {
-  display: inline-block; width: 0; margin-left: 0;
-  /* The gap before the marker is drawn, not laid out: a margin would
-     count toward the line box and put the label back off the edge. */
-  transform: translateX(0.2em);
-}
+/* No special case for a marker in a column heading. It used to be given zero
+   width and drawn into the cell padding, so that a right-aligned label stayed
+   over its right-aligned figures; with the column left-aligned the label starts
+   at the edge and the marker can simply follow it. */
 sup.fnref a { color: var(--accent); text-decoration: none; }
 sup.fnref a:hover { text-decoration: underline; }
 /*
