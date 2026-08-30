@@ -56,3 +56,8 @@ comparable to current ones and should not be blended into one live system.
 
 A visible boundary in the UI between "archive" and "live" seasons, so nobody
 reads a 2021 number as commensurable with a 2026 one.
+
+**Ratings do not carry between seasons**, deliberately: each season is rated on
+its own rounds and starts from scratch. That is stated on the About page,
+because the consequence — an almost empty rating board in September — is
+otherwise mysterious. See [07-open-questions.md](07-open-questions.md).

@@ -62,6 +62,23 @@ The calendar is still worth reading as a **lookahead** — it names tournaments
 before the league writes them up — and `npm run fetch` reports that at the end
 without acting on it.
 
+**Verified live against 2026-27 on 2026-08-28.** `SEASON=2026-27 npm run fetch`
+read the season's own workbook, reported 110 tournaments and **0 with a results
+link**, fetched nothing, and listed five calendar entries not yet in the sheet
+including Harvard as `40344` on 2026-09-05. The whole chain works before the
+season has anything in it.
+
+Two things that fall out of that run and are worth knowing before Harvard:
+
+- **The trigger is the sheet, not the tournament.** Results appearing on
+  Tabroom changes nothing. The site updates when the league writes a Tabroom URL
+  into the `Results` column, which is days to weeks after the tournament.
+- **The 2026-27 workbook is last season's, copied as a template.** Row counts
+  match 2025-26 exactly while content differs, and `School` and `SchoolList`
+  hold last year's membership and regions until the league edits them. Nothing
+  breaks; a school that joins or leaves for 2026-27 is simply wrong until then,
+  and nothing flags it.
+
 Approval status comes from the NPDL calendar sheet:
 `docs.google.com/spreadsheets/d/1VNW2wNf_QD0hqaIhXwkXUvC1VyZH8Rsy06adijMCA0A/gviz/tq?tqx=out:csv`
 

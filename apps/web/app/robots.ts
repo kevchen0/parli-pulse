@@ -1,22 +1,27 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Nothing is indexed while the site is being shown around.
+ * The site is open to search engines. Debater profiles are not.
  *
- * The pages name minors. Most of what they say is already on Tabroom, but a
- * search result is a different kind of exposure from a page someone navigated
- * to: it puts a debater's name and record in front of anyone who searches the
- * name for any reason at all. That is a decision to make deliberately rather
- * than by leaving the default in place, and the default is to allow.
+ * A table is a page about a competition. A profile is a page about one minor,
+ * and indexing it makes their name a search result for anyone who looks up that
+ * name for any reason — which is a different kind of exposure from a page
+ * somebody navigated to, and the one this project has no business creating.
  *
- * This blocks the whole site rather than the profile pages alone, because
- * during a demo the audience is people who were given the link.
- *
- * Reversing it is one file. If it is ever relaxed, `/<season>/debater/*` is
- * the part to keep disallowed, and the Privacy page has to say so first.
+ * Two mechanisms again, because they do different jobs: this asks a crawler not
+ * to fetch, and `generateMetadata` on the profile route sends `noindex` for a
+ * crawler that fetched anyway. A page nobody crawls is still indexable from an
+ * inbound link.
  */
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: '*', disallow: '/' }],
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/*/debater/', '/*/internal/', '/api/'],
+      },
+    ],
+    sitemap: 'https://parli-pulse.vercel.app/sitemap.xml',
   };
 }
