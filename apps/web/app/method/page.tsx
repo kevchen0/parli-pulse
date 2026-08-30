@@ -249,11 +249,14 @@ export default async function MethodPage() {
           partnership.
         </p>
 
-        <h3 id="shrink">Established: shrinking to the field</h3>
+        <h3 id="shrink">Rating: shrinking to the field</h3>
         <p>
-          Ranking and prediction need different numbers. The board is ordered on the rating
-          pulled toward the field average in proportion to its deviation, so a rating built
-          on few rounds sits closer to the middle of the field than one built on many.
+          Ranking and prediction need different numbers. The board is ordered on the
+          estimate pulled toward the field average in proportion to its deviation, so a
+          figure built on few rounds sits closer to the middle of the field than one built
+          on many. The board calls the pulled figure <b>Rating</b>, since it is the one it
+          ranks on, and the figure it came from <b>Raw estimate</b>. They are{' '}
+          <Sub><V>r</V><Text>est</Text></Sub> and <V>r</V> here.
         </p>
         <p>
           We first estimate the spread of true strengths. Observed spread is true spread
