@@ -14,10 +14,12 @@ import TableSkeleton from '@/app/table-skeleton';
  * better than a client-side hop. Pages that need to answer with a status do
  * not get a boundary above them.
  *
- * Deliberately unlabelled. This one boundary covers Points, Ratings, Speakers
- * and the reconciliation, which have different columns, and naming one set
- * would tell a reader waiting for Schools that Partnership and Tourns are on
- * their way. Each table supplies its own labelled fallback alongside its data.
+ * Deliberately unlabelled, and now only the reconciliation uses it. Every board
+ * -- Points, Debaters, Schools, Ratings, Speakers -- has its own `loading.tsx`
+ * naming its own heading and columns, because a `loading.tsx` is per segment and
+ * knows which route it is. This one is what is left: the reconciliation renders
+ * several tables of different widths under one boundary, so there is no single
+ * shape to draw and it draws none.
  *
  * No `main` element: this renders as the layout's children and the layout
  * already supplies one. Nesting a second is invalid, and the parser rearranges

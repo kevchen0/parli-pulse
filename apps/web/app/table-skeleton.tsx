@@ -93,3 +93,28 @@ export const SCHOOL_COLUMNS: SkeletonColumn[] = [
   { label: 'Region', fill: '2.5rem' },
   { label: 'Points', num: true, fill: '2.8rem' },
 ];
+
+/*
+ * Ratings and Speakers left-align their figures -- a value sits under the first
+ * letter of its heading -- so neither set marks a column `num`. Copying the
+ * points tables here would right-align the shimmer and put the bars somewhere
+ * the real digits never appear.
+ */
+export const RATING_COLUMNS: SkeletonColumn[] = [
+  { label: '#', fill: '1.4rem' },
+  { label: 'School', fill: '70%' },
+  { label: 'Partnership', fill: '85%' },
+  { label: 'Rounds', fill: '1.5rem' },
+  { label: 'Established', fill: '2.2rem' },
+  { label: 'Rating', fill: '3.4rem' },
+  { label: 'XXI rank', fill: '1.5rem' },
+];
+
+export const SPEAKER_COLUMNS: SkeletonColumn[] = [
+  { label: '#', fill: '1.4rem' },
+  { label: 'School', fill: '70%' },
+  { label: 'Debater', fill: '75%' },
+  { label: 'Ballots', fill: '1.5rem' },
+  { label: 'Z-score', fill: '3.2rem' },
+  { label: 'Raw', fill: '2.6rem' },
+];
