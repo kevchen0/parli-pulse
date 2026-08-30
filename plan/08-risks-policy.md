@@ -33,11 +33,22 @@ Tabroom, but aggregating them into searchable profiles is a real change in
 exposure. Defaults: no photos, no contact information, no grade or age, and an
 email-based removal path.
 
-**Nothing is indexed.** `robots.txt` disallows everything and every page sends
-`noindex, nofollow`. A search result is a different exposure from a page
-somebody navigated to: it puts a debater's name in front of anyone who searches
-that name for any reason. Relaxing this is a deliberate decision, not a default,
-and `/<season>/debater/*` is the part to keep disallowed if it ever is.
+**The site is indexed; debater profiles are not.** A table is a page about a
+competition and is open to search engines. A profile is a page about one minor,
+and indexing it makes their name a result for anyone who looks up that name for
+any reason — which is a different exposure from a page somebody navigated to.
+
+Excluded twice over, because the two mechanisms do different jobs: `robots.txt`
+disallows `/*/debater/` so a crawler does not fetch, and the route's
+`generateMetadata` sends `noindex, nofollow` so a crawler arriving from an
+inbound link does not index either. The sitemap lists tables and static pages
+and no profiles.
+
+The same split applies to link previews. Preview bots are named and allowed —
+they render a card for a link somebody deliberately pasted, they do not build an
+index — and profiles are closed to them too, since a card naming one person is
+the exposure this exists to avoid. **The card image runs names through
+`displayName`**, so a withheld debater reads as "Name withheld" there as well.
 
 **The removal path is real and has been exercised.** A withheld name reads as
 "Name withheld" everywhere it would appear, including as a partner or opponent

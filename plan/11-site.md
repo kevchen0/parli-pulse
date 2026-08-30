@@ -41,8 +41,9 @@ every round with the opponent, the panel split and their own speaks.
 **The launch pass (2026-08-28).** What it took to be publishable rather than
 correct:
 
-- **Nothing is indexed.** `robots.txt` disallows everything and every page sends
-  `noindex, nofollow`. Two mechanisms because they do different jobs.
+- **Indexed, except debater profiles**, which are disallowed in `robots.txt` and
+  send `noindex` from their own route. Two mechanisms because they stop
+  different things: one the fetch, one an index built from an inbound link.
 - **The reconciliation view is unlisted**, at `/<season>/internal/reconciliation`
   with its six public links removed.
 - **A contact route that exists.** `parlipulse@gmail.com` in one constant, plus
@@ -58,6 +59,13 @@ correct:
 - **Analytics**, cookieless, disclosed on the Privacy page in the same commit —
   that page had committed to saying so before any shipped.
 - **The whole site rewritten** against [../docs/writing-style.md](../docs/writing-style.md).
+- **An MIT licence**, with a README note that it covers the code and not the
+  data, and that a fork does not inherit the removal requests honoured here.
+- **Link previews work.** Preview bots are allowed where search crawlers were
+  not, and the card renders the top six of the ratings board from live data
+  rather than describing the site.
+- **The site is findable on Google**, profiles excepted. Sitemap built from the
+  database, so a new season appears the day it opens.
 - **The methodology page is held back.** Rebuilt with three sections, MathML
   equations and a live agreement table, then replaced on `main` with "Coming
   soon!" because parts of it were not clear enough to publish. The full version

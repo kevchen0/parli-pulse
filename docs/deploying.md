@@ -55,10 +55,20 @@ Two boxes appear, and **what you type in them becomes the commit on `main`**:
 - **Commit description** — defaults to a bulleted list of every commit on the
   branch
 
-Clear the bullet list and write the note. `main`'s history is a list of
-releases, so write it for someone scanning what changed on the live site: what
-a reader sees, and why it changed. Short first line, blank line, then the
-reasoning.
+**Keep it to the title.** One line saying what shipped, in plain words, and
+clear the description box entirely. `main`'s history is then a scannable list
+of releases:
+
+```
+Show the ratings board in the link card
+Open the site to search engines
+Fix link previews
+Add an MIT licence
+```
+
+The reasoning already lives in the commits on `dev`, which the squash preserves
+in the pull request, and in `plan/`. Repeating it on `main` makes the release
+list harder to read, not easier.
 
 Then **Confirm squash and merge**.
 

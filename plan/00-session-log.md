@@ -35,7 +35,7 @@ already shows Harvard as `40344` on 2026-09-05. That is the correct state.
 
 ## Branches, and how work ships
 
-**This is new, and it changes how everything below gets done.**
+**This is how everything gets done now.**
 
 | Branch | Holds | Preview |
 |---|---|---|
@@ -54,7 +54,10 @@ lived on `dev`, every footnote edit shipped from `dev` would drag it into
 production. Merging `main` into it conflicts only on
 `apps/web/app/method/page.tsx`, and the resolution is always `--ours`.
 
-Full workflow, including where the merge note is written, in
+**Merge notes are one line.** The squash commit gets a title saying what
+shipped and an empty description, so `main` reads as a scannable list of
+releases. The reasoning lives in the `dev` commits the pull request preserves,
+and in this directory. Full workflow in
 [../docs/deploying.md](../docs/deploying.md).
 
 **Branches do not isolate the database.** `drizzle-kit migrate` and every
@@ -63,11 +66,21 @@ from the maintainer's laptop. A migration or a `load` is a deploy in itself.
 
 ## What shipped this session
 
-**Closed to crawlers.** `robots.txt` disallows everything and the root layout
-sends `noindex, nofollow`. Both, because they do different jobs: robots.txt asks
-a crawler not to fetch, and the header stops a page indexed from an inbound
-link. The pages name minors, and a search result is a different exposure from a
-page someone navigated to.
+**Indexed, except debater profiles.** The site went closed-to-everything first
+and then opened deliberately. Tables and static pages are in a sitemap built
+from the database. `/*/debater/` is disallowed in `robots.txt` *and* sends
+`noindex` from its own route, because the two mechanisms stop different things:
+one the fetch, one an index built from an inbound link. A table is a page about
+a competition; a profile is a page about one minor.
+
+**Link previews render the ratings board.** Preview bots are named and allowed
+where search crawlers were not — they build a card for a link somebody pasted,
+not an index. Profiles are closed to them too. The card is generated from live
+ratings and runs names through `displayName`, so suppression holds there as
+well.
+
+**An MIT licence**, with a README note that it covers the code and not the
+data, and that a fork does not inherit the removal requests honoured here.
 
 **The reconciliation view is unlisted**, at `/<season>/internal/reconciliation`,
 with its six public links removed. It enumerates by name every place the
@@ -175,6 +188,9 @@ Everything in the previous handoff still applies —
 5. **Smaller:** a Seasons page; the analysis scripts that hardcode
    `rankings.zip`; `/rankings` and the masthead's Rankings link both resolve to
    the calendar's current season, which is empty until Harvard is scored.
+6. **Submit the sitemap** to Google Search Console. The site is indexable and
+   will be found on its own within weeks; the console makes it days and reports
+   what Google actually indexed.
 
 ## Waiting on the user
 

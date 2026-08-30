@@ -32,7 +32,9 @@ means what it meant when it was shared.
 /<season>/internal/reconciliation     unlisted; against the league's sheet
 /method /about /privacy /feedback     not about any one season
 /api/feedback                         POST from the contact form
-/robots.txt                           disallows everything
+/robots.txt                           allows all but profiles, internal, api
+/sitemap.xml                          static pages and every season's tables
+/opengraph-image                      the link card, rendered from live ratings
 /rankings/*                           forwards, mapped page by page
 ```
 
