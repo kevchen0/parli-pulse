@@ -157,21 +157,23 @@ tbody tr.off td { background: color-mix(in srgb, var(--accent) 8%, transparent);
 .counted { color: var(--accent); font-size: 0.75rem; }
 
 /* --- table alignment ---
-   Numeric columns are left-aligned so a value sits under the first letter of
-   its heading, which is easier to scan than a right-aligned column drifting
-   away from the word above it. Tabular figures keep the digits in line. */
+   The rank column is left-aligned. It labels a row rather than measuring it,
+   and a reader runs down it rather than comparing its values.
+
+   Every other numeric column right-aligns its figures and its heading together
+   -- that is what `.num` does on both the th and the td -- so the digits line
+   up on the column's edge and the word sits over them. A column drifting away
+   from its heading is the failure that gets blamed on right alignment, and it
+   only happens when the heading is left where the figures are not.
+
+   Ratings and Speakers never marked their columns, so their figures sat left
+   while the three points boards sat right and the two families disagreed about
+   where a number goes. Tabular figures keep the digits in line either way. */
 td.pts, td.rank { font-variant-numeric: tabular-nums; }
 td.rank { text-align: left; }
 .margin { color: var(--muted); font-size: 0.78em; font-weight: 400; white-space: nowrap; }
 
 /* --- controls --- */
-.controls { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 0 0 0.85rem; }
-.controls input[type='search'] {
-  flex: 1 1 16rem; min-width: 0; padding: 0.45rem 0.7rem; font: inherit; font-size: 0.875rem;
-  color: var(--text); background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--radius);
-}
-.controls input[type='search']:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .segmented { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .segmented button {
   padding: 0.45rem 0.9rem; font: inherit; font-size: 0.875rem; cursor: pointer;
@@ -214,12 +216,18 @@ button.sort[data-active='true'] { color: var(--text); }
  * marker can sit against the word it annotates instead of trailing the whole
  * control. It keeps the button's own colour and spacing here.
  */
+/* One triangle at one size on every sortable column, with colour saying which
+   column the table is actually sorted on. It used to be a smaller glyph at
+   less than half opacity when inactive and a larger one at full opacity when
+   active, so the mark changed size, shape and weight all at once and the
+   inactive ones were faint enough to miss. Grey means sortable; the accent
+   means sorted. */
 .sorthead .arrow {
-  font-size: 0.7em; opacity: 0.45; margin-left: 0.3rem;
-  color: var(--muted); cursor: pointer;
+  font-size: 0.7em; margin-left: 0.3rem; line-height: 1;
+  color: var(--faint); cursor: pointer;
 }
-.sorthead[data-active='true'] .arrow { opacity: 1; color: var(--accent); }
-.sorthead:hover .arrow { color: var(--text); }
+.sorthead[data-active='true'] .arrow { color: var(--accent); }
+.sorthead:hover .arrow { color: var(--muted); }
 .sorthead[data-active='true']:hover .arrow { color: var(--accent); }
 /* A flex item loses the raised position <sup> normally has, so ask for it. */
 .sorthead sup.fnref { align-self: flex-start; }
@@ -237,8 +245,12 @@ sup.fnref { font-size: 0.62em; margin-left: 0.15em; letter-spacing: 0.02em; }
  * right edge; a marker sitting in the line box pushes the word left by its own
  * width, so "Points" stops sitting over the points. Zero-width, it renders
  * into the cell's 0.9rem padding instead and the label keeps its alignment.
+ *
+ * Direct children only. A sortable header wraps its label, marker and arrow in
+ * a `.sorthead` flex row, where a zero-width marker would sit on top of the
+ * arrow instead of beside it.
  */
-th.num sup.fnref {
+th.num > sup.fnref {
   display: inline-block; width: 0; margin-left: 0;
   /* The gap before the marker is drawn, not laid out: a margin would
      count toward the line box and put the label back off the edge. */
@@ -736,33 +748,56 @@ abbr.tick.differs { color: var(--bad); }
   background: var(--surface); font-size: 0.9375rem;
 }
 
-/* --- table search and page jump --- */
+/* --- table search and page jump ---
+   A ruled line rather than a box. The field was a bordered, filled, rounded
+   input with a Search button beside it -- three pieces of chrome around one
+   word of typing, sat above a table drawn almost entirely in hairlines. It
+   filters as you type now, so the button is gone, and what is left is the rule
+   the text sits on: the same line weight as the table under it.
 
-.tablesearch { display: flex; gap: 0.4rem; align-items: center; margin: 0 0 0.9rem; flex-wrap: wrap; }
+   The rule is the focus indicator too. It takes the accent and doubles, which
+   is a clearer change than an outline drawn around a shape that has no edges. */
+
+.tablesearch {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.9rem;
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--border-firm);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.tablesearch:focus-within {
+  border-bottom-color: var(--accent);
+  box-shadow: 0 1px 0 var(--accent);
+}
+.searchicon {
+  width: 0.875rem; height: 0.875rem; flex: none;
+  align-self: center; color: var(--faint);
+}
+.tablesearch:focus-within .searchicon { color: var(--accent); }
 .tablesearch input {
   font: inherit;
-  font-size: 0.875rem;
-  padding: 0.35rem 0.55rem;
-  min-width: min(20rem, 100%);
-  flex: 1 1 14rem;
+  font-size: 0.9375rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.4rem 0;
   color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border-firm);
-  border-radius: var(--radius);
+  background: none;
+  border: none;
 }
-.tablesearch button {
-  font: inherit;
+/* The wrapper shows focus, so an outline on the input would draw a second box
+   around the one shape this design is trying not to have. */
+.tablesearch input:focus { outline: none; }
+.tablesearch input::placeholder { color: var(--faint); }
+/* Safari draws its own clear button, which sits oddly on a field with no box. */
+.tablesearch input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.searchcount {
   font-size: 0.8125rem;
-  padding: 0.35rem 0.7rem;
-  color: var(--text);
-  background: var(--sunk);
-  border: 1px solid var(--border-firm);
-  border-radius: var(--radius);
-  cursor: pointer;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-.tablesearch button:hover { background: var(--surface); }
-.clearsearch { font-size: 0.8125rem; color: var(--muted); text-decoration: none; }
-.clearsearch:hover { color: var(--text); }
 
 /* The gap in the pager takes a page number instead of stating that pages are
    missing: with eight hundred rows, the gap is exactly where a reader acts. */
@@ -790,30 +825,46 @@ abbr.tick.differs { color: var(--bad); }
 .pagerjumpinline { margin-left: 0.4rem; font: inherit; font-size: 0.8125rem; }
 
 /* --- loading states ---
-   A skeleton rather than a spinner in empty space: the page keeps its shape, so
-   nothing jumps when the rows arrive, and the reader can see what is coming. */
+   A bar rather than a skeleton. A skeleton has to choose a width for every cell
+   it draws and those widths are guesses, so the placeholders do not sit where
+   the figures land and the table looks like it is shifting as it fills. This
+   says only that something is coming, which is the only thing known at the
+   time.
 
-/* The skeleton is a real .tablewrap table, so it inherits padding, borders and
-   column widths. Only the shimmer bar is styled here, sized to a line of text so
-   a placeholder row is exactly as tall as a real one. */
-.skeleton td .skelcell { height: 0.875rem; }
-.skeleton tbody tr:hover { background: none; }
-.skelcell { display: inline-block; height: 0.7rem; border-radius: 2px; background: var(--sunk); vertical-align: middle; }
-.skelhead { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem; }
-.skelcell.title { height: 1.6rem; width: 9rem; }
-.skelcell.lede { height: 0.8rem; width: min(34rem, 90%); }
+   Boards have no loading.tsx, so a click leaves the current table up with the
+   spinner in the link that was clicked. This is the cold load, where the
+   heading and the lede stream first and the bar stands where the rows will be. */
+.loading { margin: 1.5rem 0; }
+.loadingtrack {
+  display: block;
+  height: 2px;
+  overflow: hidden;
+  background: var(--sunk);
+}
+.loadingtrack::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 28%;
+  background: var(--accent);
+}
 
-/* The shimmer says "working", which a static block does not. Held back from
-   anyone who has asked for less movement. */
 @media (prefers-reduced-motion: no-preference) {
-  .skelcell {
-    background: linear-gradient(90deg, var(--sunk) 25%, var(--border) 50%, var(--sunk) 75%);
-    background-size: 200% 100%;
-    animation: skelshimmer 1.4s ease-in-out infinite;
+  .loadingtrack::after { animation: loadingslide 1.2s ease-in-out infinite; }
+  @keyframes loadingslide {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(357%); }
   }
-  @keyframes skelshimmer {
-    from { background-position: 200% 0; }
-    to { background-position: -200% 0; }
+}
+
+/* A bar that cannot move has no way to say it is working, so where motion is
+   off the label the bar otherwise leaves to screen readers is shown instead. */
+@media (prefers-reduced-motion: reduce) {
+  .loadingtrack { display: none; }
+  .loading .sr-only {
+    position: static; width: auto; height: auto;
+    margin: 0; overflow: visible; clip: auto; white-space: normal;
+    color: var(--muted); font-size: 0.8125rem;
   }
 }
 

@@ -6,7 +6,9 @@ import type { SpeakerRow } from '@/lib/db';
 type SortKey = 'z' | 'raw';
 type Direction = 'desc' | 'asc';
 
-import { PAGE_SIZE, pageNumbers } from '@/app/pager';
+import { pageSlice } from '@/lib/paging';
+import TableSearch from '@/app/table-search';
+import TablePager from '@/app/table-pager';
 import { displayName, nameMatches } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
 import FootnoteRef from '@/app/footnote-ref';
@@ -43,7 +45,7 @@ function compare(a: SpeakerRow, b: SpeakerRow, key: SortKey, dir: Direction): nu
 }
 
 function SortHeader({
-  label, notes, active, direction, onClick,
+  label, notes, active, direction, onClick, num,
 }: {
   label: string;
   /** Footnote numbers explaining this column, linked to the list below. */
@@ -51,6 +53,8 @@ function SortHeader({
   active: boolean;
   direction: Direction;
   onClick: () => void;
+  /** Right-aligns the heading with the figures under it, as `.num` does. */
+  num?: boolean;
 }) {
   // Same shape as the ratings table: the footnote link sits outside the button
   // because an anchor nested inside one is invalid and would sort on click, and
@@ -58,7 +62,7 @@ function SortHeader({
   // than trailing the whole control. The arrow stays clickable for a mouse and
   // hidden from assistive technology, which has the button.
   return (
-    <th>
+    <th className={num ? 'num' : undefined}>
       <span className="sorthead" data-active={active}>
         <button
           type="button"
@@ -71,15 +75,24 @@ function SortHeader({
         </button>
         {notes.length > 0 ? <FootnoteRef notes={notes} /> : null}
         <span className="arrow" aria-hidden onClick={onClick}>
-          {active ? (direction === 'desc' ? '▼' : '▲') : '▾'}
+          {active && direction === 'asc' ? '▲' : '▼'}
         </span>
       </span>
     </th>
   );
 }
 
-export default function SpeakerTable({ rows, season }: { rows: SpeakerRow[]; season: string }) {
-  const [query, setQuery] = useState('');
+export default function SpeakerTable({
+  rows,
+  season,
+  initialQuery = '',
+}: {
+  rows: SpeakerRow[];
+  season: string;
+  /** `?q=` as the page was served, so a shared search arrives filtered. */
+  initialQuery?: string;
+}) {
+  const [query, setQuery] = useState(initialQuery);
   const [sort, setSort] = useState<SortKey>('z');
   const [direction, setDirection] = useState<Direction>('desc');
   const [page, setPage] = useState(1);
@@ -111,21 +124,17 @@ export default function SpeakerTable({ rows, season }: { rows: SpeakerRow[]; sea
   // Sorting or searching puts the reader at the top of a new result set, so the
   // page resets with them rather than stranding them on page seven of a list
   // that no longer has seven pages.
-  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
-  const current = Math.min(page, totalPages);
-  const visible = sorted.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const { current, totalPages, shown: visible } = pageSlice(sorted, page);
 
   return (
     <>
-      <div className="controls">
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search debater or school"
-          aria-label="Search debater or school"
-        />
-      </div>
+      <TableSearch
+        value={query}
+        onChange={(next) => { setQuery(next); setPage(1); }}
+        placeholder="Search debater or school"
+        shown={sorted.length}
+        total={rows.length}
+      />
 
       <div className="tablewrap">
         <table>
@@ -134,9 +143,9 @@ export default function SpeakerTable({ rows, season }: { rows: SpeakerRow[]; sea
               <th>#</th>
               <th>School</th>
               <th>Debater</th>
-              <th>Ballots</th>
-              <SortHeader label="Z-score" notes={[2]} active={sort === 'z'} direction={direction} onClick={() => toggle('z')} />
-              <SortHeader label="Raw" notes={[3]} active={sort === 'raw'} direction={direction} onClick={() => toggle('raw')} />
+              <th className="num">Ballots</th>
+              <SortHeader label="Z-score" notes={[2]} active={sort === 'z'} direction={direction} onClick={() => toggle('z')} num />
+              <SortHeader label="Raw" notes={[3]} active={sort === 'raw'} direction={direction} onClick={() => toggle('raw')} num />
             </tr>
           </thead>
           <tbody>
@@ -150,12 +159,12 @@ export default function SpeakerTable({ rows, season }: { rows: SpeakerRow[]; sea
                     {s.region ? <span className="region"> · {s.region}</span> : null}
                   </td>
                   <td><DebaterLink season={season} id={s.id} name={s.name} /></td>
-                  <td className="region">{s.ballots}</td>
-                  <td className="pts">
+                  <td className="region num">{s.ballots}</td>
+                  <td className="pts num">
                     {Number(s.meanZ) > 0 ? '+' : ''}{Number(s.meanZ).toFixed(2)}
                     {m === null ? null : <span className="margin"> ± {m.toFixed(2)}</span>}
                   </td>
-                  <td>{s.meanRaw === null ? '—' : Number(s.meanRaw).toFixed(2)}</td>
+                  <td className="num">{s.meanRaw === null ? '—' : Number(s.meanRaw).toFixed(2)}</td>
                 </tr>
               );
             })}
@@ -163,56 +172,7 @@ export default function SpeakerTable({ rows, season }: { rows: SpeakerRow[]; sea
         </table>
       </div>
 
-      {sorted.length > PAGE_SIZE && (
-        <nav className="pager" aria-label="Pages">
-          <span className="pagerrange">
-            {(current - 1) * PAGE_SIZE + 1}–{Math.min(current * PAGE_SIZE, sorted.length)} of{' '}
-            {sorted.length}
-          </span>
-          <span className="pagerpages">
-            {current > 1 && (
-              <button type="button" onClick={() => setPage(current - 1)} aria-label="Previous page">
-                ‹
-              </button>
-            )}
-            {pageNumbers(current, totalPages).map((p, i) =>
-              p === '…' ? (
-                <span key={`gap-${i}`} className="pagergap" aria-hidden>…</span>
-              ) : (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setPage(p)}
-                  data-current={p === current || undefined}
-                  aria-current={p === current ? 'page' : undefined}
-                >
-                  {p}
-                </button>
-              ),
-            )}
-            {current < totalPages && (
-              <button type="button" onClick={() => setPage(current + 1)} aria-label="Next page">
-                ›
-              </button>
-            )}
-          </span>
-            {totalPages > 3 && (
-              <input
-                className="pagerjumpinline"
-                type="number"
-                min={1}
-                max={totalPages}
-                placeholder={String(totalPages)}
-                aria-label={`Go to a page between 1 and ${totalPages}`}
-                onChange={(e) => {
-                  const n = Number(e.target.value);
-                  if (Number.isFinite(n) && n >= 1 && n <= totalPages) setPage(n);
-                }}
-              />
-            )}
-
-        </nav>
-      )}
+      <TablePager page={current} totalPages={totalPages} rows={sorted.length} onPage={setPage} />
       {sorted.length === 0 ? <p className="empty">No debaters match “{query}”.</p> : null}
     </>
   );

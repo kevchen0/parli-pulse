@@ -7,10 +7,10 @@ import { useLinkStatus } from 'next/link';
  * A spinner inside whichever link is currently being waited on.
  *
  * `useLinkStatus` reports the pending state of the nearest enclosing `Link`, so
- * this has to be rendered as its child rather than beside it. Without it a click
- * on a section is silent until the server answers -- the skeleton covers the
- * page body, but the thing the reader actually clicked gives no sign it heard
- * them.
+ * this has to be rendered as its child rather than beside it. It carries the
+ * whole signal now: the boards no longer swap themselves for a placeholder on a
+ * click, so between the click and the server answering, this spinner is the only
+ * thing that moves.
  */
 function Pending() {
   const { pending } = useLinkStatus();
