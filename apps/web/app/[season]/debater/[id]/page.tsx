@@ -133,14 +133,28 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
           }
           href={seasonHref(season, '/speakers')}
         />
+        {/*
+          The established figure rather than the raw rating, so the number and
+          the place beneath it are the same claim: the board is ordered on the
+          established figure, and a card reading 1934 above "1st" was pairing a
+          rating with a rank that rating did not earn.
+
+          `best` needs no change to follow it. The partnerships come back
+          ordered on the established figure already, so the first ranked one was
+          always the one this card meant.
+
+          No ± here. The deviation belongs to the raw rating, and printing it
+          beside the established number would offer it as an interval on a
+          figure it is not an interval on -- the board does not print one in its
+          Established column either. Rounds carry the weight of evidence.
+        */}
         <Figure
-          label={p.partnerships.length > 1 ? 'Best partnership rating' : 'Partnership rating'}
-          value={best ? Math.round(best.rating).toString() : '—'}
+          label={p.partnerships.length > 1 ? 'Best established rating' : 'Established rating'}
+          value={best ? Math.round(best.shrunk).toString() : '—'}
           note={
             best
               ? [
                   best.ratingRank ? ordinal(best.ratingRank) : 'Unranked',
-                  `± ${Math.round(best.deviation)}`,
                   `${best.rounds} rounds`,
                 ].join(' · ')
               : 'Not rated'
