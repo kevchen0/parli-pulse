@@ -1,6 +1,4 @@
 import { dbReady, getSchools } from '@/lib/db';
-import { Suspense } from 'react';
-import LoadingBar from '@/app/loading-bar';
 import SchoolsTable from './table';
 
 export const revalidate = 300;
@@ -17,9 +15,7 @@ export default async function SchoolsPage({
   return (
     <>
       <h1>Schools</h1>
-      <Suspense fallback={<LoadingBar label="Loading the school standings" />}>
-        <SchoolsBoard season={season} initialQuery={(sp.q ?? '').trim()} />
-      </Suspense>
+      <SchoolsBoard season={season} initialQuery={(sp.q ?? '').trim()} />
     </>
   );
 }

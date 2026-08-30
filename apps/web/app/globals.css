@@ -825,48 +825,20 @@ abbr.tick.differs { color: var(--bad); }
 .pagerjumpinline { margin-left: 0.4rem; font: inherit; font-size: 0.8125rem; }
 
 /* --- loading states ---
-   A bar rather than a skeleton. A skeleton has to choose a width for every cell
-   it draws and those widths are guesses, so the placeholders do not sit where
-   the figures land and the table looks like it is shifting as it fills. This
-   says only that something is coming, which is the only thing known at the
-   time.
+   There are none. Every Suspense boundary on this site sat stuck: React 19.2
+   marks a streamed boundary `$~` (queued for reveal) and, on next 15.5.23 with
+   react-dom 19.2.8, the reveal never completes -- the content arrives in a
+   template, the fallback stays on screen, and nothing inside the boundary ever
+   hydrates. That took the sort, the pager and the search on every board with
+   it, and the reconciliation page, whose boundary predated any of this.
 
-   Boards have no loading.tsx, so a click leaves the current table up with the
-   spinner in the link that was clicked. This is the cold load, where the
-   heading and the lede stream first and the bar stands where the rows will be. */
-.loading { margin: 1.5rem 0; }
-.loadingtrack {
-  display: block;
-  height: 2px;
-  overflow: hidden;
-  background: var(--sunk);
-}
-.loadingtrack::after {
-  content: '';
-  display: block;
-  height: 100%;
-  width: 28%;
-  background: var(--accent);
-}
+   So the boards render their data directly and the bar that used to stand in
+   for the rows is gone with them. Navigation is unaffected: a click still
+   leaves the current table up with the spinner in the link. What is lost is the
+   cold load, which now waits rather than showing a shell first.
 
-@media (prefers-reduced-motion: no-preference) {
-  .loadingtrack::after { animation: loadingslide 1.2s ease-in-out infinite; }
-  @keyframes loadingslide {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(357%); }
-  }
-}
-
-/* A bar that cannot move has no way to say it is working, so where motion is
-   off the label the bar otherwise leaves to screen readers is shown instead. */
-@media (prefers-reduced-motion: reduce) {
-  .loadingtrack { display: none; }
-  .loading .sr-only {
-    position: static; width: auto; height: auto;
-    margin: 0; overflow: visible; clip: auto; white-space: normal;
-    color: var(--muted); font-size: 0.8125rem;
-  }
-}
+   The versions are the thing to revisit. package.json asks for next ^15.1.3 and
+   react ^19.0.0; the carets resolved to 15.5.23 and 19.2.8. */
 
 .sr-only {
   position: absolute;

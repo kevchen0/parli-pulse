@@ -1,9 +1,7 @@
-import { Suspense } from 'react';
 import { MIN_BALLOTS } from '@parli-pulse/speaks';
 import { dbReady, getSpeakers, getSpeakerSummary } from '@/lib/db';
 import SpeakerTable from './table';
 import FootnoteRef from '@/app/footnote-ref';
-import LoadingBar from '@/app/loading-bar';
 
 export const revalidate = 300;
 
@@ -30,9 +28,7 @@ export default async function SpeakersPage({
         Speaker points adjusted for the judge who awarded them. Panels differ by two points or
         more, so a raw average depends heavily on the draw.
       </p>
-      <Suspense fallback={<LoadingBar label="Loading the speaker standings" />}>
-        <SpeakersBoard season={season} initialQuery={(sp.q ?? '').trim()} />
-      </Suspense>
+      <SpeakersBoard season={season} initialQuery={(sp.q ?? '').trim()} />
     </>
   );
 }

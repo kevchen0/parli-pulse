@@ -1,11 +1,9 @@
 import Link from 'next/link';
-import { Suspense } from 'react';
 import { MIN_RATED_ROUNDS } from '@parli-pulse/rating';
 import { seasonHref } from '@/lib/season';
 import { dbReady, getRatingSummary, getRatings } from '@/lib/db';
 import RatingTable from './table';
 import FootnoteRef from '@/app/footnote-ref';
-import LoadingBar from '@/app/loading-bar';
 
 export const revalidate = 300;
 
@@ -29,9 +27,7 @@ export default async function RatingsPage({
     <>
       <h1>Ratings</h1>
       <p className="lede">Glicko-2 rating adjusted for deviation.</p>
-      <Suspense fallback={<LoadingBar label="Loading the ratings" />}>
-        <RatingsBoard season={season} initialQuery={(sp.q ?? '').trim()} />
-      </Suspense>
+      <RatingsBoard season={season} initialQuery={(sp.q ?? '').trim()} />
     </>
   );
 }

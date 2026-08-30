@@ -1,7 +1,5 @@
 import { dbReady, getDebaters } from '@/lib/db';
 import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
-import { Suspense } from 'react';
-import LoadingBar from '@/app/loading-bar';
 import FootnoteRef from '@/app/footnote-ref';
 import DebatersTable from './table';
 
@@ -19,9 +17,7 @@ export default async function DebatersPage({
   return (
     <>
       <h1>Debaters</h1>
-      <Suspense fallback={<LoadingBar label="Loading the debater standings" />}>
-        <DebatersBoard season={season} initialQuery={(sp.q ?? '').trim()} />
-      </Suspense>
+      <DebatersBoard season={season} initialQuery={(sp.q ?? '').trim()} />
     </>
   );
 }
