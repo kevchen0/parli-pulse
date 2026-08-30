@@ -71,7 +71,7 @@ async function RatingsBoard({ season, initialQuery }: { season: string; initialQ
           full estimate; one with a wide deviation shows a number close to the average. It
           is what the table sorts by, so a partnership climbs by being confirmed as well as
           by winning. Sorting by <b>Raw estimate</b> shows the figure before the move.{' '}
-          <Link href="/method#prior">The formula &rarr;</Link>
+          <Link href="/method#shrink">Two numbers, two jobs &rarr;</Link>
         </li>
         <li id="fn3">
           <b>Raw estimate</b> is the Glicko-2 figure itself. 1500 is the baseline, and 100
@@ -79,7 +79,7 @@ async function RatingsBoard({ season, initialQuery }: { season: string; initialQ
           rating deviation, or how far the true strength could reasonably sit from the
           estimate. It narrows with every round debated and widens with the number of weeks
           since the partnership last competed.{' '}
-          <Link href="/method#shrink">Two numbers, two jobs &rarr;</Link>
+          <Link href="/method#why">Why Glicko-2 &rarr;</Link>
         </li>
         <li id="fn4">
           <b>XXI rank</b> is the partnership&rsquo;s place in the official season standings,
