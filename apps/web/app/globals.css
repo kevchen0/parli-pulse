@@ -220,7 +220,7 @@ button.sort[data-active='true'] { color: var(--text); }
    inactive ones were faint enough to miss. Grey means sortable; the accent
    means sorted. */
 .sorthead .arrow {
-  font-size: 0.8rem; margin-left: 0.3rem; line-height: 1;
+  font-size: 0.7em; margin-left: 0.3rem; line-height: 1;
   color: var(--faint); cursor: pointer;
 }
 .sorthead[data-active='true'] .arrow { color: var(--accent); }
