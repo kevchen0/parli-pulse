@@ -1,15 +1,38 @@
+import { Suspense } from 'react';
 import { MIN_BALLOTS } from '@parli-pulse/speaks';
 import { dbReady, getSpeakers, getSpeakerSummary } from '@/lib/db';
 import SpeakerTable from './table';
 import FootnoteRef from '@/app/footnote-ref';
+import LoadingBar from '@/app/loading-bar';
 
 export const revalidate = 300;
 
+/**
+ * The heading and the lede are not data, so they are not behind the boundary.
+ * They render at once and the board streams in under them, which is what lets
+ * the fallback be a bar rather than a drawing of the table.
+ */
 export default async function SpeakersPage(
   { params }: { params: Promise<{ season: string }> },
 ) {
   const { season } = await params;
   if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
+
+  return (
+    <>
+      <h1>Speaker points</h1>
+      <p className="lede">
+        Speaker points adjusted for the judge who awarded them. Panels differ by two points or
+        more, so a raw average depends heavily on the draw.
+      </p>
+      <Suspense fallback={<LoadingBar label="Loading the speaker standings" />}>
+        <SpeakersBoard season={season} />
+      </Suspense>
+    </>
+  );
+}
+
+async function SpeakersBoard({ season }: { season: string }) {
   const [speakers, summary] = await Promise.all([getSpeakers(season), getSpeakerSummary(season)]);
   if (speakers.length === 0) {
     return (
@@ -21,12 +44,6 @@ export default async function SpeakersPage(
 
   return (
     <>
-      <h1>Speaker points</h1>
-      <p className="lede">
-        Speaker points adjusted for the judge who awarded them. Panels differ by two points or
-        more, so a raw average depends heavily on the draw.
-      </p>
-
       <p className="meta">
         <span>
           <b>{speakers.length}</b> debaters with {MIN_BALLOTS} or more ballots

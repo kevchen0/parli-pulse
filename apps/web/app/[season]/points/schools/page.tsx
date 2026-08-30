@@ -2,7 +2,7 @@ import { dbReady, getSchools } from '@/lib/db';
 import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
-import TableSkeleton, { SCHOOL_COLUMNS } from '@/app/table-skeleton';
+import LoadingBar from '@/app/loading-bar';
 import FootnoteRef from '@/app/footnote-ref';
 
 export const revalidate = 300;
@@ -19,7 +19,7 @@ export default async function SchoolsPage({
   return (
     <>
       <h1>Schools</h1>
-      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton columns={SCHOOL_COLUMNS} />}>
+      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<LoadingBar label="Loading the school standings" />}>
         <SchoolsTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
       </Suspense>
     </>
@@ -79,7 +79,7 @@ async function SchoolsTable({
           </thead>
           <tbody>
             {shown.map((s, i) => (
-              <tr key={`${s.name}-${i}`} data-rank={s.rank}>
+              <tr key={`${s.name}-${i}`}>
                 <td className="rank">{s.rank}</td>
                 <td>{s.name}</td>
                 <td className="region">{s.region ?? '—'}</td>

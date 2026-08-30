@@ -3,7 +3,7 @@ import { dbReady, getSummary, getTeams, type TeamRow } from '@/lib/db';
 import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
-import TableSkeleton, { TEAM_COLUMNS } from '@/app/table-skeleton';
+import LoadingBar from '@/app/loading-bar';
 import { displayName, nameMatches } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
 import FootnoteRef from '@/app/footnote-ref';
@@ -31,7 +31,7 @@ function tocStanding(team: TeamRow): 'bid' | 'atLarge' | null {
  * The shell renders at once; the table suspends.
  *
  * The Suspense key carries the search parameters, so changing a page or a search
- * remounts the boundary and the skeleton appears immediately. Without the key
+ * remounts the boundary and the bar appears immediately. Without the key
  * the boundary is already resolved and React keeps showing the previous rows
  * until the new ones arrive -- which is a click that looks like it did nothing.
  */
@@ -49,7 +49,7 @@ export default async function TeamsPage({
     <>
       <h1>Teams</h1>
       <p className="lede">Points scored under the Article XXI rules.</p>
-      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton columns={TEAM_COLUMNS} />}>
+      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<LoadingBar label="Loading the team standings" />}>
         <TeamsTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
       </Suspense>
     </>
@@ -121,7 +121,7 @@ async function TeamsTable({
             {shown.map((t, i) => {
               const standing = tocStanding(t);
               return (
-                <tr key={`${t.debater1 ?? 'withheld'}-${t.debater2 ?? 'withheld'}-${i}`} data-rank={t.rank}>
+                <tr key={`${t.debater1 ?? 'withheld'}-${t.debater2 ?? 'withheld'}-${i}`}>
                   <td className="rank">{t.rank}</td>
                   <td>
                     {t.school ?? '—'}

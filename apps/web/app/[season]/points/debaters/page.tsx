@@ -3,7 +3,7 @@ import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
 import { seasonHref } from '@/lib/season';
 import { Suspense } from 'react';
 import Pager, { PAGE_SIZE, TableSearch, clampPage, pageCount } from '@/app/pager';
-import TableSkeleton, { DEBATER_COLUMNS } from '@/app/table-skeleton';
+import LoadingBar from '@/app/loading-bar';
 import { displayName, nameMatches } from '@/lib/names';
 import DebaterLink from '@/app/debater-link';
 import FootnoteRef from '@/app/footnote-ref';
@@ -22,7 +22,7 @@ export default async function DebatersPage({
   return (
     <>
       <h1>Debaters</h1>
-      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<TableSkeleton columns={DEBATER_COLUMNS} />}>
+      <Suspense key={`${sp.q ?? ''}|${sp.page ?? ''}`} fallback={<LoadingBar label="Loading the debater standings" />}>
         <DebatersTable season={season} query={(sp.q ?? '').trim()} pageParam={sp.page} />
       </Suspense>
     </>
@@ -88,7 +88,7 @@ async function DebatersTable({
           </thead>
           <tbody>
             {shown.map((d, i) => (
-              <tr key={`${d.id}-${i}`} data-rank={d.rank}>
+              <tr key={`${d.id}-${i}`}>
                 <td className="rank">{d.rank}</td>
                 <td>
                   {d.school ?? '—'}

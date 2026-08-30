@@ -1,17 +1,37 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { MIN_RATED_ROUNDS } from '@parli-pulse/rating';
 import { seasonHref } from '@/lib/season';
 import { dbReady, getRatingSummary, getRatings } from '@/lib/db';
 import RatingTable from './table';
 import FootnoteRef from '@/app/footnote-ref';
+import LoadingBar from '@/app/loading-bar';
 
 export const revalidate = 300;
 
+/**
+ * The heading and the lede are not data, so they are not behind the boundary.
+ * They render at once and the board streams in under them, which is what lets
+ * the fallback be a bar rather than a drawing of the table.
+ */
 export default async function RatingsPage(
   { params }: { params: Promise<{ season: string }> },
 ) {
   const { season } = await params;
   if (!dbReady()) return <p className="empty">Standings are unavailable right now. Please try again shortly.</p>;
+
+  return (
+    <>
+      <h1>Ratings</h1>
+      <p className="lede">Glicko-2 rating adjusted for deviation.</p>
+      <Suspense fallback={<LoadingBar label="Loading the ratings" />}>
+        <RatingsBoard season={season} />
+      </Suspense>
+    </>
+  );
+}
+
+async function RatingsBoard({ season }: { season: string }) {
   const [ratings, summary] = await Promise.all([getRatings(season), getRatingSummary(season)]);
   if (ratings.length === 0) {
     return (
@@ -24,9 +44,6 @@ export default async function RatingsPage(
 
   return (
     <>
-      <h1>Ratings</h1>
-      <p className="lede">Glicko-2 rating adjusted for deviation.</p>
-
       <p className="meta">
         <span>
           <b>{summary.ranked}</b> partnerships with {MIN_RATED_ROUNDS} or more rounds
