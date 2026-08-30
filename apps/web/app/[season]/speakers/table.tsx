@@ -143,7 +143,7 @@ export default function SpeakerTable({ rows, season }: { rows: SpeakerRow[]; sea
             {visible.map((s, i) => {
               const m = marginZ(s);
               return (
-                <tr key={`${s.id}-${i}`}>
+                <tr key={`${s.id}-${i}`} data-rank={positions.get(s)}>
                   <td className="rank">{positions.get(s)}</td>
                   <td className="school" title={s.school ?? undefined}>
                     {s.school ?? '—'}

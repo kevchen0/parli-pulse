@@ -88,7 +88,7 @@ async function DebatersTable({
           </thead>
           <tbody>
             {shown.map((d, i) => (
-              <tr key={`${d.id}-${i}`}>
+              <tr key={`${d.id}-${i}`} data-rank={d.rank}>
                 <td className="rank">{d.rank}</td>
                 <td>
                   {d.school ?? '—'}

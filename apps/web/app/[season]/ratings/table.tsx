@@ -146,7 +146,7 @@ export default function RatingTable({ rows, season }: { rows: RatingRow[]; seaso
           </thead>
           <tbody>
             {visible.map((r) => (
-              <tr key={r.subjectId}>
+              <tr key={r.subjectId} data-rank={positions.get(r)}>
                 <td className="rank">{positions.get(r)}</td>
                 <td className="school" title={r.school ?? undefined}>
                   {r.school ?? '—'}

@@ -1,19 +1,23 @@
-/* Ink and slate.
-   A reference work rather than a product page: a cool near-white ground, ink
-   text with a blue bias, and one muted slate-blue accent used for links and the
-   current page and nothing else. Semantic colour is kept separate from the
-   accent so "this differs from the league" never reads as "this is a link". */
+/* Ink on paper.
+   A reference work rather than a product page: a warm paper ground, warm ink,
+   and one muted slate-blue accent used for links and the current page and
+   nothing else. Semantic colour is kept separate from the accent so "this
+   differs from the league" never reads as "this is a link".
+
+   The ground is warm rather than the cool near-white it was. A blue-grey page
+   reads as software; paper reads as something printed, which is what a table of
+   season results is. Navy on cream is the pairing the printed version of this
+   would have used. */
 :root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --sunk: #eceff3;
-  --border: #dde1e7;
-  --border-firm: #c3cad3;
-  --text: #151a20;
-  --muted: #59636f;
-  --faint: #838d99;
+  --bg: #f4f1ea;
+  --surface: #fdfbf6;
+  --sunk: #eae4d8;
+  --border: #ddd5c6;
+  --border-firm: #bcb2a0;
+  --text: #1d1a15;
+  --muted: #6a6254;
+  --faint: #948b7a;
   --accent: #2f5d7c;
-  --accent-soft: #e4edf3;
   --good: #2c6549;
   --warn: #7d5a13;
   --bad: #93362d;
@@ -23,7 +27,7 @@
   --gold: #8a6a12;
   --silver: #77808a;
   --pending: #a8760a;
-  --radius: 4px;
+  --radius: 2px;
 
   --f-head: "Source Serif 4", Georgia, "Times New Roman", serif;
   --f-body: "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -31,16 +35,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #101419;
-    --surface: #171c22;
-    --sunk: #131920;
-    --border: #262d36;
-    --border-firm: #38424e;
-    --text: #e3e8ee;
-    --muted: #98a2ae;
-    --faint: #6e7883;
-    --accent: #7fb0d0;
-    --accent-soft: #172935;
+    --bg: #15130e;
+    --surface: #1c1913;
+    --sunk: #191610;
+    --border: #302b22;
+    --border-firm: #463f33;
+    --text: #e8e2d5;
+    --muted: #a29883;
+    --faint: #78705f;
+    --accent: #8db4cd;
     --good: #6db694;
     --warn: #c4a04c;
     --bad: #d8776a;
@@ -117,17 +120,53 @@ nav.tabs a {
 nav.tabs a[data-active='true'] { color: var(--text); border-bottom-color: var(--accent); font-weight: 500; }
 nav.tabs a:hover { color: var(--text); }
 
-/* --- tables --- */
-.tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-thead th {
-  text-align: left; font-weight: 500; color: var(--muted); font-size: 0.75rem;
-  text-transform: uppercase; letter-spacing: 0.04em; padding: 0.6rem 0.9rem;
-  border-bottom: 1px solid var(--border); white-space: nowrap;
+/* --- tables ---
+   Ruled rather than boxed. A card floats an object on a page; a printed table
+   is part of the page, held by a rule above the headings and a rule under the
+   last row. Dropping the border and the surface fill also drops the second
+   background colour, so a board is one sheet of paper with lines on it.
+
+   Rows are tighter than they were. An almanac packs them, and the density is
+   what makes a long list readable as a list rather than as a stack of cards. */
+.tablewrap {
+  overflow-x: auto;
+  border: none;
+  border-top: 1px solid var(--border-firm);
+  border-bottom: 1px solid var(--border-firm);
+  border-radius: 0;
+  background: transparent;
 }
-tbody td { padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+/* Small caps on the heading face. The synthesised form is what most readers
+   get, and it still reads as a printed column head rather than as a UI label,
+   which uppercase with wide tracking does not. */
+thead th {
+  text-align: left; font-family: var(--f-head); font-weight: 600;
+  color: var(--muted); font-size: 0.82rem;
+  font-variant-caps: all-small-caps; letter-spacing: 0.035em;
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid var(--border-firm); white-space: nowrap;
+}
+tbody td { padding: 0.38rem 0.75rem; border-bottom: 1px solid var(--border); }
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+/* --- the top of a board ---
+   Rank 1 carries the most weight and 2 and 3 taper toward the body of the
+   table, the way a printed league table sets its leaders. Keyed off the rank
+   the row actually holds rather than its position in the DOM, so page 2 of a
+   paginated board does not promote rows 51 to 53, and a table with no ranks --
+   the agreement table on /method -- is untouched.
+
+   Weight only. No tint and no rule, because the top three are not a category
+   and drawing a box around them would invent one. */
+tbody tr[data-rank='1'] td { font-size: 1.02rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+tbody tr[data-rank='2'] td,
+tbody tr[data-rank='3'] td { font-size: 0.94rem; padding-top: 0.44rem; padding-bottom: 0.44rem; }
+tbody tr[data-rank='1'] td.rank,
+tbody tr[data-rank='2'] td.rank,
+tbody tr[data-rank='3'] td.rank { color: var(--text); font-weight: 600; }
+tbody tr[data-rank='1'] td.pts { font-weight: 700; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 td.rank { color: var(--muted); font-variant-numeric: tabular-nums; width: 3.5rem; }
 td.pts { font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -166,11 +205,14 @@ td.rank { text-align: left; }
 
 /* --- controls --- */
 .controls { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 0 0 0.85rem; }
-.controls input[type='search'] {
+.controls input[type='search'],
+.controls .skelsearch {
   flex: 1 1 16rem; min-width: 0; padding: 0.45rem 0.7rem; font: inherit; font-size: 0.875rem;
   color: var(--text); background: var(--surface);
   border: 1px solid var(--border); border-radius: var(--radius);
 }
+/* Reads as the field it stands in for, in the colour a placeholder would be. */
+.controls .skelsearch { color: var(--faint); }
 .controls input[type='search']:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .segmented { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .segmented button {
@@ -488,11 +530,15 @@ sup.fnref a:hover { text-decoration: underline; }
 
 /* --- masthead ---
    Flat, on a rule. Not a card: the header is the edge of the page, not an
-   object floating on it. */
+   object floating on it.
+
+   The rule under it is double, which is the one place this site borrows a mark
+   from print outright. It does the job the panel fill used to do -- separating
+   the masthead from the page -- without introducing a second ground. */
 
 .masthead {
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  border-bottom: 3px double var(--border-firm);
+  background: transparent;
 }
 .mastrow {
   max-width: 62rem;
@@ -798,6 +844,20 @@ abbr.tick.differs { color: var(--bad); }
    a placeholder row is exactly as tall as a real one. */
 .skeleton td .skelcell { height: 0.875rem; }
 .skeleton tbody tr:hover { background: none; }
+
+/* The rows fade out down the table rather than stopping on a rule.
+   How many rows are coming is the one thing a fallback cannot know -- a search
+   may return four -- and a list that dissolves does not make a promise about
+   its length that the real table then has to break. It also keeps a screenful
+   of bars from pulsing at equal strength, which is what read as a loading
+   graphic rather than as a page filling in. */
+.tablewrap.skeleton { border-bottom: none; }
+.skeleton tbody {
+  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 96%);
+  mask-image: linear-gradient(to bottom, #000 40%, transparent 96%);
+}
+/* The top rows are not weighted here. Which row is first is data, and the
+   skeleton does not know it yet. */
 .skelcell { display: inline-block; height: 0.7rem; border-radius: 2px; background: var(--sunk); vertical-align: middle; }
 .skelhead { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem; }
 .skelcell.title { height: 1.6rem; width: 9rem; }

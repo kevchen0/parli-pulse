@@ -121,7 +121,7 @@ async function TeamsTable({
             {shown.map((t, i) => {
               const standing = tocStanding(t);
               return (
-                <tr key={`${t.debater1 ?? 'withheld'}-${t.debater2 ?? 'withheld'}-${i}`}>
+                <tr key={`${t.debater1 ?? 'withheld'}-${t.debater2 ?? 'withheld'}-${i}`} data-rank={t.rank}>
                   <td className="rank">{t.rank}</td>
                   <td>
                     {t.school ?? '—'}

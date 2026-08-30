@@ -79,7 +79,7 @@ async function SchoolsTable({
           </thead>
           <tbody>
             {shown.map((s, i) => (
-              <tr key={`${s.name}-${i}`}>
+              <tr key={`${s.name}-${i}`} data-rank={s.rank}>
                 <td className="rank">{s.rank}</td>
                 <td>{s.name}</td>
                 <td className="region">{s.region ?? '—'}</td>
