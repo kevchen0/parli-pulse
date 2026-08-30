@@ -946,29 +946,30 @@ tfoot td {
 tfoot td.total { font-size: 0.9375rem; font-weight: 600; color: var(--text); }
 
 /* Round detail is collapsed by default: fifteen tournaments of eight rounds is
-   a hundred and twenty rows, which buries the season table above it. */
-.rounds {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  margin-bottom: 0.4rem;
+   a hundred and twenty rows, which buries the season table it now sits inside.
+
+   The tournament name is the control, so it is a button rather than a clickable
+   row -- the row already holds a link to the partner, and a link inside a
+   clickable region is two targets in one place. The caret is the one the
+   reconciliation page uses, so an openable line looks the same on both. */
+.rowtoggle {
+  font: inherit; color: inherit; text-align: left;
+  background: none; border: none; padding: 0; cursor: pointer;
 }
-.rounds > summary {
-  cursor: pointer;
-  padding: 0.6rem 0.8rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 0.6rem;
-  align-items: baseline;
-  font-size: 0.875rem;
+.rowtoggle::before {
+  content: '▸'; display: inline-block;
+  margin-right: 0.4rem; font-size: 0.85em; color: var(--muted);
 }
-.rounds > summary:hover { color: var(--accent); }
-.rounds > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.rtitle { font-weight: 600; }
-.rmeta { color: var(--muted); font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
-.rounds .inset { margin: 0 0.55rem 0.55rem; }
-.rounds .tablewrap { border-radius: var(--radius); }
-p.note.inset { margin: 0 0.8rem 0.7rem; }
+.rowtoggle[aria-expanded='true']::before { content: '▾'; }
+.rowtoggle:hover, .rowtoggle:hover::before { color: var(--accent); }
+.rowtoggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* The panel a row opens onto. It spans every column, so the cell carries no
+   padding of its own and the table inside insets instead; the sunk ground is
+   what separates it from the rows above and below. */
+tr.roundsrow > td { padding: 0; background: var(--sunk); }
+tr.roundsrow .tablewrap { margin: 0.55rem; border-radius: var(--radius); }
+tr.roundsrow p.note.inset { margin: 0; padding: 0.7rem 0.85rem; }
 
 .outcome { font-weight: 600; }
 .outcome.win { color: var(--good); }
