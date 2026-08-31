@@ -48,20 +48,24 @@ export default async function SeasonLayout({
       <div className="seasonhead">
         <SeasonPicker season={season} seasons={ids} statusOf={statusOf} />
         <p className="seasonstate" data-status={status}>
-          {status === 'final' &&
-            `Complete${here?.lastResultOn ? `, last results ${formatDay(here.lastResultOn)}` : ''}`}
           {/*
-            A running season says when it last moved, not how far it has got.
-            The count belongs to the board below, which states it already, and
-            "1 tournament counted" is a scale nobody needs in September and a
-            number that reads as small all season. The date is the last result
-            counted, the same figure a complete season reports.
+            Every season that holds anything says the same thing: when it last
+            moved. It used to count tournaments while running and report a last
+            result once finished, which is two sentences for one fact, and the
+            picker beside it already says which of the two a season is -- the
+            word "complete" was on screen twice.
+
+            The date is the last result counted, so a finished season's line
+            never changes and a running one moves as the league writes results
+            up.
           */}
-          {status === 'live' &&
-            (here?.lastResultOn
+          {status === 'upcoming'
+            ? 'Not yet open'
+            : here?.lastResultOn
               ? `Last updated ${formatDay(here.lastResultOn)}`
-              : 'Open, nothing published yet')}
-          {status === 'upcoming' && 'Not yet open'}
+              : status === 'final'
+                ? 'Complete'
+                : 'Open, nothing published yet'}
         </p>
       </div>
       {/*

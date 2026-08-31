@@ -184,7 +184,7 @@ export default async function OpengraphImage() {
           </div>
           <div style={{ display: 'flex' }}>
             {here?.lastResultOn
-              ? `Complete, last results ${new Date(`${here.lastResultOn.slice(0, 10)}T00:00:00Z`)
+              ? `Last updated ${new Date(`${here.lastResultOn.slice(0, 10)}T00:00:00Z`)
                   .toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}`
               : 'Complete'}
           </div>
