@@ -8,7 +8,7 @@
  * season splits across several rows, and the school rankings understate it --
  * Stuyvesant lost roughly 90 points that way before this existed.
  *
- * Seeded from the 2025-26 data by `scripts/discover-aliases.ts`, which
+ * Seeded from the 2025-26 data by `scripts/probe/discover-aliases.ts`, which
  * compares the school Tabroom recorded against the school the league credited
  * on the same result. Hybrid entries are excluded from that comparison: they
  * are filed under one partner's school in Tabroom and the other's in the

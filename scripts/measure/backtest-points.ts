@@ -3,8 +3,8 @@
  * sheet's `Entry` tab and sliced by tournament type, result type, and rule
  * component so a mismatch names the rule that diverged.
  */
-import { weightedTotal } from '../packages/rules/src/index.ts';
-import { computeSeason, sourceFromEnv, norm, pairKey, type EntryCase } from './lib/season.ts';
+import { weightedTotal } from '../../packages/rules/src/index.ts';
+import { computeSeason, sourceFromEnv, norm, pairKey, type EntryCase } from '../lib/season.ts';
 
 const season = computeSeason(undefined, { source: sourceFromEnv() });
 const { unmatched, ambiguous, skippedTournaments, officialEntries } = season;

@@ -26,8 +26,8 @@
  * Run: npm run check:walkovers
  */
 import { existsSync } from 'node:fs';
-import { computeSeason } from './lib/season.ts';
-import { resolveSheetPath } from '../packages/ingest/src/sheet.ts';
+import { computeSeason } from '../lib/season.ts';
+import { resolveSheetPath } from '../../packages/ingest/src/sheet.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 

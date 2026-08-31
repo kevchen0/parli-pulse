@@ -22,8 +22,8 @@
  * Run: npm run compare:sources
  */
 import { existsSync } from 'node:fs';
-import { computeSeason, type EntryCase, type SeasonOptions } from './lib/season.ts';
-import { resolveSheetPath } from '../packages/ingest/src/sheet.ts';
+import { computeSeason, type EntryCase, type SeasonOptions } from '../lib/season.ts';
+import { resolveSheetPath } from '../../packages/ingest/src/sheet.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 /** Points agreement is exact; the tolerance only absorbs float dust. */

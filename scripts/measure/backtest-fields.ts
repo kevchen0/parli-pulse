@@ -8,9 +8,9 @@
  * mismatch can be attributed to a scoring rule rather than to a bad field size.
  */
 import { readFileSync, readdirSync } from 'node:fs';
-import { computeFieldStats, normalizeTournament } from '../packages/ingest/src/normalize.ts';
-import { parseTournamentsTab, parseWorkbook } from '../packages/ingest/src/sheet.ts';
-import type { TabroomTournament } from '../packages/ingest/src/tabroom-types.ts';
+import { computeFieldStats, normalizeTournament } from '../../packages/ingest/src/normalize.ts';
+import { parseTournamentsTab, parseWorkbook } from '../../packages/ingest/src/sheet.ts';
+import type { TabroomTournament } from '../../packages/ingest/src/tabroom-types.ts';
 
 const RAW_DIR = 'data/raw/tabroom';
 const wb = parseWorkbook(new Uint8Array(readFileSync('data/raw/sheet/rankings.zip')));

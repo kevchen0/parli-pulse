@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { normalizeTournament } from '../packages/ingest/src/normalize.ts';
+import { normalizeTournament } from '../../packages/ingest/src/normalize.ts';
 
 const tournId = process.argv[2]!;
 const evName = process.argv[3];

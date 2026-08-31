@@ -6,10 +6,10 @@
  * change without re-reading 370MB of payloads.
  */
 import { and, eq, gt, isNull, sql } from 'drizzle-orm';
-import { weightedTotal } from '../packages/rules/src/index.ts';
-import { createDb } from '../packages/db/src/client.ts';
-import * as t from '../packages/db/src/schema.ts';
-import { collapsePartnerships, dominantSchool, loadNameIndex } from './lib/identity.ts';
+import { weightedTotal } from '../../packages/rules/src/index.ts';
+import { createDb } from '../../packages/db/src/client.ts';
+import * as t from '../../packages/db/src/schema.ts';
+import { collapsePartnerships, dominantSchool, loadNameIndex } from '../lib/identity.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 

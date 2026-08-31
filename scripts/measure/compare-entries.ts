@@ -24,9 +24,9 @@
  * Run: npm run compare:entries
  */
 import { existsSync } from 'node:fs';
-import { computeSeason, type EntryCase } from './lib/season.ts';
-import { resolveSheetPath } from '../packages/ingest/src/sheet.ts';
-import { weightedTotal } from '../packages/rules/src/index.ts';
+import { computeSeason, type EntryCase } from '../lib/season.ts';
+import { resolveSheetPath } from '../../packages/ingest/src/sheet.ts';
+import { weightedTotal } from '../../packages/rules/src/index.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 const EPSILON = 0.051;

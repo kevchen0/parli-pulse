@@ -16,18 +16,18 @@
  *   TOURNAMENTS="NPDL-TOC,MLK Logan" npm run predict
  */
 import { and, eq, isNull } from 'drizzle-orm';
-import { createDb } from '../packages/db/src/client.ts';
-import * as t from '../packages/db/src/schema.ts';
-import { weightedTotal } from '../packages/rules/src/index.ts';
-import { loadDebatersByEntry, partnershipKey } from './lib/identity.ts';
+import { createDb } from '../../packages/db/src/client.ts';
+import * as t from '../../packages/db/src/schema.ts';
+import { weightedTotal } from '../../packages/rules/src/index.ts';
+import { loadDebatersByEntry, partnershipKey } from '../lib/identity.ts';
 import {
   VALIDATED_OPTIONS,
   SeasonRun,
   estimateSideAdvantage,
   winProbability,
   type RatedRound,
-} from '../packages/rating/src/index.ts';
-import { loadRatingData } from './lib/rating-data.ts';
+} from '../../packages/rating/src/index.ts';
+import { loadRatingData } from '../lib/rating-data.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 const TARGETS = (process.env.TOURNAMENTS ?? 'Notre Dame,La Costa Canyon,MLK Logan,NPDL-TOC')

@@ -11,8 +11,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { eq, sql } from 'drizzle-orm';
-import { createDb } from '../packages/db/src/client.ts';
-import * as t from '../packages/db/src/schema.ts';
+import { createDb } from '../../packages/db/src/client.ts';
+import * as t from '../../packages/db/src/schema.ts';
 import {
   buildSchoolIndex,
   buildStudentIndex,
@@ -27,9 +27,9 @@ import {
   parseWorkbook,
   resolveSheetPath,
   type NormalizedEvent,
-} from '../packages/ingest/src/index.ts';
-import { openEventFilter } from '../packages/ingest/src/event-selection.ts';
-import { computeSeason } from './lib/season.ts';
+} from '../../packages/ingest/src/index.ts';
+import { openEventFilter } from '../../packages/ingest/src/event-selection.ts';
+import { computeSeason } from '../lib/season.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 const RAW_DIR = 'data/raw/tabroom';

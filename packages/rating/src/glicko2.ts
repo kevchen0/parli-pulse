@@ -20,7 +20,7 @@
  *  - **Graded scores for split panels.** A round is one result, but a 3-0 and a
  *    2-1 are not the same evidence. `ballotScore` grades the outcome toward a
  *    draw as the panel splits. Whether that helps is an empirical question --
- *    `marginWeight` of zero turns it off -- and scripts/validate-rating.ts
+ *    `marginWeight` of zero turns it off -- and scripts/measure/validate-rating.ts
  *    answers it.
  *
  * Nothing here knows about elim rounds, and nothing should. Elim opponents

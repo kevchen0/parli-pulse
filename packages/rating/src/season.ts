@@ -15,7 +15,7 @@
  * the teams that met in round one had not yet been changed by meeting.
  *
  * Nothing here is written to a database, so the same code runs the live season
- * and the held-out validation in scripts/validate-rating.ts. Two copies of a
+ * and the held-out validation in scripts/measure/validate-rating.ts. Two copies of a
  * season computation drifted apart once already -- see plan/10-mistakes.md,
  * pattern G -- and a rating whose validation measures something other than what
  * ships would be worth nothing.
@@ -122,7 +122,7 @@ export const DEFAULT_OPTIONS: SeasonOptions = {
  * the league's own Article XXI ranking, at a log loss of 0.638 against 0.665.
  * The accuracy gap is 2.2 points, 95% interval 0.0 to 4.3 on a paired
  * bootstrap; the log loss gap is the surer of the two and never reversed in
- * two thousand resamples. scripts/validate-rating.ts reproduces all of it.
+ * two thousand resamples. scripts/measure/validate-rating.ts reproduces all of it.
  *
  *  - `marginWeight: 1` -- grading split panels was worth 0.0015 of log loss on
  *    dev. Small, and free.

@@ -23,9 +23,9 @@
  * "higher points wins" rather than a straw one.
  */
 import { and, eq, isNull, sql } from 'drizzle-orm';
-import { createDb } from '../packages/db/src/client.ts';
-import * as t from '../packages/db/src/schema.ts';
-import { weightedTotal } from '../packages/rules/src/index.ts';
+import { createDb } from '../../packages/db/src/client.ts';
+import * as t from '../../packages/db/src/schema.ts';
+import { weightedTotal } from '../../packages/rules/src/index.ts';
 import {
   type BradleyTerryFit,
   type BradleyTerryRound,
@@ -40,9 +40,9 @@ import {
   type SeasonOptions,
   estimateSideAdvantage,
   winProbability,
-} from '../packages/rating/src/index.ts';
-import { loadDebatersByEntry, partnershipKey } from './lib/identity.ts';
-import { loadRatingData } from './lib/rating-data.ts';
+} from '../../packages/rating/src/index.ts';
+import { loadDebatersByEntry, partnershipKey } from '../lib/identity.ts';
+import { loadRatingData } from '../lib/rating-data.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 const DEV_FROM = process.env.DEV_FROM ?? '2026-01-01';

@@ -12,7 +12,7 @@
  * nothing to read.
  */
 import { sql } from 'drizzle-orm';
-import { createDb } from '../packages/db/src/client.ts';
+import { createDb } from '../../packages/db/src/client.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 /** `github` when the scheduled workflow ran it, `local` from a laptop. */

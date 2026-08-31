@@ -31,8 +31,8 @@
  * discount, and without the shrinkage it does.
  */
 import { eq, sql } from 'drizzle-orm';
-import { createDb } from '../packages/db/src/client.ts';
-import * as t from '../packages/db/src/schema.ts';
+import { createDb } from '../../packages/db/src/client.ts';
+import * as t from '../../packages/db/src/schema.ts';
 import {
   DEFAULT_DEVIATION,
   MIN_RATED_ROUNDS,
@@ -41,9 +41,9 @@ import {
   estimateSideAdvantage,
   fieldSpread,
   shrinkToField,
-} from '../packages/rating/src/index.ts';
-import { loadPartnershipNames } from './lib/identity.ts';
-import { loadRatingData } from './lib/rating-data.ts';
+} from '../../packages/rating/src/index.ts';
+import { loadPartnershipNames } from '../lib/identity.ts';
+import { loadRatingData } from '../lib/rating-data.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 /**

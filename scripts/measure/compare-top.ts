@@ -8,10 +8,10 @@
  */
 import { readFileSync } from 'node:fs';
 import { sql } from 'drizzle-orm';
-import { createDb } from '../packages/db/src/client.ts';
-import { indexHeaders, parseWorkbook } from '../packages/ingest/src/sheet.ts';
-import { schoolKey } from '../packages/ingest/src/schools.ts';
-import { loadOurTeams, pairStandings, type OfficialTeam } from './lib/standings.ts';
+import { createDb } from '../../packages/db/src/client.ts';
+import { indexHeaders, parseWorkbook } from '../../packages/ingest/src/sheet.ts';
+import { schoolKey } from '../../packages/ingest/src/schools.ts';
+import { loadOurTeams, pairStandings, type OfficialTeam } from '../lib/standings.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 const TOP = Number(process.env.TOP ?? 100);

@@ -14,8 +14,8 @@
  * classifier already does.
  */
 import { eq, sql } from 'drizzle-orm';
-import { createDb } from '../packages/db/src/client.ts';
-import * as t from '../packages/db/src/schema.ts';
+import { createDb } from '../../packages/db/src/client.ts';
+import * as t from '../../packages/db/src/schema.ts';
 import {
   classifyRaw,
   judgeNormalizer,
@@ -23,7 +23,7 @@ import {
   scaleFor,
   toCanonical,
   MIN_BALLOTS as DEFAULT_MIN_BALLOTS,
-} from '../packages/speaks/src/index.ts';
+} from '../../packages/speaks/src/index.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 /** Overridable for sweeps; the default is the shared constant. */
