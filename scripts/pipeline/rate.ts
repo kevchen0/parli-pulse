@@ -35,6 +35,7 @@ import { createDb } from '../../packages/db/src/client.ts';
 import * as t from '../../packages/db/src/schema.ts';
 import {
   DEFAULT_DEVIATION,
+  MIN_CALIBRATION_ROUNDS,
   MIN_RATED_ROUNDS,
   SeasonRun,
   VALIDATED_OPTIONS,
@@ -53,6 +54,8 @@ const SEASON = process.env.SEASON ?? '2025-26';
  * rounds. The site reads the same constant.
  */
 const GATE_ROUNDS = Number(process.env.GATE_ROUNDS ?? MIN_RATED_ROUNDS);
+/** Who defines the scale, which is not who appears on the board. */
+const CALIBRATE_ROUNDS = Number(process.env.CALIBRATE_ROUNDS ?? MIN_CALIBRATION_ROUNDS);
 
 async function main(): Promise<void> {
   const { db, close } = createDb();
@@ -94,10 +97,13 @@ async function main(): Promise<void> {
     // ratings -- that is true spread plus measurement noise. Estimated from the
     // partnerships with enough rounds to be measured at all, so a field of
     // barely-seen teams cannot widen it and weaken the shrinkage for everyone.
-    const measured = standings.filter((x) => x.rounds >= GATE_ROUNDS).map((x) => x.rating);
+    const measured = standings.filter((x) => x.rounds >= CALIBRATE_ROUNDS).map((x) => x.rating);
     const tau = fieldSpread(measured);
     const shrunk = (r: { rating: number; deviation: number }): number => shrinkToField(r, tau);
-    console.log(`  field spread: ${tau.toFixed(1)} rating points, over ${measured.length} measured partnerships`);
+    console.log(
+      `  field spread: ${tau.toFixed(1)} rating points, over ${measured.length} partnerships ` +
+        `with ${CALIBRATE_ROUNDS}+ rounds`,
+    );
     standings.sort((a, b) => shrunk(b.rating) - shrunk(a.rating));
 
     // Season-scoped, so clearing and rewriting is safe here -- unlike `schools`

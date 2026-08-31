@@ -152,15 +152,39 @@ export const VALIDATED_OPTIONS: SeasonOptions = {
 /**
  * Rounds a partnership needs before it belongs on a public board.
  *
- * Every partnership gets a rating and a deviation; this decides only who is
- * ranked on one. Nearly half the field debates fewer than ten open rounds in a
- * season, and below that the deviation is doing most of the talking.
+ * One tournament. A team that entered once and went home has been measured, and
+ * a board that will not name them is answering a question nobody asked: plenty
+ * of partnerships debate a single tournament all season, and they are exactly
+ * the ones with no other way to see where they stand.
+ *
+ * Every partnership gets a rating and a deviation regardless; this decides only
+ * who is ranked. The shrinkage does the rest of the work -- a rating on five
+ * rounds carries a wide deviation and is pulled most of the way back to the
+ * field, so it lands where its evidence puts it rather than where its luck did.
  *
  * Exported rather than written in two places: the script that computes ratings
  * and the page that shows them have to agree, or the site quietly ranks
  * partnerships the pipeline considered unrated.
  */
-export const MIN_RATED_ROUNDS = 10;
+export const MIN_RATED_ROUNDS = 5;
+
+/**
+ * Rounds a partnership needs before it may *define* the field's spread.
+ *
+ * Not the same question as who is ranked, and it used to share a constant with
+ * it. `fieldSpread` recovers the spread of true strengths by subtracting mean
+ * squared deviation from observed variance, so a pool full of barely-measured
+ * teams subtracts an enormous noise term and returns a spread far smaller than
+ * the league's. Measured on 2025-26: calibrating on five rounds instead of ten
+ * drops tau from 117 to 72, which pulls the top of the board from 1826 to 1731
+ * and reorders twelve of the top twenty -- not because anyone new arrived, but
+ * because every existing rating was re-weighted against a scale that had
+ * collapsed.
+ *
+ * So admission moved down and calibration stayed. Who is shown and what the
+ * numbers mean are different decisions.
+ */
+export const MIN_CALIBRATION_ROUNDS = 10;
 
 /** A subject's rating plus the evidence behind it. */
 export interface SubjectState {
