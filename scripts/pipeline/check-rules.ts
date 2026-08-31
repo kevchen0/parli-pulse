@@ -15,7 +15,7 @@
  *
  *   SEASON=2026-27 npm run check:rules
  */
-import { rulesForSeason, CHSSA_LEAGUE_POINTS } from '../packages/rules/src/index.ts';
+import { rulesForSeason, CHSSA_LEAGUE_POINTS } from '../../packages/rules/src/index.ts';
 
 const SEASON = process.env.SEASON ?? '2026-27';
 const DOC_ID = process.env.RULES_DOC_ID ?? '1xv6klxK9PQPPyAaeJ9Gh9-CGL-nvikRjRAsDTiRYZtw';

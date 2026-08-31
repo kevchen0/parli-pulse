@@ -7,11 +7,11 @@
  * the teams the league ranks in its top 100.
  */
 import { readFileSync } from 'node:fs';
-import { createDb } from '../packages/db/src/client.ts';
-import { indexHeaders, parseWorkbook } from '../packages/ingest/src/sheet.ts';
-import { computeSeason, sourceFromEnv } from './lib/season.ts';
-import { loadOurTeams, pairStandings, type OfficialTeam } from './lib/standings.ts';
-import { teamKey } from './lib/season.ts';
+import { createDb } from '../../packages/db/src/client.ts';
+import { indexHeaders, parseWorkbook } from '../../packages/ingest/src/sheet.ts';
+import { computeSeason, sourceFromEnv } from '../lib/season.ts';
+import { loadOurTeams, pairStandings, type OfficialTeam } from '../lib/standings.ts';
+import { teamKey } from '../lib/season.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 const TOP = Number(process.env.TOP ?? 100);

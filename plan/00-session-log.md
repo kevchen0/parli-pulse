@@ -9,11 +9,9 @@ were only reachable once a *completed* season sat beside a live one.
 
 ## Where things stand
 
-The site is public and demo-ready at
-[parli-pulse.vercel.app](https://parli-pulse.vercel.app). Phases 0-7 complete,
-Phase 6 half done. This session took it from "correct" to "front-facing":
-closed to crawlers, given a working removal path and a contact form, and
-rewritten throughout.
+The site is public at [parli-pulse.vercel.app](https://parli-pulse.vercel.app),
+indexed except for debater profiles, ingesting nightly. Phases 0-7 complete,
+Phase 6 half done.
 
 | | |
 |---|---|
@@ -21,17 +19,17 @@ rewritten throughout.
 | Partnership season totals | **92% exact** (735/799) |
 | The league's top 100 | **89% exact**, 95% within 2 points |
 | Rating against the league's own ranking | **63.4%** vs 59.8% on held-out rounds |
-| Rating against plain Elo | 63.4% vs **60.6%** — what the deviation buys |
+| Rating against plain Elo | 63.4% vs **60.6%** |
 
 Loaded for 2025-26: 98 tournaments, 4,946 entries, 25,851 ballots, 3,302 scored
 results of which 1,587 are worth points, 806 partnerships, 1,194 debaters with
 points, 47 member schools with points of 55 members, 387 ranked speakers of
 1,831, 1,779 rated partnerships of which 387 clear the round gate, 830
-reconciliation rows. 167 tests.
+reconciliation rows. 186 tests.
 
-2026-27 is open and empty. Verified live this session: the sheet is registered,
-lists 110 tournaments and **0 with a results link**, and the circuit calendar
-already shows Harvard as `40344` on 2026-09-05. That is the correct state.
+2026-27 is open and empty: the sheet is registered, lists 110 tournaments and
+**0 with a results link**, and the circuit calendar shows Harvard as `40344` on
+2026-09-05. That is the correct state.
 
 ## Branches, and how work ships
 
@@ -66,69 +64,50 @@ from the maintainer's laptop. A migration or a `load` is a deploy in itself.
 
 ## What shipped this session
 
-**Indexed, except debater profiles.** The site went closed-to-everything first
-and then opened deliberately. Tables and static pages are in a sitemap built
-from the database. `/*/debater/` is disallowed in `robots.txt` *and* sends
-`noindex` from its own route, because the two mechanisms stop different things:
-one the fetch, one an index built from an inbound link. A table is a page about
-a competition; a profile is a page about one minor.
+**The boards were dead in production, and had been for some time.** Sorting,
+paging and search all did nothing on the live site: a click landed and React
+made no change to the page. Every Suspense boundary on the site was stuck.
+React 19.2 marks a streamed boundary `$~`, queued for reveal, and on
+`next 15.5.23` with `react-dom 19.2.8` the reveal never completes — the rows
+arrive in a `<template>`, the fallback stays on screen, and nothing inside the
+boundary ever hydrates. It looks correct for a moment, because the server HTML
+paints before React takes it away again, which is why a screenshot check missed
+it.
 
-**Link previews render the ratings board.** Preview bots are named and allowed
-where search crawlers were not — they build a card for a link somebody pasted,
-not an index. Profiles are closed to them too. The card is generated from live
-ratings and runs names through `displayName`, so suppression holds there as
-well.
+Checking out `baa80c7` and building it proved this **predates this session's
+work**: the Teams board never left its skeleton and the ratings sort was already
+inert. Every boundary is now gone, including the route-level `loading.tsx`
+files. That is not a fix for the framework bug, it is declining to depend on it.
+Cost: no cold-load shell, and a cold load waits for its data.
 
-**An MIT licence**, with a README note that it covers the code and not the
-data, and that a fork does not inherit the removal requests honoured here.
+**Every board filters as you type.** The three points boards searched through
+the server — a `?q=`, a Search button, a fresh render per query. They now filter
+in state like ratings and speakers always did, on a field that is a ruled line
+rather than a box, with `?q=` kept shareable through `replaceState`. Paging
+arithmetic moved to `apps/web/lib/paging.ts` with tests.
 
-**The reconciliation view is unlisted**, at `/<season>/internal/reconciliation`,
-with its six public links removed. It enumerates by name every place the
-league's own spreadsheet and this engine disagree, which is a maintainer's tool.
+**The debater profile is one list.** Season and Round-by-round listed the same
+tournaments twice; the rounds now open inside the season table. The rating card
+and the partnerships table both carry the figure the board is ordered on.
 
-**A removal path that reaches somebody.** `parlipulse@gmail.com`, in
-`apps/web/lib/contact.ts` rather than typed into two pages. Before this the
-Privacy page said "get in touch" and there was no `mailto:` anywhere in the app
-— mistake 39's shape, a promise with nothing behind it.
+**`Established` and `Rating` became `Rating` and `Raw estimate`.** The old pair
+put the plain, confident name on the number the board deliberately does not rank
+by. Renamed across the board, the profile and the footnotes, and on
+`method-rewrite` so the vocabulary cannot disagree with itself in production.
+Two footnote links pointed at `/method#prior`, which has never existed.
 
-**A feedback form.** `/api/feedback` stores the message in Postgres and then
-emails it through Resend. Storing first means delivery is not what decides
-whether a message survives. The same table rate-limits the form — 3 an hour and
-10 a day per sender, counted from a salted SHA-256 of the client address, which
-needs no infrastructure beyond the database already here. `parli_web` gained
-INSERT and SELECT on that one table and stays SELECT-only everywhere else.
+**A tied panel is no longer a defeat.** Three tournaments ran two-judge prelims
+and 318 rounds across 133 entries came back 1-1. The ingest asks
+`won * 2 > total` and has no third case, so every deadlock was published as a
+loss — Georgatos read 3-4 at the TOC on a card that also said Octafinalist. The
+record is now counted off the rounds the page already holds and reads 3-1-3.
+**Scoring is untouched:** `prelimPoints(wins, losses)` still sees those 318
+rounds as losses. See Next.
 
-**Vercel Web Analytics**, with the Privacy page updated in the same commit
-because it had committed to saying so before any shipped.
-
-**Suppression exercised for real, for the first time.** The flag had only ever
-run false on every row. Set true on one debater and checked: name replaced on
-all four tables and as a partner on somebody else's profile, no link emitted,
-profile 404, unfindable by search, and **every figure byte-identical** — school
-total, both partnerships, debater row, speaker row. Set back; 0 suppressed rows
-now. Search was then changed so a withheld name never matches, since filtering
-on the displayed string made "withheld" list exactly the people who asked not to
-be listed.
-
-**Elo added to the rating comparison.** Glicko-2 was measured against the
-league's points, a win rate and Bradley-Terry, but not against the obvious
-simpler rating, so the choice rested on an argument rather than a number. Elo
-with K swept to 48 scores 60.6% and 0.6559 against Glicko-2's 63.4% and 0.6380.
-
-**The speaker floor moved to 10 and back to 20.** Ten fills the board earlier;
-twenty is where extra ballots stop buying precision. The threshold is now
-`MIN_BALLOTS` in `packages/speaks`, beside `MIN_SPREAD`, rather than a literal
-in the script and a second literal in the page's prose.
-
-**The whole site rewritten**, against a new style guide at
-[../docs/writing-style.md](../docs/writing-style.md): what the register is, the
-fifteen patterns cut from the copy with the examples they were cut from, and the
-JSX mechanics that break a page.
-
-**The methodology page is held back.** It was rebuilt this session — three
-sections, MathML equations, a live agreement table — and then replaced on `main`
-with "Coming soon!" because parts of it were not clear enough to publish. The
-full version is on `method-rewrite`.
+**Repository shape.** `scripts/` split into `pipeline/`, `measure/` and
+`probe/` — nine of the twenty-six were in no npm script at all. The README is
+now a public-facing document; the runbook moved to
+[../docs/pipeline.md](../docs/pipeline.md).
 
 ## Commands
 
@@ -147,7 +126,7 @@ full version is on `method-rewrite`.
 | `npm run mark-ingest` | records that the pipeline finished; the site reads it |
 | `npm run validate:rating` | the held-out comparison, now including Elo |
 | `npm run backtest` | fields, per-entry, partnerships |
-| `npm test` | 167 tests |
+| `npm test` | 186 tests |
 | `npm run dev --workspace @parli-pulse/web` | the site locally |
 
 **Order matters:** `fetch` → `load` → `rollup` → `speaks` → `rate` →
@@ -161,6 +140,14 @@ inputs, which is what a backtest wants.
 Everything in the previous handoff still applies —
 [04-architecture.md](04-architecture.md) has the full list — plus:
 
+- **Do not run `next build` while the dev server is running.** They share
+  `.next`, and the result is `Cannot find module './vendor-chunks/…'` on every
+  page. Stop the server, `rm -rf apps/web/.next`, rebuild. Cost about twenty
+  minutes this session before it was recognised as cache damage rather than a
+  code fault.
+- **Do not add a Suspense boundary** until the framework pin is resolved. Every
+  one of them strands its contents unhydrated on the current versions, and the
+  page looks right long enough to pass a screenshot check. See "What shipped".
 - **`.next` does not switch with the branch.** After changing branches a running
   dev server can serve the old branch's pages. Stop it, `rm -rf apps/web/.next`,
   restart, in that order. Deleting it while the server runs breaks the server,
@@ -188,12 +175,33 @@ Everything in the previous handoff still applies —
 5. **Smaller:** a Seasons page; the analysis scripts that hardcode
    `rankings.zip`; `/rankings` and the masthead's Rankings link both resolve to
    the calendar's current season, which is empty until Harvard is scored.
-6. **Submit the sitemap** to Google Search Console. The site is indexable and
+6. **Decide what a tie is worth under XXI.3.A.** 318 prelim rounds across 133
+   entries are shown as ties and scored as losses. The rules table is keyed on
+   wins and losses and does not contemplate one. Recovering the real result from
+   Tabroom's published record is the honest answer — these were not really ties,
+   a two-judge deadlock got resolved somehow and Tabroom knows how — and it
+   needs an ingest change and a reload, so snapshot first.
+7. **Pin `next` and `react-dom`.** `package.json` asks for `^15.1.3` and
+   `^19.0.0`; the carets resolved to 15.5.23 and 19.2.8, where streaming is
+   broken. Pinning to a working pair would let the loading states come back; the
+   code for them is in git history at the parent of `85082ce`.
+8. **Submit the sitemap** to Google Search Console. The site is indexable and
    will be found on its own within weeks; the console makes it days and reports
    what Google actually indexed.
 
 ## Waiting on the user
 
+- **`packages/ingest/src/manual-results.ts` holds data that is in no public
+  source.** 28 of its 41 entries are `source: 'reported'` — the Ridge Debates
+  field, supplied by the league — and the file's own
+  `INCOMPLETE_TOURNAMENTS` note says "the rest exist in no public source". That
+  is 56 minors' surnames with school and placement, committed to a public MIT
+  repo. The other 13 entries are `speechwire` and are fine. Two problems: it
+  fails the stated bar of publishing only what Tabroom or SpeechWire already
+  carry, and a removal request cannot reach it, because suppression is a column
+  in the database and this is a file. Moving the reported rows to a gitignored
+  file under `data/` matches how the raw payloads are already handled, but it
+  makes a clone score the season differently, and it does not erase git history.
 - **The four unlisted results** — Blair & Ray Chaudhuri, Patil & Malik, Squires
   & Luft, Hu & Qiu. Real Tabroom results the league's `Entry` tab omits. Two are
   at NYPDL October OL, which suggests one cause rather than four. A question for

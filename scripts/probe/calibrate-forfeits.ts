@@ -3,8 +3,8 @@
  * official open field? Scores several candidates against the sheet.
  */
 import { existsSync, readFileSync } from 'node:fs';
-import { normalizeTournament } from '../packages/ingest/src/normalize.ts';
-import { parseTournamentsTab, parseWorkbook } from '../packages/ingest/src/sheet.ts';
+import { normalizeTournament } from '../../packages/ingest/src/normalize.ts';
+import { parseTournamentsTab, parseWorkbook } from '../../packages/ingest/src/sheet.ts';
 
 const wb = parseWorkbook(new Uint8Array(readFileSync('data/raw/sheet/rankings.zip')));
 const official = parseTournamentsTab(wb.get('Tournaments')!);

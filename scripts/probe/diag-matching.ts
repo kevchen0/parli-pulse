@@ -1,8 +1,8 @@
 /** What is still unmatched after the matcher runs, and why. */
 import { existsSync, readFileSync } from 'node:fs';
-import { buildStudentIndex, computeFieldStats, normalizeTournament } from '../packages/ingest/src/normalize.ts';
-import { matchTeams, peopleFromEntryLabel, type EntryCandidate } from '../packages/ingest/src/matching.ts';
-import { parseEntryTab, parseTournamentsTab, parseWorkbook } from '../packages/ingest/src/sheet.ts';
+import { buildStudentIndex, computeFieldStats, normalizeTournament } from '../../packages/ingest/src/normalize.ts';
+import { matchTeams, peopleFromEntryLabel, type EntryCandidate } from '../../packages/ingest/src/matching.ts';
+import { parseEntryTab, parseTournamentsTab, parseWorkbook } from '../../packages/ingest/src/sheet.ts';
 
 const wb = parseWorkbook(new Uint8Array(readFileSync('data/raw/sheet/rankings.zip')));
 const tourns = parseTournamentsTab(wb.get('Tournaments')!);

@@ -42,7 +42,7 @@ import {
   seasonStartYear,
   sheetIdFor,
   sheetPathFor,
-} from '../packages/ingest/src/index.ts';
+} from '../../packages/ingest/src/index.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 const RAW_DIR = 'data/raw/tabroom';

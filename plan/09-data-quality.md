@@ -86,7 +86,7 @@ Clubs, academies, and independent entries the league credits to a school, in
 Academy` → Campolindo, `Rodda's Disciples` → Stuyvesant, `Papaya Valley` →
 Evergreen Valley.
 
-Regenerate candidates with `node scripts/discover-aliases.ts`. It only sees
+Regenerate candidates with `node scripts/probe/discover-aliases.ts`. It only sees
 affiliations that appeared in a scored result, so **new academies must be
 added by hand**. Two cases remain unresolved and are recorded in
 `SCHOOL_ALIASES_UNRESOLVED`.
@@ -258,7 +258,7 @@ Before a season opens:
    year's rules. `packages/rules` is season-versioned for exactly this.
 2. Check SpeechWire for Phillipsburg, Hap Hingston, and any new non-Tabroom
    tournaments.
-3. Re-run `scripts/discover-aliases.ts` and fold in new academies.
+3. Re-run `scripts/probe/discover-aliases.ts` and fold in new academies.
 4. Confirm no new tournament shares a `tourn_id` with another, and that its
    *field* comes from the right event where one does — see section 3.
 5. Confirm the speaker scale for any new league.

@@ -9,18 +9,18 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { eq, sql } from 'drizzle-orm';
-import { DIMINISHING_RETURNS_WEIGHTS } from '../packages/rules/src/index.ts';
-import { createDb } from '../packages/db/src/client.ts';
-import * as t from '../packages/db/src/schema.ts';
+import { DIMINISHING_RETURNS_WEIGHTS } from '../../packages/rules/src/index.ts';
+import { createDb } from '../../packages/db/src/client.ts';
+import * as t from '../../packages/db/src/schema.ts';
 import {
   indexHeaders,
   parseEntryTab,
   parseWorkbook,
   resolveSheetPath,
-} from '../packages/ingest/src/sheet.ts';
-import { schoolKey } from '../packages/ingest/src/schools.ts';
-import { computeSeason, teamKey } from './lib/season.ts';
-import { loadOurTeams, pairStandings, type OfficialTeam } from './lib/standings.ts';
+} from '../../packages/ingest/src/sheet.ts';
+import { schoolKey } from '../../packages/ingest/src/schools.ts';
+import { computeSeason, teamKey } from '../lib/season.ts';
+import { loadOurTeams, pairStandings, type OfficialTeam } from '../lib/standings.ts';
 
 const SEASON = process.env.SEASON ?? '2025-26';
 // The season's own workbook. Reading 2025-26's while tagging rows 2026-27

@@ -9,9 +9,9 @@
  * whether the *aggregation* is right, the first says how far the per-entry
  * work still has to go.
  */
-import { weightedTotal } from '../packages/rules/src/index.ts';
-import { indexHeaders } from '../packages/ingest/src/sheet.ts';
-import { computeSeason, sourceFromEnv, norm, teamKey, type EntryCase } from './lib/season.ts';
+import { weightedTotal } from '../../packages/rules/src/index.ts';
+import { indexHeaders } from '../../packages/ingest/src/sheet.ts';
+import { computeSeason, sourceFromEnv, norm, teamKey, type EntryCase } from '../lib/season.ts';
 
 const season = computeSeason(undefined, { source: sourceFromEnv() });
 // Only entries the league publishes a figure for can be compared against it.

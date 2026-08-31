@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { buildStudentIndex, computeEntryPerformances, computeFieldStats, normalizeTournament } from '../packages/ingest/src/normalize.ts';
-import { parseEntryTab, parseTournamentsTab, parseWorkbook } from '../packages/ingest/src/sheet.ts';
+import { buildStudentIndex, computeEntryPerformances, computeFieldStats, normalizeTournament } from '../../packages/ingest/src/normalize.ts';
+import { parseEntryTab, parseTournamentsTab, parseWorkbook } from '../../packages/ingest/src/sheet.ts';
 const wb = parseWorkbook(new Uint8Array(readFileSync('data/raw/sheet/rankings.zip')));
 const sheetName = process.argv[2]!;
 const off = parseTournamentsTab(wb.get('Tournaments')!).find((t) => t.name === sheetName)!;
