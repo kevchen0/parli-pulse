@@ -1,4 +1,4 @@
-import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
+import { rulesForSeason } from '@parli-pulse/rules';
 import { dbReady, getSummary, getTeams } from '@/lib/db';
 import FootnoteRef from '@/app/footnote-ref';
 import TeamsTable from './table';
@@ -44,6 +44,7 @@ async function TeamsBoard({ season, initialQuery }: { season: string; initialQue
     );
   }
   const bids = teams.filter((x) => x.partnersQualified >= 2).length;
+  const autoqual = rulesForSeason(season).tocAutoqualPoints;
 
   return (
     <>
@@ -60,7 +61,7 @@ async function TeamsBoard({ season, initialQuery }: { season: string; initialQue
 
       <ol className="footnotes">
         <li id="fn1">
-          <b>AQ</b> means both partners are at or above the {TOC_AUTOQUAL_POINTS}-point
+          <b>AQ</b> means both partners are at or above the {autoqual}-point
           line, autoqualifying the partnership for the TOC. <b>AL</b> means only one
           debater in a partnership has autoqualified, meaning the team would need an
           at-large bid.{' '}

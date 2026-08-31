@@ -6,7 +6,7 @@
  * change without re-reading 370MB of payloads.
  */
 import { and, eq, gt, isNull, sql } from 'drizzle-orm';
-import { weightedTotal } from '../../packages/rules/src/index.ts';
+import { rulesForSeason, weightedTotal } from '../../packages/rules/src/index.ts';
 import { createDb } from '../../packages/db/src/client.ts';
 import * as t from '../../packages/db/src/schema.ts';
 import { collapsePartnerships, dominantSchool, loadNameIndex } from '../lib/identity.ts';
@@ -353,14 +353,18 @@ async function main(): Promise<void> {
       points: r.points, rank: r.rank, tournamentsCounted: r.counted,
     }));
 
+    const autoqualLine = rulesForSeason(SEASON).tocAutoqualPoints;
     const debaterRows = assignRanks(
       [...debaterPoints.entries()].map(([id, pts]) => ({ id, points: weightedTotal(pts) })),
     ).map((r) => ({
       id: `deb_${SEASON}_${r.id}`, seasonId: SEASON, debaterId: r.id,
       points: r.points, rank: r.rank,
       tocQualPoints: r.points, tocQualRank: r.rank,
-      // XXII.1.A: 40 individual points on March 1.
-      autoQualified: r.points >= 40,
+      // XXII.1.A, at this season's line: 40 for 2025-26, 43 for 2026-27. It was
+      // written here as a literal 40, which is the same figure the constant
+      // held and a separate copy of it -- pattern G, and the copy that would
+      // have kept qualifying people at 40 all through 2026-27.
+      autoQualified: r.points >= autoqualLine,
     }));
 
     const schoolRows = assignRanks(
@@ -382,7 +386,7 @@ async function main(): Promise<void> {
     await insert(t.schoolSeasonTotals as never, schoolRows, 'schools');
 
     const qualified = debaterRows.filter((d) => d.autoQualified).length;
-    console.log(`\nTOC autoqualified (>= 40 individual points): ${qualified}`);
+    console.log(`\nTOC autoqualified (>= ${autoqualLine} individual points): ${qualified}`);
     console.log('done');
   } finally {
     await close();
