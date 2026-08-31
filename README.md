@@ -23,62 +23,59 @@ check, and the two are reconciled result by result.
 On the 2025-26 season that reaches **96% per-entry agreement** with the league's
 published figures and **92%** on partnership season totals. Where the two
 disagree, the disagreement is recorded rather than smoothed over, and the
-league's number is what a reader sees.
+league's number is what a reader sees. NPDL's points are the official ones;
+ours run alongside as a check, never as a correction.
 
 **The rating earns its place or is reported as a failure.** On 2,209 held-out
 rounds from February 2026 onward, Glicko-2 predicts 63.4% against the league
 ranking's 59.8%, at a better log loss. The commitment was to publish that
-comparison either way.
+comparison either way. How every figure is produced is on the site itself, at
+`/method`.
 
 **These are minors.** Only what the league and Tabroom already publish appears;
 nothing identifies an Article XIV conduct sanction; and a removal request is
 honoured everywhere a name would otherwise show, including on other people's
-pages.
+pages. Debater profiles are excluded from search engines twice over — by
+`robots.txt` and by `noindex` — because a table is a page about a competition
+and a profile is a page about one child.
+
+## Layout
+
+```
+apps/web/          Next.js 15, App Router; seasons are routable
+packages/rules/    Article XXI engine — pure, and where correctness risk lives
+packages/rating/   Glicko-2, the field prior, Bradley-Terry
+packages/speaks/   speaker-point normalization
+packages/ingest/   Tabroom client, sheet mirror, entity resolution
+packages/db/       Drizzle schema and migrations
+scripts/pipeline/  the nightly chain that builds a season
+scripts/measure/   backtests, and the comparisons against the league
+scripts/probe/     one-off investigation tools
+docs/              how to run the pipeline, how to deploy, how to write the copy
+plan/              why every one of the above is the way it is
+```
+
+All TypeScript, one repo, one deploy target, chosen so a single maintainer never
+context-switches languages. Node runs the `.ts` files directly — no build step,
+which is why imports carry explicit `.ts` extensions.
 
 ## Running it
 
 ```bash
 npm install
-npm test                      # 167 tests
+npm test                      # 186 tests
 npm run typecheck
 npm run dev --workspace @parli-pulse/web
 ```
 
 The site is buildable without a database and reads as "not connected yet"
-rather than crashing. To build a season you need `DATABASE_URL` and the raw
-payloads, which are gitignored and about 800MB:
+rather than crashing, so this is enough to see it.
 
-```bash
-npm run fetch                 # cache payloads named by the league's sheet
-npm run check:rules           # stop if the Board Code has been revised
-npm run load                  # score the season   (SEASON= to pick one)
-npm run rollup                # identity merging, then standings
-npm run speaks                # judge-normalized speaker points
-npm run rate                  # Glicko-2 partnership ratings
-npm run diagnostics           # the reconciliation the site displays
-npm run mark-ingest           # record the run; the site shows how fresh it is
-```
-
-**The order is not negotiable.** `rollup` decides who is one person and who is
-two, and everything after it groups by the identities it settles.
-`.github/workflows/ingest.yml` runs the whole chain nightly.
-
-### Measuring it
-
-| | |
-|---|---|
-| `npm run backtest` | field sizes, per-entry points, partnership totals |
-| `npm run compare` | agreement across the league's top 100 |
-| `npm run compare:sources` | what the league's own inputs are worth, one at a time |
-| `npm run compare:entries` | scoring every Tabroom entry against only the league's list |
-| `npm run check:walkovers` | XXI.5.C derived from Tabroom against the league's column |
-| `npm run validate:rating` | the held-out comparison against the league's ranking |
-
-`SOURCE=sheet` on `load` or any backtest restores the league's own field sizes.
-That is the right instrument for asking whether a *rule* is wrong — it isolates
-the points rules, so a mismatch can never be a field-size mismatch in disguise —
-and the wrong default for a pipeline that has to score a tournament before the
-league writes it up.
+Building a season from Tabroom needs `DATABASE_URL` and about 800MB of cached
+payloads. That chain, the order it has to run in, and what each check is for
+are in [docs/pipeline.md](docs/pipeline.md). Deploying is
+[docs/deploying.md](docs/deploying.md), and the copy the site shows follows
+[docs/writing-style.md](docs/writing-style.md).
 
 ## Licence
 
@@ -93,96 +90,20 @@ with a fork — `debaters.suppressed` is a column in this database, not a fact i
 the source — so you are responsible for your own. See
 [plan/08-risks-policy.md](plan/08-risks-policy.md) for what that involves.
 
-## Branches
-
-`main` is what is live at [parli-pulse.vercel.app](https://parli-pulse.vercel.app).
-Nothing is committed to it directly.
-
-`dev` is day-to-day work, one page at a time, and starts each cycle identical
-to `main`. `method-rewrite` holds the methodology page while it is rewritten;
-`main` and `dev` show "Coming soon!" there.
-
-Merging a pull request into `main` is the deploy. Full workflow, including
-where the merge note goes and why `dev` is reset afterwards, in
-[docs/deploying.md](docs/deploying.md).
-
-One thing branches do not isolate: the database. `drizzle-kit migrate` and the
-pipeline scripts read `DATABASE_URL`, which is production on every branch.
-Treat a migration or a `load` as a deploy in itself, and snapshot first.
-
-## Layout
-
-```
-apps/web/          Next.js 15, App Router; seasons are routable
-packages/rules/    Article XXI engine — pure, and where correctness risk lives
-packages/rating/   Glicko-2, the field prior, Bradley-Terry
-packages/speaks/   speaker-point normalization
-packages/ingest/   Tabroom client, sheet mirror, entity resolution
-packages/db/       Drizzle schema and migrations
-scripts/           the pipeline, backtests and diagnostics
-docs/              rules text, the elim points table, the writing style guide
-plan/              why every one of the above is the way it is
-```
-
-Copy the site shows follows [docs/writing-style.md](docs/writing-style.md).
-Read it before editing a page.
-
-All TypeScript, one repo, one deploy target, chosen so a single maintainer never
-context-switches languages. Node runs the `.ts` files directly — no build step,
-which is why imports carry explicit `.ts` extensions.
-
 ## The plan
 
 `plan/` is the project's memory: what was measured, what was decided, and what
 went wrong. It is not a design document written in advance — most of it was
-written after finding something out.
-
-| | |
-|---|---|
-| [00-session-log.md](plan/00-session-log.md) | **Current state and handoff. Read this first.** |
-| [01-product.md](plan/01-product.md) | What is being built and why; the pages and surfaces |
-| [02-findings.md](plan/02-findings.md) | **Measurements.** Everything verified against live data |
-| [03-rules-engine.md](plan/03-rules-engine.md) | Article XXI implementation spec |
-| [04-architecture.md](plan/04-architecture.md) | Stack, data model, ingestion, entity resolution |
-| [05-metrics.md](plan/05-metrics.md) | Glicko-2, speaker points, judge scoring |
-| [06-roadmap.md](plan/06-roadmap.md) | Phases, sequencing, status |
-| [07-open-questions.md](plan/07-open-questions.md) | What is unresolved, and what the sheet still supplies |
-| [08-risks-policy.md](plan/08-risks-policy.md) | Risks, privacy, and editorial policy |
-| [09-data-quality.md](plan/09-data-quality.md) | **Known gaps, hand entries, seasonal checklist** |
-| [10-mistakes.md](plan/10-mistakes.md) | **Errors made and the patterns behind them. Read before changing scoring** |
-| [11-site.md](plan/11-site.md) | Site structure, visual identity, and the pages that were missing |
-
-## Ground rules
-
-1. **Article XXI governs.** Where recollection, convention or intuition
-   conflicts with the rules text, the text wins — and where the text is
-   ambiguous, the league's own behaviour is the tiebreak. Every rule in
-   [03-rules-engine.md](plan/03-rules-engine.md) was verified against real data
-   before being written down.
-2. **Never contradict NPDL in public.** Its points are displayed as
-   authoritative. Ours run alongside as a check, and a disagreement goes to a
-   triage queue rather than onto the page.
-3. **Compute it, then check it against the league.** A figure read from the
-   sheet cannot also verify the sheet. Where the two must differ, say so.
-4. **Assume nothing about Tabroom.** The bulk endpoint is undocumented. Cache
-   every payload so the site can be rebuilt offline.
-5. **Read [10-mistakes.md](plan/10-mistakes.md) before touching scoring or
-   identity.** Several of those bugs were reintroduced once already, in tooling
-   written after the original fix. The patterns recur; the specific bugs matter
-   less than the rule at the end of each one.
-6. **Anything that reads a season must take the season.** A workbook, a cache
-   path, a clearing `UPDATE`, a hardcoded document id: each has silently used
-   the wrong season at least once, and every time the output looked normal. A
-   source that yields a plausible answer for the wrong input is worse than one
-   that errors.
-7. **Diff it, do not count it.** 288 merges and 286 merges look equally
-   plausible and one of them had two people in one. Snapshot what you are not
-   changing and compare it afterwards.
+written after finding something out. Start at
+[plan/00-session-log.md](plan/00-session-log.md), which is the current state and
+the handoff, and read [plan/10-mistakes.md](plan/10-mistakes.md) before changing
+anything that scores or identifies.
 
 ## Status
 
-Phases 0–7 are complete and deployed; Phase 6 is half done, with debater
-profiles live and team, school and tournament pages still to come. The season
-ingests itself nightly and its points are computed from Tabroom.
+Live, indexed, and ingesting nightly. Phases 0–7 are complete; Phase 6 is half
+done, with debater profiles live and team, school and tournament pages still to
+come. `/method` reads "Coming soon!" while the methodology page is rewritten on
+the `method-rewrite` branch.
 
 Unofficial, and not affiliated with the NPDL.
