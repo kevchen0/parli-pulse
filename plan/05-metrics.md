@@ -123,7 +123,32 @@ Two results worth keeping:
 
 ### What it is made of
 
-Rating the **partnership**, one rating period per tournament, every round inside
+### Why a tournament is two periods
+
+A rating period means "these rounds happened at once, judge them against a
+common prior". True inside prelims, true inside elims, false across the two: an
+elimination round is contested by exactly the teams that just won their prelims.
+Grouped as one weekend, a season's first tournament pays the same for beating
+the eventual champion as for beating an 0-5 team, because every opponent is
+still sitting at 1500 -- and Glicko is a forward-only filter, so that flat
+weekend propagates rather than being revisited.
+
+Measured on the February held-out set: **63.4% to 64.0%** accuracy, 0.6380 to
+0.6364 log loss, with the gain only where either team had fewer than ten prior
+rounds and none at all where both were well measured. Measured on an early
+window instead -- train August-September, test November -- it is roughly twice
+that, and **elimination rounds go 54.6% to 64.9%**. Without the split the model
+predicted early elims at barely better than a coin flip. Elo and Bradley-Terry
+gain on the same rounds, so this is the information ordering rather than
+anything about Glicko.
+
+Both configurations were run twice and diffed before these numbers were quoted.
+Mistake 30 is a validation that disagreed with itself by exactly 63.4 against
+64.0; the runs here are byte-identical, so the collision is a coincidence.
+`SPLIT_PHASES=0` restores one period per tournament.
+
+Rating the **partnership**, two rating periods per tournament -- prelims then
+elims -- every round inside
 a period judged against the ratings held before it began.
 
 Three departures from plain Glicko-2, each measured on the January split rather
@@ -171,11 +196,36 @@ subtraction a partnership rises by being confirmed as well as by winning.
 Predictions still use the rating itself. For a prediction the uncertainty
 belongs in the width of the answer, not in the estimate.
 
-Partnerships below **ten rated rounds** keep a rating and a deviation but are
-not ranked: 387 of 1,776 clear the line. That figure is much harsher than the
-"47% under ten rounds" measured above, because that measurement counted only
-partnerships the league scores; the rating sees every team in an open room,
-including the many from outside NPDL who appear once.
+### Two gates, not one
+
+Partnerships below **five rated rounds** keep a rating and a deviation but are
+not ranked: 1,129 of 1,779 clear the line. Five rounds is one tournament, and
+that is deliberate -- a team that entered once has been measured, and plenty
+enter once all season. They are exactly the teams with no other way to see where
+they stand.
+
+The gate could not simply move from ten to five, because it was two decisions
+sharing a constant. `fieldSpread` recovers the spread of true strengths by
+subtracting mean squared deviation from observed variance, and it was estimating
+that from whoever cleared the same gate. Handing it 742 partnerships averaging a
+deviation of 166 subtracts a noise term of 27,000-odd and returns a spread far
+smaller than the league's: **tau falls from 117 to 72, the top of the board falls
+from 1826 to 1731, and twelve of the top twenty reorder** -- not because anyone
+new arrived, but because every existing rating was re-weighted against a scale
+that had collapsed. That is the reordering that made a lower gate look
+unworkable, and it was never about the newcomers.
+
+So `MIN_CALIBRATION_ROUNDS` stays at ten and `MIN_RATED_ROUNDS` is five. Who is
+shown and what the numbers mean are separate questions. Separated, the top
+twenty is identical to the ten-round board in all twenty places, and five
+partnerships with under ten rounds appear in the top fifty on the strength of
+their own shrunken ratings.
+
+A live season has nobody at ten rounds until its third or fourth weekend, so
+`fieldSpread` falls back to a default of 350 and the shrinkage is close to off.
+That is visible on 2026-27 now and is an open question, not a settled design:
+tau is a property of the league rather than of how far a season has got, and the
+previous season's figure would be a better fallback than a constant.
 
 ### What is not rated, and why
 

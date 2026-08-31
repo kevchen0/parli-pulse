@@ -72,7 +72,7 @@ both centre and spread shrunk toward the field by sample size.
 
 ### Phase 5 — Glicko-2 with a field prior
 Partnership ratings at `/<season>/ratings`, ordered on the rating shrunk toward
-the field by its deviation, gated at ten rated rounds. Method written for a
+the field by its deviation, gated at five rated rounds -- one tournament. Method written for a
 reader at `/method#rating`, now behind the placeholder.
 
 The gate was that it beat "higher Article XXI points wins" on held-out rounds
@@ -89,7 +89,7 @@ predicting makes prediction worse, because the win probability already widens by
 both deviations. Two dead ends are recorded in [05-metrics.md](05-metrics.md) so
 they are not retried.
 
-7,699 rated rounds over 78 tournaments and 1,776 partnerships, of which 387
+7,699 rated rounds over 78 tournaments and 1,779 partnerships, of which 1,129
 clear the round gate. Method and the full comparison in
 [05-metrics.md](05-metrics.md); `npm run validate:rating` reruns it.
 

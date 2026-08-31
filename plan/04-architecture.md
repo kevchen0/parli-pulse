@@ -155,10 +155,13 @@ IPv4 address is reversible in minutes.
 shape, so a backtest mismatch points at the specific rule that diverged rather
 than at a single opaque total.
 
-`ratings` holds two kinds of row per subject: one per tournament, carrying the
-rating as it stood after that rating period so a season can be charted, and one
+`ratings` holds two kinds of row per subject: a historical one per rating period
+carrying the rating as it stood after it, so a season can be charted, and one
 with a null `tournament_id` — the current figure, its deviation widened for
-however long the partnership has been away. The subject id is the partnership
+however long the partnership has been away. A tournament is *two* periods,
+prelims then elims, so a weekend usually writes two historical rows. Both carry
+the same `tournament_id`, which is what the column has a foreign key to; the
+period's own identity lives in the row id. The subject id is the partnership
 key from `scripts/lib/identity.ts`, which is what lets a rating join to a
 standings row.
 

@@ -20,16 +20,27 @@ Phase 6 half done.
 | The league's top 100 | **89% exact**, 95% within 2 points |
 | Rating against the league's own ranking | **64.0%** vs 59.7% on held-out rounds |
 | Rating against plain Elo | 64.0% vs **61.1%** |
+| Margin over Article XXI points | **4.3 points** (95% 1.9 to 6.7) |
 
-Loaded for 2025-26: 98 tournaments, 4,946 entries, 25,851 ballots, 3,302 scored
-results of which 1,587 are worth points, 806 partnerships, 1,194 debaters with
-points, 47 member schools with points of 55 members, 387 ranked speakers of
-1,831, 1,779 rated partnerships of which 387 clear the round gate, 830
-reconciliation rows. 186 tests.
+**2025-26, complete.** 98 tournaments, 4,946 entries, 25,851 ballots, 806
+partnerships and 1,194 debaters with points, 47 member schools of 55, 109
+debaters over the 40-point autoqualification line, 387 ranked speakers of 1,831,
+1,779 rated partnerships of which **1,129 clear the five-round gate**, 830
+reconciliation rows.
 
-2026-27 is open and empty: the sheet is registered, lists 110 tournaments and
-**0 with a results link**, and the circuit calendar shows Harvard as `40344` on
-2026-09-05. That is the correct state.
+**2026-27, running.** One tournament: Yale Summer Parli, 2026-08-29, fetched
+ahead of the league's sheet and scored from Tabroom. 62 entries, 360 ballots, 21
+ranked partnerships, 42 debaters and 7 schools with points, 47 rated
+partnerships of which 35 clear the gate, 97 speaker figures of which **none** yet
+clear 20 ballots. The autoqualification line for this season is **43**, not 40.
+
+Two things about 2026-27 are worth knowing before reading its boards. Nobody has
+ten rounds yet, so `fieldSpread` falls back to its 350 default and the shrinkage
+is close to off -- the ratings there are much nearer raw than 2025-26's. And
+every figure carries the pending asterisk, because the league has published no
+Entry rows for Yale and there is nothing to reconcile against.
+
+189 tests.
 
 ## Branches, and how work ships
 
@@ -104,6 +115,35 @@ record is now counted off the rounds the page already holds and reads 3-1-3.
 **Scoring is untouched:** `prelimPoints(wins, losses)` still sees those 318
 rounds as losses. See Next.
 
+**Yale Summer Parli is in 2026-27, fetched ahead of the league's sheet.** The
+sheet still decides what exists -- no row, no link, no load -- with one named
+exception per run, `EXTRA_TOURNAMENTS=39844`, for a tournament that has finished
+and published to Tabroom while the Results column is empty. Scoring needed a
+second change: `computeSeason` skipped any tournament with no rows in the
+league's Entry tab, which reads like a data dependency and is not one. Every
+figure below that gate is computed from the payload, `row` is optional
+throughout, and `unlisted: !row` already existed. The Entry tab supplies the
+comparison, not the score.
+
+What the sheet is genuinely needed for, measured against 2025-26: a Tabroom id
+for any tournament at all; `category` for the 17 NYPDL tournaments, which set a
+23-30 speaker scale rather than 25-30; `category` plus Entry rows for the 45
+CHSSA and OSAA qualifiers, whose placements are not in any payload; and the
+league's exact `name` wherever an event override or a manual result keys on it.
+For an ordinary invitational the id alone is enough.
+
+**A partnership is ranked after one tournament.** Five rated rounds, down from
+ten, taking 2025-26 from 387 ranked partnerships to 1,129. See
+[05-metrics.md](05-metrics.md) for why the gate had to be split in two before it
+could move, and what happens to the board if it is not.
+
+**The autoqualification line belongs to the season.** XXII.1.A is 43 points for
+2026-27 and stays 40 for 2025-26, so a `SeasonRules` field rather than a module
+constant -- an archived season was otherwise going to restate who qualified
+under next season's line. `rollup` had been carrying its own literal `>= 40`,
+which is the copy that would have kept qualifying people at 40 all through a
+season that had moved.
+
 **A tournament is two rating periods now, prelims then elims.** A period means
 "these rounds happened at once, judge them against a common prior", which is
 false across the two phases: an elimination round is contested by exactly the
@@ -149,11 +189,22 @@ now a public-facing document; the runbook moved to
 | `npm run mark-ingest` | records that the pipeline finished; the site reads it |
 | `npm run validate:rating` | the held-out comparison, now including Elo |
 | `npm run backtest` | fields, per-entry, partnerships |
-| `npm test` | 186 tests |
+| `npm test` | 189 tests |
 | `npm run dev --workspace @parli-pulse/web` | the site locally |
 
 **Order matters:** `fetch` → `load` → `rollup` → `speaks` → `rate` →
-`diagnostics` → `mark-ingest`.
+`diagnostics` → `mark-ingest`. Every one of them takes `SEASON`, and a run
+without it rebuilds 2025-26.
+
+Knobs worth knowing, all opt-in:
+
+| | |
+|---|---|
+| `EXTRA_TOURNAMENTS=39844` | on `fetch` and `load`: treat an id as though the sheet listed it. The one exception to sheet-decides-what-exists |
+| `SOURCE=sheet` | on `load` or a backtest: use the league's own field sizes instead of computing them |
+| `SPLIT_PHASES=0` | on `rate`: one rating period per tournament, the pre-2026-08 behaviour |
+| `GATE_ROUNDS` / `CALIBRATE_ROUNDS` | on `rate`: who is ranked, and who defines the field spread. Different questions, see 05-metrics |
+| `DEV_FROM` / `TEST_FROM` / `TEST_TO` | on `validate:rating`: move the train/dev/test windows. `TEST_TO` bounds the test, which is what an early-season measurement needs |
 
 `SOURCE=sheet` on `load`, the backtests or `diagnose` restores the league's own
 inputs, which is what a backtest wants.
@@ -191,28 +242,60 @@ Everything in the previous handoff still applies —
    two-period rating. The current figures are 64.0%, 0.6364, 4.3 points and 1.9
    to 6.7. Regenerate them from a run rather than hand-editing, and the same
    goes for the Elo gap and the shrink-before-predicting comparison.
-2. **Watch the first real tournament.** Harvard is Sept 5-6, and a season
-   holding exactly one tournament has still never run. The site does not update
-   when the tournament ends — it updates when the league writes a results link
-   into the sheet's `Tournaments` tab, which is days to weeks later.
+2. **Watch the first tournament the league writes up.** A season holding
+   exactly one tournament has now run -- Yale went in ahead of the sheet, and it
+   found the "1 tournaments" plural bug on every board, exactly as the previous
+   handoff predicted. What has still never happened is the league *publishing*
+   one: the site does not update when a tournament ends, it updates when a
+   results link appears in the sheet's `Tournaments` tab, which is days to weeks
+   later. Harvard is Sept 5-6. When it lands, Yale's figures stop being
+   `pending` and start being reconciled, which is the first real test of the
+   ahead-of-the-sheet path against the league's own numbers.
 3. **Finish Phase 6.** Team, school and tournament pages, and head-to-head.
-4. **Three dead mechanisms.** `manual_overrides` has no reader or writer;
+4. **Four dead mechanisms.** `manual_overrides` has no reader or writer;
    `official_tournament_stats` is written every load and read by nothing;
-   `Approval` is parsed and never consulted, so XXI.1.E/F is unenforced.
+   `Approval` is parsed and never consulted, so XXI.1.E/F is unenforced; and
+   `EXCLUDED_MONTHS` / `EXCLUDED_WINDOW` are exported and imported nowhere.
+   That last one should be **deleted rather than wired up**: XXI.1.H reads as
+   though June to August score nothing, but the league scored Harvard on
+   2025-08-30 -- 83 entries, 39 of them scoring, 25 points to the winner -- and
+   our figures agree with the league's. Implementing the constant would wrongly
+   zero all of them. The rule as written and the league's behaviour disagree,
+   and the league's behaviour is the tiebreak.
 5. **Smaller:** a Seasons page; the analysis scripts that hardcode
-   `rankings.zip`; `/rankings` and the masthead's Rankings link both resolve to
-   the calendar's current season, which is empty until Harvard is scored.
+   `rankings.zip`.
 6. **Decide what a tie is worth under XXI.3.A.** 318 prelim rounds across 133
    entries are shown as ties and scored as losses. The rules table is keyed on
    wins and losses and does not contemplate one. Recovering the real result from
    Tabroom's published record is the honest answer — these were not really ties,
    a two-judge deadlock got resolved somehow and Tabroom knows how — and it
    needs an ingest change and a reload, so snapshot first.
-7. **Pin `next` and `react-dom`.** `package.json` asks for `^15.1.3` and
+7. **Give a young season a real field spread.** `fieldSpread` needs
+   partnerships with ten or more rounds and there are none until a season's
+   third or fourth weekend, so it falls back to a constant 350 and the shrinkage
+   is close to off -- which is why 2026-27's board is nearly raw ratings right
+   now. Tau is a property of the league rather than of how far a season has got,
+   so the previous season's figure is a far better fallback than a constant:
+   2025-26's 128.6 against the default's 350. Small change, and it makes every
+   September open on a sane scale instead of an arbitrary one.
+8. **Speakers still rank on a raw mean, and the ballot gate is a lottery.** The
+   board orders on `mean_z` with no shrinkage, which is the regime ratings were
+   in before `shrinkToField`. `sd_z / sqrt(ballots)` is the standard error and
+   the direct analogue of a deviation, so `fieldSpread` and `shrinkToField` work
+   on it unchanged -- measured, tau_z is 0.349 calibrated on 20+ ballots. Two
+   findings sit alongside it. Shrinkage is far gentler here than for ratings,
+   because a five-ballot standard error of 0.26 is *smaller* than tau_z where a
+   five-round deviation of 166 is larger than tau -- so it will not hold back a
+   low gate the way it did for ratings. And 20 ballots is not a gate on
+   evidence: one tournament is 5 ballots with a single judge and 14 with panels,
+   so the gate is measuring panel size. **974 debaters attended exactly one
+   tournament and not one of them is ranked.** If the intent is one tournament,
+   the honest gate is tournaments, not ballots.
+9. **Pin `next` and `react-dom`.** `package.json` asks for `^15.1.3` and
    `^19.0.0`; the carets resolved to 15.5.23 and 19.2.8, where streaming is
    broken. Pinning to a working pair would let the loading states come back; the
    code for them is in git history at the parent of `85082ce`.
-8. **Make the site findable.** It is not indexed at all: searching the exact
+10. **Make the site findable.** It is not indexed at all: searching the exact
    string `"parli-pulse"` on 2026-08-31 returned the league's own pages and
    nothing of ours. The earlier note here assumed it would be found on its own
    within weeks. That was wrong, and four separate things are in the way.

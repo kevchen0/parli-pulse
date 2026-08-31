@@ -226,7 +226,7 @@ them deliberately is unresolved, and worth asking the Reporting Director.
   could never meet, and the extra evidence would be evidence about a different
   competition.
 - **Minimum rounds before a partnership appears on the rating board** — ten.
-  387 of 1,779 rated partnerships clear it. Every partnership keeps a rating and
+  1,129 of 1,779 rated partnerships clear it. Every partnership keeps a rating and
   a deviation regardless; the gate decides only who is ranked. It matters less
   than it looked, because the board is ordered on the rating *less* its
   deviation, which already pushes thin ratings down rather than out.
