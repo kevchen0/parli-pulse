@@ -2,15 +2,14 @@
 
 **[parli-pulse.vercel.app](https://parli-pulse.vercel.app)**
 
-A public rankings site for American high school parliamentary debate. It mirrors
-the National Parliamentary Debate League's official Article XXI points, and adds
-two things that exist nowhere today: a Glicko-2 partnership rating and
-judge-normalized speaker points.
+A public rankings site for American high school parliamentary debate. It
+computes the National Parliamentary Debate League's Article XXI points from
+Tabroom's round data, and adds two figures of its own: a Glicko-2 partnership
+rating and judge-normalized speaker points.
 
-There is no other public rankings site for this format. DebateDrills covers LD
-and PF only, and Debate Land is defunct. NPDL publishes its points in a Google
-Sheet embedded on `parliamentarydebate.org` — accurate, and with no profiles, no
-history, no head-to-heads and no way to browse it.
+Points, ratings and speaker standings are browsable by season — for
+partnerships, for debaters and for schools — and every debater has a page that
+opens their season tournament by tournament and round by round.
 
 ## What it does
 
