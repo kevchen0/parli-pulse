@@ -47,6 +47,16 @@ import { loadRatingData } from '../lib/rating-data.ts';
 const SEASON = process.env.SEASON ?? '2025-26';
 const DEV_FROM = process.env.DEV_FROM ?? '2026-01-01';
 const TEST_FROM = process.env.TEST_FROM ?? '2026-02-01';
+/**
+ * Optional upper bound on the test window.
+ *
+ * Unset, the test runs to the end of the season, which is what the headline
+ * figure wants. Set, it isolates a slice -- the point of which is to ask
+ * whether a change helps *early*, when teams are thinly measured, rather than
+ * across a season where most rounds happen between teams the model already
+ * knows well.
+ */
+const TEST_TO = process.env.TEST_TO ?? null;
 /** Rounds a partnership needs before it would appear on a public board. */
 const GATE_ROUNDS = Number(process.env.GATE_ROUNDS ?? 10);
 
@@ -659,7 +669,9 @@ async function main(): Promise<void> {
 
     const train = data.periods.filter((p) => p.date < DEV_FROM);
     const dev = data.periods.filter((p) => p.date >= DEV_FROM && p.date < TEST_FROM);
-    const test = data.periods.filter((p) => p.date >= TEST_FROM);
+    const test = data.periods.filter(
+      (p) => p.date >= TEST_FROM && (TEST_TO === null || p.date < TEST_TO),
+    );
     const rounds = (ps: readonly RatingPeriod[]): number =>
       ps.reduce((n, p) => n + p.rounds.length, 0);
 

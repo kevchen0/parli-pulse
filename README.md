@@ -26,8 +26,8 @@ league's number is what a reader sees. NPDL's points are the official ones;
 ours run alongside as a check, never as a correction.
 
 **The rating earns its place or is reported as a failure.** On 2,209 held-out
-rounds from February 2026 onward, Glicko-2 predicts 63.4% against the league
-ranking's 59.8%, at a better log loss. The commitment was to publish that
+rounds from February 2026 onward, Glicko-2 predicts 64.0% against the league
+ranking's 59.7%, at a better log loss. The commitment was to publish that
 comparison either way. How every figure is produced is on the site itself, at
 `/method`.
 
