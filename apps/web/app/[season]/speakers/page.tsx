@@ -27,7 +27,7 @@ export default async function SpeakersPage({
     <>
       <h1>Speaker points</h1>
       <p className="lede">
-        Speaker points, adjusted for how generously each judge scores.
+        Speaker points, adjusted for each judge&rsquo;s median.
       </p>
       <SpeakersBoard season={season} initialQuery={(sp.q ?? '').trim()} />
     </>
