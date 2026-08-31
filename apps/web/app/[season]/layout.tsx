@@ -50,11 +50,16 @@ export default async function SeasonLayout({
         <p className="seasonstate" data-status={status}>
           {status === 'final' &&
             `Complete${here?.lastResultOn ? `, last results ${formatDay(here.lastResultOn)}` : ''}`}
+          {/*
+            A running season says when it last moved, not how far it has got.
+            The count belongs to the board below, which states it already, and
+            "1 tournament counted" is a scale nobody needs in September and a
+            number that reads as small all season. The date is the last result
+            counted, the same figure a complete season reports.
+          */}
           {status === 'live' &&
-            (here && here.tournaments > 0
-              ? `${here.tournaments} tournament${here.tournaments === 1 ? '' : 's'} counted${
-                  here.lastResultOn ? `, through ${formatDay(here.lastResultOn)}` : ''
-                }`
+            (here?.lastResultOn
+              ? `Last updated ${formatDay(here.lastResultOn)}`
               : 'Open, nothing published yet')}
           {status === 'upcoming' && 'Not yet open'}
         </p>

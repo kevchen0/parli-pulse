@@ -185,9 +185,38 @@ Everything in the previous handoff still applies —
    `^19.0.0`; the carets resolved to 15.5.23 and 19.2.8, where streaming is
    broken. Pinning to a working pair would let the loading states come back; the
    code for them is in git history at the parent of `85082ce`.
-8. **Submit the sitemap** to Google Search Console. The site is indexable and
-   will be found on its own within weeks; the console makes it days and reports
-   what Google actually indexed.
+8. **Make the site findable.** It is not indexed at all: searching the exact
+   string `"parli-pulse"` on 2026-08-31 returned the league's own pages and
+   nothing of ours. The earlier note here assumed it would be found on its own
+   within weeks. That was wrong, and four separate things are in the way.
+
+   The setup itself is sound -- `robots.txt` allows everything but profiles, the
+   sitemap serves 15 valid URLs, and production carries no stray
+   `X-Robots-Tag`. What is missing is everything around it.
+
+   1. **Nobody has told Google it exists.** Verify the property in Search
+      Console, submit the sitemap, request indexing on the homepage. Google
+      finds a new site by following a link to it, and no link to this one
+      exists, so there is no path by which it would be crawled at all.
+   2. **Nothing links to it.** The console gets it crawled; links are what get
+      it ranked. This needs the league, a coach, or a post somewhere debate
+      people read, and it is the slowest of the four.
+   3. **Twelve of the fifteen sitemap URLs share one title.** Every board
+      inherits `parli-pulse — NPDL rankings` and the layout's description; only
+      `/about`, `/method` and `/privacy` set their own. Google reads a dozen
+      near-duplicates and indexes one. **This is the code fix**, and the pattern
+      to copy is the debater route's `generateMetadata`: `Ratings — 2025–26 —
+      Parli Pulse`, with a description naming the season and the board.
+   4. **`*.vercel.app` is a shared host on the Public Suffix List**, which
+      Google deprioritises. A custom domain is the largest structural
+      improvement available and is already an open question below.
+
+   One structural note: `/` is a 307 to the current season's points board, so
+   there is no indexable homepage -- the sitemap's priority 1.0 URL is a
+   signpost. The 307 is *correct* and must stay temporary, for the reason
+   `/rankings` gives: the destination changes every August and a permanent
+   redirect would be cached long past the point it is true. The cost is that
+   nothing on the site is built to answer a search for its own name.
 
 ## Waiting on the user
 
