@@ -1,7 +1,5 @@
 import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
 import { dbReady, getSummary, getTeams } from '@/lib/db';
-import { Suspense } from 'react';
-import LoadingBar from '@/app/loading-bar';
 import FootnoteRef from '@/app/footnote-ref';
 import TeamsTable from './table';
 
@@ -30,9 +28,7 @@ export default async function TeamsPage({
     <>
       <h1>Teams</h1>
       <p className="lede">Points scored under the Article XXI rules.</p>
-      <Suspense fallback={<LoadingBar label="Loading the team standings" />}>
-        <TeamsBoard season={season} initialQuery={(sp.q ?? '').trim()} />
-      </Suspense>
+      <TeamsBoard season={season} initialQuery={(sp.q ?? '').trim()} />
     </>
   );
 }
