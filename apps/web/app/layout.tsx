@@ -50,9 +50,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="wrap">
           <footer>
             <p>
-              Points follow Article XXI of the NPDL League Rules. Results are derived from
-              publicly available Tabroom data. Ratings and speaker figures are our own and
-              are not published by the league.
+              Results are derived from publicly available data. Ratings and speaker
+              figures are our own and are not published by the league.
             </p>
             {/*
               Rendered from the same list as the masthead, so the two orders
