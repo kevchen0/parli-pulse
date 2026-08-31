@@ -3,6 +3,8 @@ import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
 import FootnoteRef from '@/app/footnote-ref';
 import DebatersTable from './table';
 
+import { plural } from '@/lib/labels';
+
 export const revalidate = 300;
 
 export default async function DebatersPage({
@@ -37,7 +39,7 @@ async function DebatersBoard({ season, initialQuery }: { season: string; initial
   return (
     <>
       <p className="meta">
-        <span><b>{debaters.length}</b> debaters ranked</span>
+        <span><b>{debaters.length}</b> {plural(debaters.length, 'debater')} ranked</span>
         <span>
           <b>{qualified}</b> at or above the {TOC_AUTOQUAL_POINTS}-point
           autoqualification line<FootnoteRef notes={[1]} />

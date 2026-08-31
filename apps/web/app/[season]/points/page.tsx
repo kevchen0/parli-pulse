@@ -3,6 +3,8 @@ import { dbReady, getSummary, getTeams } from '@/lib/db';
 import FootnoteRef from '@/app/footnote-ref';
 import TeamsTable from './table';
 
+import { plural } from '@/lib/labels';
+
 export const revalidate = 300;
 
 /**
@@ -46,12 +48,12 @@ async function TeamsBoard({ season, initialQuery }: { season: string; initialQue
   return (
     <>
       <p className="meta">
-        <span><b>{teams.length}</b> partnerships ranked</span>
+        <span><b>{teams.length}</b> {plural(teams.length, 'partnership')} ranked</span>
         <span>
           <b>{bids}</b> eligible for a TOC bid
           <FootnoteRef notes={[1]} />
         </span>
-        <span><b>{summary.tournaments}</b> tournaments</span>
+        <span><b>{summary.tournaments}</b> {plural(summary.tournaments, 'tournament')}</span>
       </p>
 
       <TeamsTable rows={teams} season={season} initialQuery={initialQuery} />

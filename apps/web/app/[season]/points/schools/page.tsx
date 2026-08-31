@@ -1,6 +1,8 @@
 import { dbReady, getSchools } from '@/lib/db';
 import SchoolsTable from './table';
 
+import { plural } from '@/lib/labels';
+
 export const revalidate = 300;
 
 export default async function SchoolsPage({
@@ -34,7 +36,7 @@ async function SchoolsBoard({ season, initialQuery }: { season: string; initialQ
   return (
     <>
       <p className="meta">
-        <span><b>{schools.length}</b> member schools with points</span>
+        <span><b>{schools.length}</b> member {plural(schools.length, 'school')} with points</span>
         <span>Hybrid partnerships count half to each school</span>
       </p>
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   compareRounds,
+  plural,
   prelimRecord,
   recordLabel,
   entryResultLabel,
@@ -210,5 +211,22 @@ describe('recordLabel', () => {
 
   it('shows ties as a third figure', () => {
     expect(recordLabel({ wins: 3, losses: 1, ties: 3 })).toBe('3–1–3');
+  });
+});
+
+describe('plural', () => {
+  it('drops the s at one', () => {
+    expect(plural(1, 'tournament')).toBe('tournament');
+  });
+
+  it('keeps it at every other count', () => {
+    expect(plural(0, 'tournament')).toBe('tournaments');
+    expect(plural(2, 'tournament')).toBe('tournaments');
+    expect(plural(98, 'tournament')).toBe('tournaments');
+  });
+
+  it('takes an irregular plural', () => {
+    expect(plural(1, 'match', 'matches')).toBe('match');
+    expect(plural(3, 'match', 'matches')).toBe('matches');
   });
 });

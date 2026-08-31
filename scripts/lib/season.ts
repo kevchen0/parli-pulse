@@ -34,8 +34,10 @@ import { buildSchoolIndex, schoolKey } from '../../packages/ingest/src/schools.t
 import { INCOMPLETE_TOURNAMENTS, MANUAL_RESULTS } from '../../packages/ingest/src/manual-results.ts';
 import {
   indexHeaders,
+  extraTournamentIds,
   parseEntryTab,
   parseTournamentsTab,
+  tournamentAheadOfTheSheet,
   parseWorkbook,
   type OfficialEntry,
   type OfficialTournament,
@@ -239,7 +241,18 @@ export function computeSeason(
   const fromSheet = <T>(v: T | null | undefined): T | undefined =>
     sources.fields === 'sheet' ? (v ?? undefined) : undefined;
   const workbook = parseWorkbook(new Uint8Array(readFileSync(zipPath)));
-  const officialTournaments = parseTournamentsTab(workbook.get('Tournaments')!);
+  const sheetTournaments = parseTournamentsTab(workbook.get('Tournaments')!);
+  // The scoring engine reads the workbook itself rather than being handed the
+  // loader's list, so ids named as ahead of the sheet have to be added here as
+  // well. Without this the gate below is unreachable: a tournament the sheet
+  // has never heard of is not in the list the loop walks.
+  const listedIds = new Set(sheetTournaments.map((r) => r.tournId).filter(Boolean));
+  const officialTournaments = [
+    ...sheetTournaments,
+    ...extraTournamentIds()
+      .filter((id) => !listedIds.has(id))
+      .map(tournamentAheadOfTheSheet),
+  ];
   const officialEntries = parseEntryTab(workbook.get('Entry')!);
   // XXI.9.A tables member schools only, and the league's membership is a fact
   // about the league rather than a figure -- the same kind of thing as which
@@ -272,9 +285,21 @@ export function computeSeason(
   const ambiguous: { tournament: string; team: string }[] = [];
   const skippedTournaments: string[] = [];
 
+  // Ids named for this run as ahead of the sheet. Their entries are scored from
+  // the payload and compared against nothing, because there is nothing yet to
+  // compare against.
+  const aheadIds = new Set(extraTournamentIds());
+
   for (const off of officialTournaments) {
     const sheetRows = officialEntries.filter((e) => e.tournament === off.name);
-    if (!sheetRows.length) continue;
+    // The league's Entry tab is how a tournament is normally known to have
+    // happened, and it is also the only source of `theirs`. A tournament we
+    // have deliberately fetched ahead of the sheet has neither, and is scored
+    // anyway: every figure below this line is computed from the payload under
+    // the default `tabroom` source, and every entry falls out as `unlisted`,
+    // which is the state the boards already draw as a pending asterisk.
+    const aheadOfSheet = !sheetRows.length && Boolean(off.tournId) && aheadIds.has(off.tournId!);
+    if (!sheetRows.length && !aheadOfSheet) continue;
     const path = off.tournId ? `data/raw/tabroom/${off.tournId}.json` : '';
     // A tournament flagged incomplete is scored as though it had no payload at
     // all. Ridge Debates published four of twenty-eight teams, which is worse
@@ -319,6 +344,9 @@ export function computeSeason(
 
     const raw = JSON.parse(readFileSync(path, 'utf8'));
     const t = normalizeTournament(raw);
+    // The sheet's name where it has one, the payload's where it does not. Every
+    // report groups on this, and an empty string would group them all together.
+    const label = off.name || t.name;
     const students = buildStudentIndex(raw);
     const selectOpen = openEventFilter(off.name);
     const opens = t.events.filter((e) => selectOpen(e) && !computeFieldStats(e).phantom);
@@ -497,7 +525,7 @@ export function computeSeason(
           const name1 = row?.partner1 ?? surnames[0] ?? '';
           const name2 = row?.partner2 ?? surnames[1] ?? '';
           cases.push({
-            tournament: off.name,
+            tournament: label,
             category: off.category || '(none)',
             tournId: off.tournId!,
             school: schoolName,
