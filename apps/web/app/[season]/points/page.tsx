@@ -1,7 +1,9 @@
-import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
+import { rulesForSeason } from '@parli-pulse/rules';
 import { dbReady, getSummary, getTeams } from '@/lib/db';
 import FootnoteRef from '@/app/footnote-ref';
 import TeamsTable from './table';
+
+import { plural } from '@/lib/labels';
 
 export const revalidate = 300;
 
@@ -27,7 +29,6 @@ export default async function TeamsPage({
   return (
     <>
       <h1>Teams</h1>
-      <p className="lede">Points scored under the Article XXI rules.</p>
       <TeamsBoard season={season} initialQuery={(sp.q ?? '').trim()} />
     </>
   );
@@ -43,44 +44,42 @@ async function TeamsBoard({ season, initialQuery }: { season: string; initialQue
     );
   }
   const bids = teams.filter((x) => x.partnersQualified >= 2).length;
+  const autoqual = rulesForSeason(season).tocAutoqualPoints;
 
   return (
     <>
       <p className="meta">
-        <span><b>{teams.length}</b> partnerships ranked</span>
-        <span><b>{summary.tournaments}</b> tournaments</span>
+        <span><b>{teams.length}</b> {plural(teams.length, 'partnership')} ranked</span>
         <span>
           <b>{bids}</b> eligible for a TOC bid
           <FootnoteRef notes={[1]} />
         </span>
+        <span><b>{summary.tournaments}</b> {plural(summary.tournaments, 'tournament')}</span>
       </p>
 
       <TeamsTable rows={teams} season={season} initialQuery={initialQuery} />
 
       <ol className="footnotes">
         <li id="fn1">
-          <b>AQ</b> means both partners are at or above the {TOC_AUTOQUAL_POINTS}-point
-          autoqualification line. Under XXII.1.A an individual autoqualifies at that
-          threshold, and under XXII.1.E a partnership may accept a bid only when both
-          partners autoqualify.{' '}
-          <b>AL</b> marks a partnership where one partner autoqualified and the other did
-          not, so it cannot accept an autoqualification bid and would need an at-large one.{' '}
+          <b>AQ</b> means both partners are at or above the {autoqual}-point
+          line, autoqualifying the partnership for the TOC. <b>AL</b> means only one
+          debater in a partnership has autoqualified, meaning the team would need an
+          at-large bid.{' '}
           <em>
-            TOC qualification labels here are only a prediction. At-large bids depend on
-            ordinal rankings, regional bid distributions, and underrepresented group point
-            allocations that are not modelled here.
+            All TOC qualification labels here are our prediction. At-large bids depend on
+            regional bid distributions, underrepresented group point allocations, and other
+            factors that are not calculated here.
           </em>
         </li>
         <li id="fn2">
-          An asterisk beside a total means it disagrees with the league&rsquo;s published
-          sheet.{' '}
+          An asterisk means a figure disagrees with the league&rsquo;s published sheet.{' '}
           <abbr className="tick pending">*</abbr>{' '}
           <b>amber</b> means the sheet has no row for this partnership yet, which is normal
-          for a tournament the league has not scored.{' '}
+          for a recent tournament the league has not yet scored.{' '}
           <abbr className="tick differs">*</abbr>{' '}
-          <b>red</b> means the sheet reports a figure different from ours. Hover for the
+          <b>red</b> means our number is different from the league&rsquo;s. Hover for the
           league&rsquo;s number.{' '}
-          <em>Wherever numbers disagree, the league&rsquo;s figure is the official one.</em>
+          <em>When in conflict, the league&rsquo;s sheet is always the most accurate.</em>
         </li>
       </ol>
     </>

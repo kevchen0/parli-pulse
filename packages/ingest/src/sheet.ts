@@ -142,6 +142,53 @@ export function resolveSheetPath(season: string, exists: (p: string) => boolean)
   return season === '2025-26' ? LEGACY_SHEET_PATH : own;
 }
 
+/**
+ * A tournament to score before the league has written it up.
+ *
+ * Discovery is the sheet's job and stays the sheet's job: no row, no link, no
+ * load. This is the one deliberate exception, for a tournament that has
+ * finished and published to Tabroom while the league's Results column is still
+ * empty. It is opt-in per run through `EXTRA_TOURNAMENTS`, never automatic,
+ * because a tournament arriving on its own would mean the site had started
+ * disagreeing with the league about which tournaments exist.
+ *
+ * Every league-supplied figure is null, which is the honest state rather than a
+ * gap: the league has published none of them yet. The engine derives field
+ * sizes and break percentages from Tabroom anyway -- that is the default and
+ * the point -- and every entry reconciles as `pending`, which the boards
+ * already render as the amber asterisk meaning "the sheet has no row for this
+ * partnership yet".
+ */
+export function tournamentAheadOfTheSheet(tournId: string): OfficialTournament & { tournId: string } {
+  return {
+    row: -1,
+    name: '',
+    tournId,
+    startDate: '',
+    endDate: '',
+    approval: '',
+    category: '',
+    openField: null,
+    njvField: null,
+    afs: null,
+    openElimField: null,
+    prelimCount: null,
+    breakingRecord: '',
+    prelimAdjustment: null,
+    breakPct: null,
+    breakPenalty: null,
+    tocQual: false,
+  };
+}
+
+/** Ids named in `EXTRA_TOURNAMENTS`, comma separated. Empty when unset. */
+export function extraTournamentIds(): string[] {
+  return (process.env.EXTRA_TOURNAMENTS ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 export interface OfficialTournament {
   row: number;
   name: string;

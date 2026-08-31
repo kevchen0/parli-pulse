@@ -3,6 +3,8 @@ import { dbReady, getSpeakers, getSpeakerSummary } from '@/lib/db';
 import SpeakerTable from './table';
 import FootnoteRef from '@/app/footnote-ref';
 
+import { plural } from '@/lib/labels';
+
 export const revalidate = 300;
 
 /**
@@ -25,8 +27,7 @@ export default async function SpeakersPage({
     <>
       <h1>Speaker points</h1>
       <p className="lede">
-        Speaker points adjusted for the judge who awarded them. Panels differ by two points or
-        more, so a raw average depends heavily on the draw.
+        Speaker points, adjusted for each judge&rsquo;s median.
       </p>
       <SpeakersBoard season={season} initialQuery={(sp.q ?? '').trim()} />
     </>
@@ -47,10 +48,10 @@ async function SpeakersBoard({ season, initialQuery }: { season: string; initial
     <>
       <p className="meta">
         <span>
-          <b>{speakers.length}</b> debaters with {MIN_BALLOTS} or more ballots
+          <b>{speakers.length}</b> {plural(speakers.length, 'debater')} with {MIN_BALLOTS} or more ballots
           <FootnoteRef notes={[1]} />
         </span>
-        <span><b>{summary.rankedBallots.toLocaleString()}</b> ballots between them</span>
+        <span><b>{summary.rankedBallots.toLocaleString()}</b> {plural(summary.rankedBallots, 'ballot')} between them</span>
         <span>Open divisions only</span>
       </p>
 

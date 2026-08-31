@@ -1,7 +1,9 @@
 import { dbReady, getDebaters } from '@/lib/db';
-import { TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
+import { rulesForSeason } from '@parli-pulse/rules';
 import FootnoteRef from '@/app/footnote-ref';
 import DebatersTable from './table';
+
+import { plural } from '@/lib/labels';
 
 export const revalidate = 300;
 
@@ -33,13 +35,14 @@ async function DebatersBoard({ season, initialQuery }: { season: string; initial
     );
   }
   const qualified = debaters.filter((d) => d.autoQualified).length;
+  const autoqual = rulesForSeason(season).tocAutoqualPoints;
 
   return (
     <>
       <p className="meta">
-        <span><b>{debaters.length}</b> debaters ranked</span>
+        <span><b>{debaters.length}</b> {plural(debaters.length, 'debater')} ranked</span>
         <span>
-          <b>{qualified}</b> at or above the {TOC_AUTOQUAL_POINTS}-point
+          <b>{qualified}</b> at or above the {autoqual}-point
           autoqualification line<FootnoteRef notes={[1]} />
         </span>
       </p>
@@ -48,9 +51,9 @@ async function DebatersBoard({ season, initialQuery }: { season: string; initial
 
       <ol className="footnotes">
         <li id="fn1">
-          <b>AQ</b> means the debater is at or above the {TOC_AUTOQUAL_POINTS}-point
+          <b>AQ</b> means the debater is at or above the {autoqual}-point
           autoqualification line. Under XXII.1.A an individual with at least{' '}
-          {TOC_AUTOQUAL_POINTS} points on March 1 autoqualifies for the TOC.
+          {autoqual} points on March 1 autoqualifies for the TOC.
         </li>
         <li id="fn2">
           The league publishes no per-debater table, and our points are derived from

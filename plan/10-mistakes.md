@@ -411,6 +411,35 @@ opposite directions.
 
 ---
 
+### Found ingesting a tournament ahead of the sheet
+
+**46. `rollup` re-derives identity globally, and only rebuilds one season.**
+Loading Yale Summer Parli into an empty 2026-27 revealed that one of its
+debaters already had a record in 2025-26 under a second Tabroom id. `rollup`
+merged them, correctly, and merges are global: `debaters.canonical_id` is not
+scoped to a season. But `rollup` was invoked as `SEASON=2026-27`, so only
+2026-27's standings were rebuilt. 2025-26 was left holding one
+`debater_season_totals` row and two `debater_speaker_totals` rows keyed on an id
+that had just stopped being canonical -- Jordan Bodnick, 29.1 points, 197th,
+whose profile would have shown no points at all while the figure sat in the
+table under the old id.
+
+Nothing reported it. The load succeeded, the 2026-27 numbers were right, and
+every count in 2025-26 was unchanged, because the rows were still there and
+still summed to 11114.10. It was a *keying* fault, not a counting one, and only
+a query for standings whose debater has a `canonical_id` could see it.
+
+The rule: **a merge in any season invalidates every other season's standings.**
+After any run that reports a merge count different from the last one, re-run
+`rollup`, `speaks` and `rate` for every other loaded season, and check
+`debater_season_totals` and `debater_speaker_totals` for rows whose debater now
+has a `canonical_id`. The repair here changed the orphan counts from 1 and 2 to
+0 and left all nine other aggregates identical to the cent, which is what a
+correct re-key looks like.
+
+The nightly job runs one season. The first time it merges an identity while two
+seasons are loaded, it will do this again on its own.
+
 ## What actually caught these
 
 Ranked by yield:
@@ -440,6 +469,8 @@ Ranked by yield:
 8. **Snapshotting the thing you are not changing.** Running the pipeline for an
    empty season should have touched nothing else. Diffing 2025-26 before and
    after is what exposed #35 and #36, neither of which changed anything visible.
+   #46 needed one more thing on top of the counts: an integrity query, because
+   every count was identical and the fault was which id a row hung from.
 9. **Reading a page as a machine would.** #40 was invisible to every check that
    looked at the rendered page, which was correct throughout. One `curl -w
    '%{http_code}'` found it. The same habit would have found #39 years earlier:

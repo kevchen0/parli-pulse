@@ -25,6 +25,8 @@ import {
   indexHeaders,
   parseTournamentsTab,
   parseWorkbook,
+  extraTournamentIds,
+  tournamentAheadOfTheSheet,
   resolveSheetPath,
   type NormalizedEvent,
 } from '../../packages/ingest/src/index.ts';
@@ -68,7 +70,13 @@ async function main(): Promise<void> {
     console.log(`loading season ${SEASON}\n`);
 
     const wb = parseWorkbook(new Uint8Array(readFileSync(SHEET)));
-    const officialTournaments = parseTournamentsTab(wb.get('Tournaments')!);
+    const sheetTournaments = parseTournamentsTab(wb.get('Tournaments')!);
+    // The sheet still decides what exists, except for ids named explicitly for
+    // this run. See tournamentAheadOfTheSheet.
+    const listed = new Set(sheetTournaments.map((r) => r.tournId).filter(Boolean));
+    const extra = extraTournamentIds().filter((id) => !listed.has(id));
+    if (extra.length) console.log(`ahead of the sheet: ${extra.join(', ')}`);
+    const officialTournaments = [...sheetTournaments, ...extra.map(tournamentAheadOfTheSheet)];
     // The league's own School tab is its member list; SchoolList is merely
     // every school seen. XXI.9.A ranks members only.
     const schoolTab = wb.get('School')!;
@@ -146,7 +154,7 @@ async function main(): Promise<void> {
 
       rows.tournaments.push({
         id: off.tournId, seasonId: SEASON, tabroomId: off.tournId,
-        name: norm.name, officialName: off.name,
+        name: norm.name, officialName: off.name || null,
         startsOn: norm.start?.slice(0, 10) ?? null, endsOn: norm.end?.slice(0, 10) ?? null,
         location: off.category === 'CHSSA' ? null : null,
         category: off.category || null, approval: off.approval || null,

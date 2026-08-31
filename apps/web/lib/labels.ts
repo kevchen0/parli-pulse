@@ -73,6 +73,18 @@ export function roundOutcome(
 }
 
 /**
+ * A count's noun, singular where the count is one.
+ *
+ * Every board states its size in the line above the table, and each of those
+ * read "1 tournaments" the first time a season held exactly one. Nothing was
+ * wrong with the figure; the sentence around it had only ever been seen with a
+ * plural in it. The season status line had already grown its own copy of this
+ * logic, which is the second sign it belonged somewhere shared.
+ */
+export const plural = (n: number, one: string, many = `${one}s`): string =>
+  (n === 1 ? one : many);
+
+/**
  * A prelim record counted off the ballots, ties kept apart from losses.
  *
  * The stored `prelim_wins`/`prelim_losses` fold a tie into the losses: the

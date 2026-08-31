@@ -5,6 +5,8 @@ import { dbReady, getRatingSummary, getRatings } from '@/lib/db';
 import RatingTable from './table';
 import FootnoteRef from '@/app/footnote-ref';
 
+import { plural } from '@/lib/labels';
+
 export const revalidate = 300;
 
 /**
@@ -47,11 +49,11 @@ async function RatingsBoard({ season, initialQuery }: { season: string; initialQ
     <>
       <p className="meta">
         <span>
-          <b>{summary.ranked}</b> partnerships with {MIN_RATED_ROUNDS} or more rounds
+          <b>{summary.ranked}</b> {plural(summary.ranked, 'partnership')} with {MIN_RATED_ROUNDS} or more rounds
           <FootnoteRef notes={[1]} />
         </span>
-        <span><b>{summary.rankedRounds.toLocaleString()}</b> rounds behind them</span>
-        <span><b>{summary.periods}</b> tournaments rated</span>
+        <span><b>{summary.rankedRounds.toLocaleString()}</b> {plural(summary.rankedRounds, 'round')} behind them</span>
+        <span><b>{summary.periods}</b> {plural(summary.periods, 'tournament')} rated</span>
         <span>Open divisions only</span>
         <span className="methodlink"><Link href="/method#rating">How this is calculated &rarr;</Link></span>
       </p>

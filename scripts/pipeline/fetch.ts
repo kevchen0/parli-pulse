@@ -39,6 +39,8 @@ import {
   LEGACY_SHEET_PATH,
   parseTournamentsTab,
   parseWorkbook,
+  extraTournamentIds,
+  tournamentAheadOfTheSheet,
   seasonStartYear,
   sheetIdFor,
   sheetPathFor,
@@ -189,12 +191,21 @@ async function main(): Promise<void> {
   if (!tab) throw new Error('the workbook has no Tournaments tab');
 
   const rows = parseTournamentsTab(tab);
-  const linked = rows.filter((r): r is OfficialTournament & { tournId: string } => Boolean(r.tournId));
-  const unlinked = rows.length - linked.length;
+  const fromSheet = rows.filter((r): r is OfficialTournament & { tournId: string } => Boolean(r.tournId));
+  const unlinked = rows.length - fromSheet.length;
   console.log(
-    `  sheet lists ${rows.length} tournaments, ${linked.length} with a results link` +
+    `  sheet lists ${rows.length} tournaments, ${fromSheet.length} with a results link` +
       `${unlinked ? `, ${unlinked} awaiting one` : ''}`,
   );
+
+  // Named explicitly for this run, and only ones the sheet has not caught up to.
+  const listed = new Set(fromSheet.map((r) => r.tournId));
+  const extra = extraTournamentIds().filter((id) => !listed.has(id));
+  if (extra.length) {
+    console.log(`  ahead of the sheet, named for this run: ${extra.join(', ')}`);
+  }
+  const linked = [...fromSheet, ...extra.map(tournamentAheadOfTheSheet)];
+
   if (linked.length === 0) {
     console.log('\nNothing to fetch yet. Tournaments appear here as the league posts results links.');
     // The lookahead matters most in exactly this state: the sheet is empty, and

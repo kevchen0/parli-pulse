@@ -14,7 +14,7 @@ const getDebaterProfile = cache(loadProfile);
 import { debaterHref, seasonHref, seasonLabel } from '@/lib/season';
 import DebaterLink from '@/app/debater-link';
 import SeasonTable from './season-table';
-import { DIMINISHING_RETURNS_WEIGHTS, TOC_AUTOQUAL_POINTS } from '@parli-pulse/rules';
+import { DIMINISHING_RETURNS_WEIGHTS, rulesForSeason } from '@parli-pulse/rules';
 import { MIN_RATED_ROUNDS } from '@parli-pulse/rating';
 
 export const revalidate = 300;
@@ -93,6 +93,7 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
   if (!p) notFound();
 
   const counted = p.tournaments.filter((t) => t.weight > 0);
+  const autoqual = rulesForSeason(season).tocAutoqualPoints;
   const empty = p.tournaments.length === 0;
   const best = p.partnerships.find((x) => x.ranked) ?? p.partnerships[0] ?? null;
 
@@ -106,7 +107,7 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
       <h1>
         {p.name}
         {p.autoQualified && (
-          <abbr className="aq" title={`Autoqualified as an individual: ${TOC_AUTOQUAL_POINTS}+ points (XXII.1.A)`}>
+          <abbr className="aq" title={`Autoqualified as an individual: ${autoqual}+ points (XXII.1.A)`}>
             {' '}AQ
           </abbr>
         )}
@@ -174,7 +175,7 @@ async function Profile({ season, canonical }: { season: string; canonical: strin
 
       {p.autoQualified && (
         <p className="note aqnote">
-          Cleared the {TOC_AUTOQUAL_POINTS}-point individual autoqualification line
+          Cleared the {autoqual}-point individual autoqualification line
           (XXII.1.A). A partnership may only accept a bid when <em>both</em> partners
           cleared it.
         </p>

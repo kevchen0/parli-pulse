@@ -144,6 +144,13 @@ export interface SeasonRules {
   prelimPoints: Record<string, number>;
   elimPointsTable: readonly ElimPointsBand[];
   diminishingReturnsWeights: readonly number[];
+  /**
+   * Article XXII.1.A -- individual points needed on March 1 to autoqualify to
+   * the TOC. The league moved it from 40 to 43 for 2026-27, so it belongs to
+   * the season rather than to the module: a past season recomputed under this
+   * season's line would silently restate who qualified.
+   */
+  tocAutoqualPoints: number;
 }
 
 const SEASON_RULES: Record<Season, SeasonRules> = {
@@ -152,6 +159,7 @@ const SEASON_RULES: Record<Season, SeasonRules> = {
     prelimPoints: PRELIM_POINTS_2025_26,
     elimPointsTable: [],       // filled below; the table is declared later
     diminishingReturnsWeights: [1.0, 0.9, 0.6, 0.3, 0.1],
+    tocAutoqualPoints: 40,
   },
   /**
    * Registered explicitly rather than left to fall through the default.
@@ -172,6 +180,7 @@ const SEASON_RULES: Record<Season, SeasonRules> = {
     prelimPoints: PRELIM_POINTS_2025_26,
     elimPointsTable: [],
     diminishingReturnsWeights: [1.0, 0.9, 0.6, 0.3, 0.1],
+    tocAutoqualPoints: 43,
   },
 };
 
@@ -293,7 +302,14 @@ export const FORFEITS_EXCLUDED_FROM_FIELD_SIZE = 2;
  */
 export const LOSING_RECORD_ELIM_THRESHOLD = 1 / 3;
 
-/** Article XXII.1.A -- individual points needed on March 1 to autoqualify to the TOC. */
+/**
+ * Article XXII.1.A -- individual points needed on March 1 to autoqualify to the
+ * TOC, for the default season.
+ *
+ * Prefer `rulesForSeason(season).tocAutoqualPoints`. This is 2025-26's figure
+ * and is wrong for 2026-27, which moved to 43. It stays only because a caller
+ * with no season in hand is worse off inventing one.
+ */
 export const TOC_AUTOQUAL_POINTS = 40;
 
 /**
