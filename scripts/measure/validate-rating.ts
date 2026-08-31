@@ -236,7 +236,12 @@ class ArticleXxiPoints implements Model {
   }
   setBeta(beta: number[]): void { this.beta = beta; }
   observe(period: RatingPeriod): void {
-    const earnedHere = this.pointsAt.get(period.id);
+    // Keyed on the tournament, and only once its last phase has been predicted.
+    // A weekend's Article XXI points include what was earned in its elims, so
+    // handing them to the baseline after prelims would let it predict those
+    // elims from their own result.
+    if (!period.final) return;
+    const earnedHere = this.pointsAt.get(period.tournamentId);
     if (!earnedHere) return;
     for (const [subject, points] of earnedHere) {
       (this.earned.get(subject) ?? this.earned.set(subject, []).get(subject)!).push(points);
@@ -658,7 +663,11 @@ async function main(): Promise<void> {
     const rounds = (ps: readonly RatingPeriod[]): number =>
       ps.reduce((n, p) => n + p.rounds.length, 0);
 
-    console.log(`season ${SEASON}: ${data.rounds.length} rated rounds over ${data.periods.length} tournaments`);
+    const tournamentCount = new Set(data.periods.map((p) => p.tournamentId)).size;
+    console.log(
+      `season ${SEASON}: ${data.rounds.length} rated rounds over ${tournamentCount} tournaments` +
+        `${data.periods.length === tournamentCount ? '' : ` (${data.periods.length} rating periods)`}`,
+    );
     console.log(`  partnerships ${data.members.size}`);
     console.log(`  skipped: ${Object.entries(data.skipped).map(([k, v]) => `${k} ${v}`).join(', ')}`);
     console.log(`\nsplit  train <${DEV_FROM}: ${train.length} tournaments, ${rounds(train)} rounds`);

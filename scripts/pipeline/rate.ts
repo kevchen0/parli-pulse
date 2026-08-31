@@ -66,7 +66,12 @@ async function main(): Promise<void> {
       return;
     }
 
-    console.log(`${data.rounds.length} rated rounds, ${data.periods.length} tournaments, ${data.members.size} partnerships`);
+    const tournamentCount = new Set(data.periods.map((p) => p.tournamentId)).size;
+    console.log(
+      `${data.rounds.length} rated rounds, ${tournamentCount} tournaments, ` +
+        `${data.members.size} partnerships` +
+        `${data.periods.length === tournamentCount ? '' : ` (${data.periods.length} rating periods)`}`,
+    );
     const { byes, undecided, tied, unknownTeam, selfMatch, oddSection } = data.skipped;
     console.log(
       `  not rated: ${byes} byes, ${undecided} with no result entered, ${tied} tied panels, ` +
@@ -116,7 +121,10 @@ async function main(): Promise<void> {
         seasonId: SEASON,
         subjectKind: 'partnership',
         subjectId: h.subject,
-        tournamentId: h.periodId,
+        // The tournament, never the period id: a split weekend writes two rows
+        // and both belong to the same tournament, which the column has a
+        // foreign key to.
+        tournamentId: h.tournamentId,
         rating: Number(h.rating.toFixed(2)),
         deviation: Number(h.deviation.toFixed(2)),
         volatility: Number(h.volatility.toFixed(6)),

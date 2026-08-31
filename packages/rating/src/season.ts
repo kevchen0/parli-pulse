@@ -50,9 +50,22 @@ export interface RatedRound {
 
 /** A tournament's worth of rounds, and when it happened. */
 export interface RatingPeriod {
+  /** Unique per period. Not a tournament id once phases are split. */
   id: string;
+  /**
+   * The tournament these rounds belong to, always. Two periods share it when a
+   * tournament is split into its prelim and elim phases, so anything keyed on
+   * the tournament -- the ratings table's foreign key, the league's points for
+   * the weekend -- stays keyed on the tournament.
+   */
+  tournamentId: string;
   /** ISO date. Used only to measure how long a subject has been away. */
   date: string;
+  /**
+   * Whether this is the last period of its tournament. Anything that should
+   * happen once a weekend, rather than once a phase, waits for it.
+   */
+  final: boolean;
   rounds: RatedRound[];
 }
 
@@ -199,6 +212,8 @@ export interface SubjectState {
 export interface Snapshot {
   subject: string;
   periodId: string;
+  /** The tournament the period belonged to. See RatingPeriod. */
+  tournamentId: string;
   date: string;
   rating: number;
   deviation: number;
@@ -375,6 +390,7 @@ export class SeasonRun {
       this.history.push({
         subject,
         periodId: period.id,
+        tournamentId: period.tournamentId,
         date: period.date,
         rating: next.rating,
         deviation: next.deviation,
