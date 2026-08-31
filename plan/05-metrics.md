@@ -85,6 +85,13 @@ Held-out test, 2,209 rounds from February 2026 on:
 | Season win rate to date | 60.0% | 0.6543 | 0.2313 |
 | **Elo, K swept to 48** | **60.6%** | **0.6559** | **0.2319** |
 | Bradley-Terry on pairs | 61.2% | 0.6505 | 0.2296 |
+> **These figures predate two-period rating.** Every number in this section was
+> measured with one rating period per tournament. Splitting a tournament into
+> prelims and elims moves Glicko-2 to 64.0% and 0.6364 on the same held-out set,
+> the Elo gap to 2.9 points, and the margin over Article XXI points to 4.3
+> (95% 1.9 to 6.7). The comparisons *between* variants below have not been
+> re-derived and should be, before any of them is quoted again.
+
 | Glicko-2, shrunk | 62.6% | 0.6638 | 0.2356 |
 | **Glicko-2** | **63.4%** | **0.6380** | **0.2235** |
 | Bradley-Terry on people | 64.5% | 0.6290 | 0.2198 |

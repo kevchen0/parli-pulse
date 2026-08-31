@@ -47,6 +47,16 @@ import { loadRatingData } from '../lib/rating-data.ts';
 const SEASON = process.env.SEASON ?? '2025-26';
 const DEV_FROM = process.env.DEV_FROM ?? '2026-01-01';
 const TEST_FROM = process.env.TEST_FROM ?? '2026-02-01';
+/**
+ * Optional upper bound on the test window.
+ *
+ * Unset, the test runs to the end of the season, which is what the headline
+ * figure wants. Set, it isolates a slice -- the point of which is to ask
+ * whether a change helps *early*, when teams are thinly measured, rather than
+ * across a season where most rounds happen between teams the model already
+ * knows well.
+ */
+const TEST_TO = process.env.TEST_TO ?? null;
 /** Rounds a partnership needs before it would appear on a public board. */
 const GATE_ROUNDS = Number(process.env.GATE_ROUNDS ?? 10);
 
@@ -236,7 +246,12 @@ class ArticleXxiPoints implements Model {
   }
   setBeta(beta: number[]): void { this.beta = beta; }
   observe(period: RatingPeriod): void {
-    const earnedHere = this.pointsAt.get(period.id);
+    // Keyed on the tournament, and only once its last phase has been predicted.
+    // A weekend's Article XXI points include what was earned in its elims, so
+    // handing them to the baseline after prelims would let it predict those
+    // elims from their own result.
+    if (!period.final) return;
+    const earnedHere = this.pointsAt.get(period.tournamentId);
     if (!earnedHere) return;
     for (const [subject, points] of earnedHere) {
       (this.earned.get(subject) ?? this.earned.set(subject, []).get(subject)!).push(points);
@@ -654,11 +669,17 @@ async function main(): Promise<void> {
 
     const train = data.periods.filter((p) => p.date < DEV_FROM);
     const dev = data.periods.filter((p) => p.date >= DEV_FROM && p.date < TEST_FROM);
-    const test = data.periods.filter((p) => p.date >= TEST_FROM);
+    const test = data.periods.filter(
+      (p) => p.date >= TEST_FROM && (TEST_TO === null || p.date < TEST_TO),
+    );
     const rounds = (ps: readonly RatingPeriod[]): number =>
       ps.reduce((n, p) => n + p.rounds.length, 0);
 
-    console.log(`season ${SEASON}: ${data.rounds.length} rated rounds over ${data.periods.length} tournaments`);
+    const tournamentCount = new Set(data.periods.map((p) => p.tournamentId)).size;
+    console.log(
+      `season ${SEASON}: ${data.rounds.length} rated rounds over ${tournamentCount} tournaments` +
+        `${data.periods.length === tournamentCount ? '' : ` (${data.periods.length} rating periods)`}`,
+    );
     console.log(`  partnerships ${data.members.size}`);
     console.log(`  skipped: ${Object.entries(data.skipped).map(([k, v]) => `${k} ${v}`).join(', ')}`);
     console.log(`\nsplit  train <${DEV_FROM}: ${train.length} tournaments, ${rounds(train)} rounds`);

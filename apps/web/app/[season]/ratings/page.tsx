@@ -62,10 +62,12 @@ async function RatingsBoard({ season, initialQuery }: { season: string; initialQ
 
       <ol className="footnotes">
         <li id="fn1">
-          Under {MIN_RATED_ROUNDS} rounds a deviation is wide enough that a short lucky
-          run places higher than a season of steady results, so those partnerships are left
-          unranked. Many of them appear at a single tournament. They keep a rating either
-          way, but are only ranked after meeting the {MIN_RATED_ROUNDS} round threshold.
+          {MIN_RATED_ROUNDS} rated rounds is one tournament, which is what it takes to be
+          ranked. Below that there is not a tournament&rsquo;s worth of evidence to place a
+          partnership against the field at all. Everyone keeps a rating either way, and
+          the board is ordered on the rating pulled toward the field average, so a
+          partnership with few rounds sits near the middle of the field until it has
+          confirmed more rather than riding a short run.
         </li>
         <li id="fn2">
           <b>Rating</b> is the raw estimate moved toward the field average, further when

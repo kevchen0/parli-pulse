@@ -234,8 +234,8 @@ them deliberately is unresolved, and worth asking the Reporting Director.
   Elim opponents average 53% more season points, so an opponent-adjusted rating
   already pays more for beating them; a multiplier would count the same fact
   twice. See [05-metrics.md](05-metrics.md).
-- **Whether the rating earns its place** — yes, on held-out rounds: 63.4%
-  against the league ranking's 59.8%, with a clearly better log loss. The
+- **Whether the rating earns its place** — yes, on held-out rounds: 64.0%
+  against the league ranking's 59.7%, with a clearly better log loss. The
   commitment was to report a failure if it lost, and it did not.
 - **Which season starts the live era** — 2025-26. Earlier seasons are archival
   (Phase 8); 2024-25 may be backfilled, and the schema and loader are

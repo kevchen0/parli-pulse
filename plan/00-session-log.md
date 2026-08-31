@@ -18,8 +18,8 @@ Phase 6 half done.
 | Per-entry Article XXI agreement | **96%** (1532/1588) |
 | Partnership season totals | **92% exact** (735/799) |
 | The league's top 100 | **89% exact**, 95% within 2 points |
-| Rating against the league's own ranking | **63.4%** vs 59.8% on held-out rounds |
-| Rating against plain Elo | 63.4% vs **60.6%** |
+| Rating against the league's own ranking | **64.0%** vs 59.7% on held-out rounds |
+| Rating against plain Elo | 64.0% vs **61.1%** |
 
 Loaded for 2025-26: 98 tournaments, 4,946 entries, 25,851 ballots, 3,302 scored
 results of which 1,587 are worth points, 806 partnerships, 1,194 debaters with
@@ -104,6 +104,29 @@ record is now counted off the rounds the page already holds and reads 3-1-3.
 **Scoring is untouched:** `prelimPoints(wins, losses)` still sees those 318
 rounds as losses. See Next.
 
+**A tournament is two rating periods now, prelims then elims.** A period means
+"these rounds happened at once, judge them against a common prior", which is
+false across the two phases: an elimination round is contested by exactly the
+teams that just won their prelims. Grouped as one weekend, a season's first
+tournament pays the same for beating the eventual champion as for beating an
+0-5 team, because every opponent is still at 1500, and Glicko never revisits it.
+
+Measured on the February held-out set: 63.4% to 64.0%, log loss 0.6380 to
+0.6364, and the gain sits only where either team had fewer than ten prior
+rounds. Measured on an early-season window instead -- train August-September,
+test November -- it is roughly twice that, and **elimination rounds go 54.6% to
+64.9%**, which is the failure this was aimed at: without the split the model
+predicted early elims at barely better than a coin flip. Elo and Bradley-Terry
+gain on the same rounds, so it is the information ordering rather than anything
+about Glicko.
+
+Both configurations were run twice and diffed before the numbers were quoted,
+because mistake 30 is a validation that disagreed with itself by exactly
+63.4 against 64.0. They are byte-identical run to run.
+
+The board's top 50 keeps 47 of its 50 teams; the three that change sit at ranks
+39 to 50, and 35 of the 47 move by a place or several. The top 15 is unmoved.
+
 **Repository shape.** `scripts/` split into `pipeline/`, `measure/` and
 `probe/` — nine of the twenty-six were in no npm script at all. The README is
 now a public-facing document; the runbook moved to
@@ -163,7 +186,11 @@ Everything in the previous handoff still applies —
 ## Next
 
 1. **Rewrite the methodology page** on `method-rewrite`. It is the only page the
-   public site does not have.
+   public site does not have. **Its validation table is now stale**: it carries
+   63.4%, 0.6380, a 3.7-point gap and a 1.2-to-6.1 interval, all measured before
+   two-period rating. The current figures are 64.0%, 0.6364, 4.3 points and 1.9
+   to 6.7. Regenerate them from a run rather than hand-editing, and the same
+   goes for the Elo gap and the shrink-before-predicting comparison.
 2. **Watch the first real tournament.** Harvard is Sept 5-6, and a season
    holding exactly one tournament has still never run. The site does not update
    when the tournament ends — it updates when the league writes a results link

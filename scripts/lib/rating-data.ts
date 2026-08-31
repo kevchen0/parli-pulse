@@ -237,9 +237,59 @@ export async function loadRatingData(db: Db, season: string): Promise<RatingData
     (byTournament.get(tid) ?? byTournament.set(tid, []).get(tid)!).push(r);
   }
 
+  /**
+   * Split each tournament into a prelim period and an elim period.
+   *
+   * A period means "these rounds happened at once, judge them against a common
+   * prior", which is true inside prelims and inside elims and false across the
+   * two: an elimination round is contested by exactly the teams that just won
+   * their prelims. Grouping the weekend into one period asserts the final
+   * happened at the same time as round 1, so at a season's first tournament --
+   * where every opponent is still at 1500 -- beating the eventual champion pays
+   * the same as beating an 0-5 team, and Glicko never revisits it.
+   *
+   * Split, prelims resolve first and elims are then judged against ratings the
+   * same weekend earned.
+   *
+   * Measured on the 2,209 held-out rounds from February 2026: Glicko-2 goes
+   * from 63.4% to 64.0% accuracy and 0.6380 to 0.6364 log loss. The gain sits
+   * where the mechanism says it should -- rounds where either team had fewer
+   * than ten prior rounds improve 63.4% to 64.3%, and rounds where both were
+   * already well measured do not improve at all. Small, and in the right place
+   * for the right reason.
+   *
+   * `SPLIT_PHASES=0` restores one period per tournament, which is how the
+   * comparison above was run.
+   */
+  const splitPhases = process.env.SPLIT_PHASES !== '0';
+
   const periods = [...byTournament]
-    .map(([id, rs]) => ({ id, date: tournamentDates.get(id) ?? NO_DATE, rounds: rs }))
-    .sort((x, y) => (x.date === y.date ? x.id.localeCompare(y.id) : x.date.localeCompare(y.date)));
+    .flatMap(([id, rs]) => {
+      const date = tournamentDates.get(id) ?? NO_DATE;
+      if (!splitPhases) {
+        return [{ id, tournamentId: id, date, final: true, rounds: rs, phase: 0 }];
+      }
+      const prelims = rs.filter((r) => r.kind === 'prelim');
+      const elims = rs.filter((r) => r.kind === 'elim');
+      const out: { id: string; tournamentId: string; date: string; final: boolean; rounds: RatedRound[]; phase: number }[] = [];
+      if (prelims.length) {
+        out.push({ id: `${id}:prelim`, tournamentId: id, date, final: elims.length === 0, rounds: prelims, phase: 0 });
+      }
+      if (elims.length) {
+        out.push({ id: `${id}:elim`, tournamentId: id, date, final: true, rounds: elims, phase: 1 });
+      }
+      return out;
+    })
+    // Date, then tournament, then phase. Sorting on the id alone would put an
+    // `:elim` period before its own `:prelim`, which is the whole thing
+    // backwards.
+    .sort((x, y) =>
+      x.date !== y.date
+        ? x.date.localeCompare(y.date)
+        : x.tournamentId !== y.tournamentId
+          ? x.tournamentId.localeCompare(y.tournamentId)
+          : x.phase - y.phase)
+    .map(({ phase, ...p }) => p);
 
   return { periods, rounds, members, tournamentsFor, tournamentNames, tournamentDates, skipped };
 }

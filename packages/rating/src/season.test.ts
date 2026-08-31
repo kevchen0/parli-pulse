@@ -22,7 +22,7 @@ const round = (
 });
 
 const period = (id: string, date: string, rounds: RatedRound[]): RatingPeriod => ({
-  id, date, rounds,
+  id, tournamentId: id, date, final: true, rounds,
 });
 
 describe('SeasonRun', () => {
