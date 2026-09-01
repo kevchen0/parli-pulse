@@ -331,11 +331,11 @@ Everything in the previous handoff still applies —
 ## Waiting on the user
 
 - **`packages/ingest/src/manual-results.ts` holds data that is in no public
-  source.** 28 of its 41 entries are `source: 'reported'` — the Ridge Debates
+  source.** 28 of its 40 entries are `source: 'reported'` — the Ridge Debates
   field, supplied by the league — and the file's own
   `INCOMPLETE_TOURNAMENTS` note says "the rest exist in no public source". That
   is 56 minors' surnames with school and placement, committed to a public MIT
-  repo. The other 13 entries are `speechwire` and are fine. Two problems: it
+  repo. The other 12 entries are `speechwire` and are fine. Two problems: it
   fails the stated bar of publishing only what Tabroom or SpeechWire already
   carry, and a removal request cannot reach it, because suppression is a column
   in the database and this is a file. Moving the reported rows to a gitignored

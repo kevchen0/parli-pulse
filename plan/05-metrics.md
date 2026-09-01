@@ -85,16 +85,16 @@ Held-out test, 2,209 rounds from February 2026 on:
 | Season win rate to date | 60.0% | 0.6543 | 0.2313 |
 | **Elo, K swept to 48** | **60.6%** | **0.6559** | **0.2319** |
 | Bradley-Terry on pairs | 61.2% | 0.6505 | 0.2296 |
+| Glicko-2, shrunk | 62.6% | 0.6638 | 0.2356 |
+| **Glicko-2** | **63.4%** | **0.6380** | **0.2235** |
+| Bradley-Terry on people | 64.5% | 0.6290 | 0.2198 |
+
 > **These figures predate two-period rating.** Every number in this section was
 > measured with one rating period per tournament. Splitting a tournament into
 > prelims and elims moves Glicko-2 to 64.0% and 0.6364 on the same held-out set,
 > the Elo gap to 2.9 points, and the margin over Article XXI points to 4.3
 > (95% 1.9 to 6.7). The comparisons *between* variants below have not been
 > re-derived and should be, before any of them is quoted again.
-
-| Glicko-2, shrunk | 62.6% | 0.6638 | 0.2356 |
-| **Glicko-2** | **63.4%** | **0.6380** | **0.2235** |
-| Bradley-Terry on people | 64.5% | 0.6290 | 0.2198 |
 
 **Elo is the row that prices the design.** Added 2026-08-28, because Glicko-2
 had been measured against the league's points, a win rate and Bradley-Terry but
@@ -106,8 +106,9 @@ on the training split like every other fitted parameter, so this is Elo at its
 best. It costs **2.8 points of accuracy and 0.018 of log loss**, and that gap is
 what the deviation buys.
 
-The accuracy gap is 3.6 points, 95% interval 1.2 to 6.0 on a paired bootstrap —
-real but not comfortable. The log loss gap of 0.029 is the surer finding and
+The accuracy gap, one period per tournament, is 3.6 points, 95% interval 1.2 to
+6.0 on a paired bootstrap — real but not comfortable. (Two-period rating takes
+it to 4.3, 1.9 to 6.7, per the note above.) The log loss gap of 0.029 is the surer finding and
 never reversed in two thousand resamples: the rating is better calibrated than
 it is decisive, which is what a system carrying its own uncertainty should look
 like.
@@ -120,8 +121,6 @@ Two results worth keeping:
 - **The rating's margin is widest where evidence is thinnest.** On rounds where
   both teams had ten or more prior rounds it leads points by 2.0; on rounds
   where either had fewer, by 2.2. That is the seeding below doing its work.
-
-### What it is made of
 
 ### Why a tournament is two periods
 
@@ -147,9 +146,11 @@ Mistake 30 is a validation that disagreed with itself by exactly 63.4 against
 64.0; the runs here are byte-identical, so the collision is a coincidence.
 `SPLIT_PHASES=0` restores one period per tournament.
 
+### What it is made of
+
 Rating the **partnership**, two rating periods per tournament -- prelims then
-elims -- every round inside
-a period judged against the ratings held before it began.
+elims -- every round inside a period judged against the ratings held before it
+began.
 
 Three departures from plain Glicko-2, each measured on the January split rather
 than chosen:
@@ -163,9 +164,11 @@ than chosen:
 3. **A side correction**, read off the season rather than fixed: about −17
    rating points to proposition on 2025-26. Worth 0.0007.
 
-`tau` was swept and moves nothing at four decimal places — with periods one
-tournament long the volatility has no time to change — so it stays at
-Glickman's default.
+`tau` was swept and moves nothing at four decimal places — a period is far too
+short for the volatility to change — so it stays at Glickman's default. *Swept
+before the phase split, when a period was a whole tournament; the periods are
+shorter now, which can only strengthen the finding, but it has not been
+re-swept.*
 
 Deviation grows with time away rather than with tournaments missed, since three
 tournaments can share one weekend.

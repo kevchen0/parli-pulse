@@ -413,7 +413,7 @@ opposite directions.
 
 ### Found ingesting a tournament ahead of the sheet
 
-**46. `rollup` re-derives identity globally, and only rebuilds one season.**
+**48. `rollup` re-derives identity globally, and only rebuilds one season.**
 Loading Yale Summer Parli into an empty 2026-27 revealed that one of its
 debaters already had a record in 2025-26 under a second Tabroom id. `rollup`
 merged them, correctly, and merges are global: `debaters.canonical_id` is not
@@ -469,7 +469,7 @@ Ranked by yield:
 8. **Snapshotting the thing you are not changing.** Running the pipeline for an
    empty season should have touched nothing else. Diffing 2025-26 before and
    after is what exposed #35 and #36, neither of which changed anything visible.
-   #46 needed one more thing on top of the counts: an integrity query, because
+   #48 needed one more thing on top of the counts: an integrity query, because
    every count was identical and the fault was which id a row hung from.
 9. **Reading a page as a machine would.** #40 was invisible to every check that
    looked at the rendered page, which was correct throughout. One `curl -w

@@ -25,7 +25,8 @@ costs, not of a better engine. What the sheet still supplies is audited in
 ## 1. Tournaments that do not use Tabroom
 
 Results are entered by hand in `packages/ingest/src/manual-results.ts` with
-`source` recorded — **41 results across three tournaments**. Each is a claim we
+`source` recorded — **40 results across three tournaments**, 28 `reported` and
+12 `speechwire`. Each is a claim we
 cannot verify against a source we control, so keep the list short and prefer
 fixing ingestion wherever a result exists somewhere. **These need updating every
 season.**
