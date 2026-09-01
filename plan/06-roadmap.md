@@ -72,13 +72,13 @@ both centre and spread shrunk toward the field by sample size.
 
 ### Phase 5 — Glicko-2 with a field prior
 Partnership ratings at `/<season>/ratings`, ordered on the rating shrunk toward
-the field by its deviation, gated at ten rated rounds. Method written for a
+the field by its deviation, gated at five rated rounds -- one tournament. Method written for a
 reader at `/method#rating`, now behind the placeholder.
 
 The gate was that it beat "higher Article XXI points wins" on held-out rounds
 or be reported as a failure. On 2,209 rounds from February 2026 onward it
 predicted 64.0% against the league ranking's 59.7%, at a log loss of 0.636
-against 0.667 — a 3.6 point gap, 95% interval 1.2 to 6.0 on a paired bootstrap.
+against 0.667 — a 4.3 point gap, 95% interval 1.9 to 6.7 on a paired bootstrap.
 The log loss gap is the surer of the two.
 
 The board is ordered on the shrunk figure and predictions use the raw one.
@@ -89,7 +89,7 @@ predicting makes prediction worse, because the win probability already widens by
 both deviations. Two dead ends are recorded in [05-metrics.md](05-metrics.md) so
 they are not retried.
 
-7,699 rated rounds over 78 tournaments and 1,776 partnerships, of which 387
+7,699 rated rounds over 78 tournaments and 1,779 partnerships, of which 1,129
 clear the round gate. Method and the full comparison in
 [05-metrics.md](05-metrics.md); `npm run validate:rating` reruns it.
 
@@ -213,7 +213,12 @@ launched aggregate-first. See [08-risks-policy.md](08-risks-policy.md).
 - **Gating the reconciliation view** to maintainers. Honest and public today.
 - **Analysis scripts that hardcode `rankings.zip`.** Correct for the season
   they run against, wrong for any other.
-- **Three dead mechanisms.** `manual_overrides` has no reader or writer;
+- **Four dead mechanisms.** `manual_overrides` has no reader or writer;
   `official_tournament_stats` is written every load and read by nothing;
-  `Approval` is parsed and never consulted, so XXI.1.E/F is unenforced. Each is
-  a feature to finish or a table to delete.
+  `Approval` is parsed and never consulted, so XXI.1.E/F is unenforced; and
+  `EXCLUDED_MONTHS` / `EXCLUDED_WINDOW` are exported and imported nowhere. The
+  first three are each a feature to finish or a table to delete. The last should
+  be **deleted rather than wired up**: XXI.1.H reads as though June to August
+  score nothing, but the league scored Harvard on 2025-08-30 and our figures
+  agree with the league's, so implementing the constant would wrongly zero all
+  of them. See [00-session-log.md](00-session-log.md).

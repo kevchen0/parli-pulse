@@ -67,6 +67,21 @@ export interface RatingPeriod {
    */
   final: boolean;
   rounds: RatedRound[];
+  /**
+   * Subjects that contested a round in this period which could not be rated,
+   * and how many.
+   *
+   * A round against an opponent we cannot name -- a maverick, or an entry
+   * recovered from a ballot label carrying one debater record -- teaches the
+   * rating nothing, and it is still a round the partnership turned up and
+   * debated. Counting only rated rounds toward the gate holds a team back for
+   * who it drew, which is not a fact about the team. So these count toward
+   * admission and toward nothing else: they move no rating, they widen no
+   * deviation, and they are deliberately kept out of the calibration cohort,
+   * because a round that carried no information cannot be evidence that a
+   * partnership is well measured.
+   */
+  contested?: ReadonlyMap<string, number>;
 }
 
 export interface SeasonOptions {
@@ -202,11 +217,25 @@ export const MIN_CALIBRATION_ROUNDS = 10;
 /** A subject's rating plus the evidence behind it. */
 export interface SubjectState {
   rating: Rating;
+  /** Rounds that moved the rating. This is what calibration counts. */
   rounds: number;
+  /** Rounds debated that could not be rated. See `RatingPeriod.contested`. */
+  contested: number;
   periods: number;
   /** ISO date of the last period the subject competed in. */
   lastDate: string;
 }
+
+/**
+ * Rounds a subject has debated, rated or not -- what the admission gate counts.
+ *
+ * Deliberately not the same figure as `rounds`. Who is shown and how well
+ * measured they are were separated once already, when the round gate split into
+ * `MIN_RATED_ROUNDS` and `MIN_CALIBRATION_ROUNDS`; this is the same separation
+ * reaching one step further back, into what counts as a round at all.
+ */
+export const gateRounds = (s: Pick<SubjectState, 'rounds' | 'contested'>): number =>
+  s.rounds + s.contested;
 
 /** One subject's rating as it stood after one rating period. */
 export interface Snapshot {
@@ -219,6 +248,8 @@ export interface Snapshot {
   deviation: number;
   volatility: number;
   rounds: number;
+  /** Rounds debated but not rated, as at this period. */
+  contested: number;
 }
 
 const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -278,12 +309,21 @@ export class SeasonRun {
     return this.subjects.get(subject)?.rounds ?? 0;
   }
 
+  /** Rounds this subject has debated, rated or not -- what the gate counts. */
+  gateRoundsFor(subject: string): number {
+    const s = this.subjects.get(subject);
+    return s ? gateRounds(s) : 0;
+  }
+
   /** Every subject that has ever competed, with its rating brought to `date`. */
-  standingsAt(date: string): { subject: string; rating: Rating; rounds: number; periods: number }[] {
+  standingsAt(
+    date: string,
+  ): { subject: string; rating: Rating; rounds: number; contested: number; periods: number }[] {
     return [...this.subjects].map(([subject, s]) => ({
       subject,
       rating: this.ratingAt(subject, date),
       rounds: s.rounds,
+      contested: s.contested,
       periods: s.periods,
     }));
   }
@@ -383,6 +423,7 @@ export class SeasonRun {
       const state: SubjectState = {
         rating: next,
         rounds: (prior?.rounds ?? 0) + (roundCount.get(subject) ?? 0),
+        contested: (prior?.contested ?? 0) + (period.contested?.get(subject) ?? 0),
         periods: (prior?.periods ?? 0) + 1,
         lastDate: period.date,
       };
@@ -396,10 +437,28 @@ export class SeasonRun {
         deviation: next.deviation,
         volatility: next.volatility,
         rounds: state.rounds,
+        contested: state.contested,
       });
       for (const m of this.members.get(subject) ?? []) {
         (this.debaterSubjects.get(m) ?? this.debaterSubjects.set(m, new Set()).get(m)!).add(subject);
       }
+    }
+
+    // Subjects whose only rounds this period were ones we could not rate. They
+    // gain the round toward the gate and nothing else -- no update, and
+    // crucially no `lastDate`, so the deviation still widens across the gap.
+    // Turning up and debating a round nobody can score teaches us exactly as
+    // much as not turning up, which is the honest treatment of it.
+    for (const [subject, count] of period.contested ?? []) {
+      if (schedule.has(subject)) continue;
+      const prior = this.subjects.get(subject);
+      this.subjects.set(subject, {
+        rating: prior?.rating ?? this.seed(subject),
+        rounds: prior?.rounds ?? 0,
+        contested: (prior?.contested ?? 0) + count,
+        periods: prior?.periods ?? 0,
+        lastDate: prior?.lastDate ?? period.date,
+      });
     }
 
     this.refreshDebaters(period.date);

@@ -37,6 +37,7 @@ import {
   DEFAULT_DEVIATION,
   MIN_CALIBRATION_ROUNDS,
   MIN_RATED_ROUNDS,
+  gateRounds,
   SeasonRun,
   VALIDATED_OPTIONS,
   estimateSideAdvantage,
@@ -102,14 +103,27 @@ async function main(): Promise<void> {
     // ratings -- that is true spread plus measurement noise. Estimated from the
     // partnerships with enough rounds to be measured at all, so a field of
     // barely-seen teams cannot widen it and weaken the shrinkage for everyone.
-    const measured = standings.filter((x) => x.rounds >= CALIBRATE_ROUNDS).map((x) => x.rating);
+    // Subjects holding a rating, which is not everyone the season saw. A
+    // partnership whose every round was unratable has no rating derived from
+    // anything, and writing it 1500 at the default deviation would put pure
+    // ignorance on the board -- the site gates in SQL on `rounds_counted` and
+    // cannot tell that figure apart from a measured one. They were absent
+    // before this change and stay absent.
+    const rated = standings.filter((s) => s.rounds >= 1);
+    const unratable = standings.length - rated.length;
+
+    // Rated rounds only, deliberately. A round we could not score is evidence
+    // that a partnership turned up, not evidence that it is well measured, so
+    // it opens the gate below and must never widen the scale everything is
+    // judged against.
+    const measured = rated.filter((x) => x.rounds >= CALIBRATE_ROUNDS).map((x) => x.rating);
     const tau = fieldSpread(measured);
     const shrunk = (r: { rating: number; deviation: number }): number => shrinkToField(r, tau);
     console.log(
       `  field spread: ${tau.toFixed(1)} rating points, over ${measured.length} partnerships ` +
         `with ${CALIBRATE_ROUNDS}+ rounds`,
     );
-    standings.sort((a, b) => shrunk(b.rating) - shrunk(a.rating));
+    rated.sort((a, b) => shrunk(b.rating) - shrunk(a.rating));
 
     // Season-scoped, so clearing and rewriting is safe here -- unlike `schools`
     // and `debaters`, which are not, and must be upserted.
@@ -129,9 +143,12 @@ async function main(): Promise<void> {
         deviation: Number(h.deviation.toFixed(2)),
         volatility: Number(h.volatility.toFixed(6)),
         shrunkRating: Number(shrunk(h).toFixed(2)),
-        roundsCounted: h.rounds,
+        // The gate figure, which is what the site filters and displays on. The
+        // rated count is not stored: only this script needs it, and it needs it
+        // before any of these rows exist.
+        roundsCounted: h.rounds + h.contested,
       })),
-      ...standings.map((s) => ({
+      ...rated.map((s) => ({
         id: `rt_${SEASON}_${s.subject}_current`,
         seasonId: SEASON,
         subjectKind: 'partnership',
@@ -141,20 +158,39 @@ async function main(): Promise<void> {
         deviation: Number(s.rating.deviation.toFixed(2)),
         volatility: Number(s.rating.volatility.toFixed(6)),
         shrunkRating: Number(shrunk(s.rating).toFixed(2)),
-        roundsCounted: s.rounds,
+        roundsCounted: gateRounds(s),
       })),
     ];
 
     for (let i = 0; i < rows.length; i += 500) {
       await db.insert(t.ratings).values(rows.slice(i, i + 500) as never);
     }
-    console.log(`\nwrote ${rows.length} rows (${standings.length} current, ${run.history.length} historical)`);
+    console.log(`\nwrote ${rows.length} rows (${rated.length} current, ${run.history.length} historical)`);
 
-    const ranked = standings.filter((s) => s.rounds >= GATE_ROUNDS);
+    // Rounds debated, rated or not. A partnership is not held back by having
+    // drawn a maverick; it is held back by having no rating at all, which is
+    // what the `rounds >= 1` clause says. Without it a team whose every round
+    // was unratable would clear the gate carrying the default deviation, and
+    // the shrinkage would seat that pure ignorance in the middle of the board.
+    // Rounds debated, rated or not. A partnership is not held back by having
+    // drawn a maverick: that is a fact about the pairing, not about the team.
+    const ranked = rated.filter((s) => gateRounds(s) >= GATE_ROUNDS);
+    const onRated = rated.filter((s) => s.rounds >= GATE_ROUNDS).length;
     console.log(
-      `${ranked.length} of ${standings.length} partnerships clear ${GATE_ROUNDS} rounds ` +
-        `(${((100 * ranked.length) / standings.length).toFixed(0)}%)`,
+      `${ranked.length} of ${rated.length} partnerships clear ${GATE_ROUNDS} rounds ` +
+        `(${((100 * ranked.length) / rated.length).toFixed(0)}%)`,
     );
+    const contestedTotal = rated.reduce((a, s) => a + s.contested, 0);
+    if (contestedTotal > 0) {
+      console.log(
+        `  ${contestedTotal} unratable rounds counted toward the gate across ` +
+          `${rated.filter((s) => s.contested > 0).length} partnerships; ` +
+          `${ranked.length - onRated} reach the gate only with them`,
+      );
+    }
+    if (unratable > 0) {
+      console.log(`  ${unratable} partnerships had no ratable round at all and get no row`);
+    }
 
     const names = await loadPartnershipNames(db, ranked.slice(0, 20).map((s) => s.subject));
     console.log(`\ntop 20 as of ${asOf}, ranked on the shrunk rating:\n`);

@@ -225,11 +225,15 @@ them deliberately is unresolved, and worth asking the Reporting Director.
   the speaker points. Mixing divisions would place a team above opponents it
   could never meet, and the extra evidence would be evidence about a different
   competition.
-- **Minimum rounds before a partnership appears on the rating board** — ten.
-  387 of 1,779 rated partnerships clear it. Every partnership keeps a rating and
-  a deviation regardless; the gate decides only who is ranked. It matters less
-  than it looked, because the board is ordered on the rating *less* its
-  deviation, which already pushes thin ratings down rather than out.
+- **Minimum rounds before a partnership appears on the rating board** — **five**,
+  one tournament, revised from ten on 2026-08-31. 1,129 of 1,779 rated
+  partnerships clear it, against 387 at ten. Every partnership keeps a rating and
+  a deviation regardless; the gate decides only who is ranked. The move required
+  splitting one constant into two, because `fieldSpread` was calibrating tau on
+  whoever cleared the same gate: `MIN_RATED_ROUNDS` is five and
+  `MIN_CALIBRATION_ROUNDS` stays ten. Lowering both together collapses tau from
+  117 to 72 and reorders twelve of the top twenty. See
+  [05-metrics.md](05-metrics.md), "Two gates, not one".
 - **Whether elim rounds need extra weight** — no, and neither do large fields.
   Elim opponents average 53% more season points, so an opponent-adjusted rating
   already pays more for beating them; a multiplier would count the same fact
@@ -256,9 +260,6 @@ them deliberately is unresolved, and worth asking the Reporting Director.
   partner, per XXI.8.A. Not averaged between partners.
 - **Speaker pools** — open divisions only, and novice kept separate. Judges
   score novice rounds differently; mixing distorts both.
-- **Minimum ballots to rank a speaker** — 20. From the data: the spread of
-  season means is 0.75 sd among debaters with ten ballots or fewer, 0.52 by
-  twenty, 0.41 by thirty.
 - **Punitive sub-25 scores** — kept in a debater's own average, since they are
   real results, but never surfaced as such. Robust judge statistics stop one
   from distorting everyone else. See [08-risks-policy.md](08-risks-policy.md).

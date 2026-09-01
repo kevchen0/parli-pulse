@@ -143,13 +143,13 @@ export default function RatingTable({
               <th>#</th>
               <th>School</th>
               <th>Partnership</th>
-              <SortHeader label="Rounds" notes={[]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} num />
-              <SortHeader label="Rating" notes={[2]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} num />
-              <SortHeader label="Raw estimate" notes={[3]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} num />
+              <SortHeader label="Rounds" notes={[2]} active={sort === 'rounds'} direction={direction} onClick={() => toggle('rounds')} num />
+              <SortHeader label="Rating" notes={[3]} active={sort === 'shown'} direction={direction} onClick={() => toggle('shown')} num />
+              <SortHeader label="Raw estimate" notes={[4]} active={sort === 'rating'} direction={direction} onClick={() => toggle('rating')} num />
               <th className="num">
                 <span className="sorthead">
                   XXI rank
-                  <FootnoteRef notes={[4]} />
+                  <FootnoteRef notes={[5]} />
                 </span>
               </th>
             </tr>

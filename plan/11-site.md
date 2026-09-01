@@ -62,10 +62,15 @@ correct:
 - **An MIT licence**, with a README note that it covers the code and not the
   data, and that a fork does not inherit the removal requests honoured here.
 - **Link previews work.** Preview bots are allowed where search crawlers were
-  not, and the card renders the top six of the ratings board from live data
-  rather than describing the site.
-- **The site is findable on Google**, profiles excepted. Sitemap built from the
-  database, so a new season appears the day it opens.
+  not, and the card is the ratings page itself -- masthead, unofficial line,
+  season bar, section tabs and the board, drawn with the stylesheet's own
+  measurements and palette and set in the site's own faces, clipping mid-row at
+  the bottom the way a screenshot of the top of a page does. A window onto the
+  page rather than a poster about it.
+- **The site is open to Google**, profiles excepted. Sitemap built from the
+  database, so a new season appears the day it opens. *Open is not the same as
+  found*: as of 2026-08-31 nothing of ours is indexed at all. See the session
+  log for the four reasons and which one is a code fix.
 - **The methodology page is held back.** Rebuilt with three sections, MathML
   equations and a live agreement table, then replaced on `main` with "Coming
   soon!" because parts of it were not clear enough to publish. The full version

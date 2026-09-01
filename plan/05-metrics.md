@@ -85,16 +85,16 @@ Held-out test, 2,209 rounds from February 2026 on:
 | Season win rate to date | 60.0% | 0.6543 | 0.2313 |
 | **Elo, K swept to 48** | **60.6%** | **0.6559** | **0.2319** |
 | Bradley-Terry on pairs | 61.2% | 0.6505 | 0.2296 |
+| Glicko-2, shrunk | 62.6% | 0.6638 | 0.2356 |
+| **Glicko-2** | **63.4%** | **0.6380** | **0.2235** |
+| Bradley-Terry on people | 64.5% | 0.6290 | 0.2198 |
+
 > **These figures predate two-period rating.** Every number in this section was
 > measured with one rating period per tournament. Splitting a tournament into
 > prelims and elims moves Glicko-2 to 64.0% and 0.6364 on the same held-out set,
 > the Elo gap to 2.9 points, and the margin over Article XXI points to 4.3
 > (95% 1.9 to 6.7). The comparisons *between* variants below have not been
 > re-derived and should be, before any of them is quoted again.
-
-| Glicko-2, shrunk | 62.6% | 0.6638 | 0.2356 |
-| **Glicko-2** | **63.4%** | **0.6380** | **0.2235** |
-| Bradley-Terry on people | 64.5% | 0.6290 | 0.2198 |
 
 **Elo is the row that prices the design.** Added 2026-08-28, because Glicko-2
 had been measured against the league's points, a win rate and Bradley-Terry but
@@ -106,8 +106,9 @@ on the training split like every other fitted parameter, so this is Elo at its
 best. It costs **2.8 points of accuracy and 0.018 of log loss**, and that gap is
 what the deviation buys.
 
-The accuracy gap is 3.6 points, 95% interval 1.2 to 6.0 on a paired bootstrap —
-real but not comfortable. The log loss gap of 0.029 is the surer finding and
+The accuracy gap, one period per tournament, is 3.6 points, 95% interval 1.2 to
+6.0 on a paired bootstrap — real but not comfortable. (Two-period rating takes
+it to 4.3, 1.9 to 6.7, per the note above.) The log loss gap of 0.029 is the surer finding and
 never reversed in two thousand resamples: the rating is better calibrated than
 it is decisive, which is what a system carrying its own uncertainty should look
 like.
@@ -121,10 +122,35 @@ Two results worth keeping:
   both teams had ten or more prior rounds it leads points by 2.0; on rounds
   where either had fewer, by 2.2. That is the seeding below doing its work.
 
+### Why a tournament is two periods
+
+A rating period means "these rounds happened at once, judge them against a
+common prior". True inside prelims, true inside elims, false across the two: an
+elimination round is contested by exactly the teams that just won their prelims.
+Grouped as one weekend, a season's first tournament pays the same for beating
+the eventual champion as for beating an 0-5 team, because every opponent is
+still sitting at 1500 -- and Glicko is a forward-only filter, so that flat
+weekend propagates rather than being revisited.
+
+Measured on the February held-out set: **63.4% to 64.0%** accuracy, 0.6380 to
+0.6364 log loss, with the gain only where either team had fewer than ten prior
+rounds and none at all where both were well measured. Measured on an early
+window instead -- train August-September, test November -- it is roughly twice
+that, and **elimination rounds go 54.6% to 64.9%**. Without the split the model
+predicted early elims at barely better than a coin flip. Elo and Bradley-Terry
+gain on the same rounds, so this is the information ordering rather than
+anything about Glicko.
+
+Both configurations were run twice and diffed before these numbers were quoted.
+Mistake 30 is a validation that disagreed with itself by exactly 63.4 against
+64.0; the runs here are byte-identical, so the collision is a coincidence.
+`SPLIT_PHASES=0` restores one period per tournament.
+
 ### What it is made of
 
-Rating the **partnership**, one rating period per tournament, every round inside
-a period judged against the ratings held before it began.
+Rating the **partnership**, two rating periods per tournament -- prelims then
+elims -- every round inside a period judged against the ratings held before it
+began.
 
 Three departures from plain Glicko-2, each measured on the January split rather
 than chosen:
@@ -138,9 +164,11 @@ than chosen:
 3. **A side correction**, read off the season rather than fixed: about −17
    rating points to proposition on 2025-26. Worth 0.0007.
 
-`tau` was swept and moves nothing at four decimal places — with periods one
-tournament long the volatility has no time to change — so it stays at
-Glickman's default.
+`tau` was swept and moves nothing at four decimal places — a period is far too
+short for the volatility to change — so it stays at Glickman's default. *Swept
+before the phase split, when a period was a whole tournament; the periods are
+shorter now, which can only strengthen the finding, but it has not been
+re-swept.*
 
 Deviation grows with time away rather than with tournaments missed, since three
 tournaments can share one weekend.
@@ -171,11 +199,36 @@ subtraction a partnership rises by being confirmed as well as by winning.
 Predictions still use the rating itself. For a prediction the uncertainty
 belongs in the width of the answer, not in the estimate.
 
-Partnerships below **ten rated rounds** keep a rating and a deviation but are
-not ranked: 387 of 1,776 clear the line. That figure is much harsher than the
-"47% under ten rounds" measured above, because that measurement counted only
-partnerships the league scores; the rating sees every team in an open room,
-including the many from outside NPDL who appear once.
+### Two gates, not one
+
+Partnerships below **five rated rounds** keep a rating and a deviation but are
+not ranked: 1,129 of 1,779 clear the line. Five rounds is one tournament, and
+that is deliberate -- a team that entered once has been measured, and plenty
+enter once all season. They are exactly the teams with no other way to see where
+they stand.
+
+The gate could not simply move from ten to five, because it was two decisions
+sharing a constant. `fieldSpread` recovers the spread of true strengths by
+subtracting mean squared deviation from observed variance, and it was estimating
+that from whoever cleared the same gate. Handing it 742 partnerships averaging a
+deviation of 166 subtracts a noise term of 27,000-odd and returns a spread far
+smaller than the league's: **tau falls from 117 to 72, the top of the board falls
+from 1826 to 1731, and twelve of the top twenty reorder** -- not because anyone
+new arrived, but because every existing rating was re-weighted against a scale
+that had collapsed. That is the reordering that made a lower gate look
+unworkable, and it was never about the newcomers.
+
+So `MIN_CALIBRATION_ROUNDS` stays at ten and `MIN_RATED_ROUNDS` is five. Who is
+shown and what the numbers mean are separate questions. Separated, the top
+twenty is identical to the ten-round board in all twenty places, and five
+partnerships with under ten rounds appear in the top fifty on the strength of
+their own shrunken ratings.
+
+A live season has nobody at ten rounds until its third or fourth weekend, so
+`fieldSpread` falls back to a default of 350 and the shrinkage is close to off.
+That is visible on 2026-27 now and is an open question, not a settled design:
+tau is a property of the league rather than of how far a season has got, and the
+previous season's figure would be a better fallback than a constant.
 
 ### What is not rated, and why
 

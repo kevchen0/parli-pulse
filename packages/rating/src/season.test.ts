@@ -195,3 +195,91 @@ describe('SeasonRun', () => {
     expect(at.get('A')!).toBeGreaterThan(at.get('C')!);
   });
 });
+
+describe('contested rounds', () => {
+  /** A period holding both ratable rounds and rounds we could not rate. */
+  const mixed = (
+    id: string,
+    date: string,
+    rounds: RatedRound[],
+    contested: Record<string, number>,
+  ): RatingPeriod => ({
+    id, tournamentId: id, date, final: true, rounds,
+    contested: new Map(Object.entries(contested)),
+  });
+
+  it('counts toward the gate without touching the rating', () => {
+    const rounds = [round('r1', 'A', 'B', true)];
+    const plain = runSeason([mixed('t1', '2025-09-06', rounds, {})], new Map());
+    const withMav = runSeason([mixed('t1', '2025-09-06', rounds, { A: 3 })], new Map());
+
+    // The whole point: the gate moves, the rating does not.
+    expect(withMav.gateRoundsFor('A')).toBe(plain.gateRoundsFor('A') + 3);
+    expect(withMav.roundsFor('A')).toBe(plain.roundsFor('A'));
+    expect(withMav.ratingAt('A', '2025-09-06')).toEqual(plain.ratingAt('A', '2025-09-06'));
+  });
+
+  it('leaves the deviation alone, so an unratable round buys no certainty', () => {
+    const rounds = [round('r1', 'A', 'B', true)];
+    const plain = runSeason([mixed('t1', '2025-09-06', rounds, {})], new Map());
+    const withMav = runSeason([mixed('t1', '2025-09-06', rounds, { A: 5 })], new Map());
+    expect(withMav.ratingAt('A', '2025-09-06').deviation)
+      .toBeCloseTo(plain.ratingAt('A', '2025-09-06').deviation, 10);
+  });
+
+  it('keeps them out of the rated count that calibration reads', () => {
+    const run = runSeason(
+      [mixed('t1', '2025-09-06', [round('r1', 'A', 'B', true)], { A: 9 })],
+      new Map(),
+    );
+    // Ten gate rounds, one rated. Calibration must see the one.
+    expect(run.gateRoundsFor('A')).toBe(10);
+    expect(run.roundsFor('A')).toBe(1);
+  });
+
+  it('tracks a subject whose only rounds were unratable', () => {
+    const run = runSeason([mixed('t1', '2025-09-06', [], { Z: 5 })], new Map());
+    expect(run.gateRoundsFor('Z')).toBe(5);
+    // No rating came from anywhere, so it must still read as entirely unknown.
+    expect(run.roundsFor('Z')).toBe(0);
+    expect(run.ratingAt('Z', '2025-09-06').rating).toBe(DEFAULT_RATING);
+    expect(run.ratingAt('Z', '2025-09-06').deviation).toBe(DEFAULT_DEVIATION);
+  });
+
+  it('still widens the deviation across a period spent only on unratable rounds', () => {
+    // Turning up to a round nobody can score teaches us exactly as much as not
+    // turning up, so the deviation must grow as though the subject were away.
+    const rounds = [round('r1', 'A', 'B', true)];
+    const run = runSeason(
+      [
+        mixed('t1', '2025-09-06', rounds, {}),
+        mixed('t2', '2025-11-06', [], { A: 4 }),
+      ],
+      new Map(),
+    );
+    const at = run.ratingAt('A', '2025-11-06');
+    const before = runSeason([mixed('t1', '2025-09-06', rounds, {})], new Map());
+    expect(at.deviation).toBeGreaterThan(before.ratingAt('A', '2025-09-06').deviation);
+    expect(run.gateRoundsFor('A')).toBe(5);
+  });
+
+  it('accumulates across periods', () => {
+    const run = runSeason(
+      [
+        mixed('t1', '2025-09-06', [round('r1', 'A', 'B', true)], { A: 2 }),
+        mixed('t2', '2025-10-06', [round('r2', 'A', 'B', false)], { A: 1 }),
+      ],
+      new Map(),
+    );
+    expect(run.roundsFor('A')).toBe(2);
+    expect(run.gateRoundsFor('A')).toBe(5);
+  });
+
+  it('is inert when a period declares none', () => {
+    const rounds = [round('r1', 'A', 'B', true)];
+    const a = runSeason([period('t1', '2025-09-06', rounds)], new Map());
+    const b = runSeason([mixed('t1', '2025-09-06', rounds, {})], new Map());
+    expect(a.gateRoundsFor('A')).toBe(b.gateRoundsFor('A'));
+    expect(a.ratingAt('A', '2025-09-06')).toEqual(b.ratingAt('A', '2025-09-06'));
+  });
+});
