@@ -181,6 +181,18 @@ export async function loadRatingData(db: Db, season: string): Promise<RatingData
   const tournamentNames = new Map<string, string>();
   const tournamentDates = new Map<string, string>();
   const tournamentsFor = new Map<string, string[]>();
+  /** `tournamentId|kind` -> subject -> rounds contested but not rated. */
+  const contested = new Map<string, Map<string, number>>();
+
+  /** Registers a subject we have seen, whether or not the round was ratable. */
+  const seen = (key: string, row: BallotRow): void => {
+    members.set(key, key.split('|'));
+    tournamentNames.set(row.tournamentId, row.tournamentName);
+    tournamentDates.set(row.tournamentId, row.date ?? NO_DATE);
+    const list = tournamentsFor.get(key) ?? [];
+    if (!list.includes(row.tournamentId)) list.push(row.tournamentId);
+    tournamentsFor.set(key, list);
+  };
 
   for (const [sectionId, sides] of bySection) {
     if (sides.some((s) => s.isBye)) { skipped.byes += 1; continue; }
@@ -191,27 +203,42 @@ export async function loadRatingData(db: Db, season: string): Promise<RatingData
     // holds six rows and the panel size is the count on one side, not the sum.
     // Getting this wrong reads every single-judge round as a 1-1 tie.
     const panel = Math.max(a.decided, b.decided);
-    if (panel === 0) { skipped.undecided += 1; continue; }
-    // The majority, over the decided ballots only. An even split is not a
-    // result: in practice it is a three-judge panel with a ballot missing.
-    if (a.won * 2 === panel) { skipped.tied += 1; continue; }
-
+    // Resolved before the section is classified, so a round we cannot rate can
+    // still be credited to whichever side we *can* name.
     const keyA = resolve(a.entryId);
     const keyB = resolve(b.entryId);
-    if (!keyA || !keyB) { skipped.unknownTeam += 1; continue; }
+
+    /**
+     * Records a round that was debated and cannot be rated.
+     *
+     * It counts toward the admission gate and nothing else. A partnership that
+     * drew a maverick, or an opponent recovered from a ballot label carrying one
+     * debater record, turned up and debated a round; holding that against them
+     * gates on who they were paired with, which is not a fact about them. The
+     * round still moves no rating, because there is nothing in it to move one.
+     */
+    const contest = (): void => {
+      const bucket = `${a.tournamentId}|${a.kind}`;
+      const m = contested.get(bucket) ?? contested.set(bucket, new Map()).get(bucket)!;
+      for (const [k, row] of [[keyA, a], [keyB, b]] as const) {
+        if (!k) continue;
+        m.set(k, (m.get(k) ?? 0) + 1);
+        seen(k, row);
+      }
+    };
+
+    if (panel === 0) { skipped.undecided += 1; contest(); continue; }
+    // The majority, over the decided ballots only. An even split is not a
+    // result: in practice it is a three-judge panel with a ballot missing.
+    if (a.won * 2 === panel) { skipped.tied += 1; contest(); continue; }
+    if (!keyA || !keyB) { skipped.unknownTeam += 1; contest(); continue; }
     // Two registrations resolving to one pair, which happens when a partnership
-    // enters twice. There is nothing to learn from a team beating itself.
+    // enters twice. There is nothing to learn from a team beating itself, and
+    // nothing was really contested either, so it earns no credit.
     if (keyA === keyB) { skipped.selfMatch += 1; continue; }
 
-    members.set(keyA, keyA.split('|'));
-    members.set(keyB, keyB.split('|'));
-    tournamentNames.set(a.tournamentId, a.tournamentName);
-    tournamentDates.set(a.tournamentId, a.date ?? NO_DATE);
-    for (const k of [keyA, keyB]) {
-      const list = tournamentsFor.get(k) ?? [];
-      if (!list.includes(a.tournamentId)) list.push(a.tournamentId);
-      tournamentsFor.set(k, list);
-    }
+    seen(keyA, a);
+    seen(keyB, b);
 
     rounds.push({
       id: sectionId,
@@ -263,20 +290,42 @@ export async function loadRatingData(db: Db, season: string): Promise<RatingData
    */
   const splitPhases = process.env.SPLIT_PHASES !== '0';
 
-  const periods = [...byTournament]
-    .flatMap(([id, rs]) => {
+  /** Merges the contested tallies for a set of buckets into one map. */
+  const contestedFor = (...buckets: string[]): Map<string, number> => {
+    const out = new Map<string, number>();
+    for (const b of buckets) {
+      for (const [k, n] of contested.get(b) ?? []) out.set(k, (out.get(k) ?? 0) + n);
+    }
+    return out;
+  };
+
+  // Every tournament that produced a contested round needs a period even if it
+  // produced no ratable one, or the credit has nowhere to live.
+  const tournamentIds = new Set([
+    ...byTournament.keys(),
+    ...[...contested.keys()].map((b) => b.slice(0, b.lastIndexOf('|'))),
+  ]);
+
+  const periods = [...tournamentIds]
+    .flatMap((id) => {
+      const rs = byTournament.get(id) ?? [];
       const date = tournamentDates.get(id) ?? NO_DATE;
       if (!splitPhases) {
-        return [{ id, tournamentId: id, date, final: true, rounds: rs, phase: 0 }];
+        return [{
+          id, tournamentId: id, date, final: true, rounds: rs, phase: 0,
+          contested: contestedFor(`${id}|prelim`, `${id}|elim`),
+        }];
       }
       const prelims = rs.filter((r) => r.kind === 'prelim');
       const elims = rs.filter((r) => r.kind === 'elim');
-      const out: { id: string; tournamentId: string; date: string; final: boolean; rounds: RatedRound[]; phase: number }[] = [];
-      if (prelims.length) {
-        out.push({ id: `${id}:prelim`, tournamentId: id, date, final: elims.length === 0, rounds: prelims, phase: 0 });
+      const cPrelim = contestedFor(`${id}|prelim`);
+      const cElim = contestedFor(`${id}|elim`);
+      const out: { id: string; tournamentId: string; date: string; final: boolean; rounds: RatedRound[]; phase: number; contested: Map<string, number> }[] = [];
+      if (prelims.length || cPrelim.size) {
+        out.push({ id: `${id}:prelim`, tournamentId: id, date, final: elims.length === 0 && cElim.size === 0, rounds: prelims, phase: 0, contested: cPrelim });
       }
-      if (elims.length) {
-        out.push({ id: `${id}:elim`, tournamentId: id, date, final: true, rounds: elims, phase: 1 });
+      if (elims.length || cElim.size) {
+        out.push({ id: `${id}:elim`, tournamentId: id, date, final: true, rounds: elims, phase: 1, contested: cElim });
       }
       return out;
     })

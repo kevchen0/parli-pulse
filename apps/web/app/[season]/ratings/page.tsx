@@ -50,7 +50,7 @@ async function RatingsBoard({ season, initialQuery }: { season: string; initialQ
       <p className="meta">
         <span>
           <b>{summary.ranked}</b> {plural(summary.ranked, 'partnership')} with {MIN_RATED_ROUNDS} or more rounds
-          <FootnoteRef notes={[1]} />
+          <FootnoteRef notes={[1, 2]} />
         </span>
         <span><b>{summary.rankedRounds.toLocaleString()}</b> {plural(summary.rankedRounds, 'round')} behind them</span>
         <span><b>{summary.periods}</b> {plural(summary.periods, 'tournament')} rated</span>
@@ -62,14 +62,25 @@ async function RatingsBoard({ season, initialQuery }: { season: string; initialQ
 
       <ol className="footnotes">
         <li id="fn1">
-          {MIN_RATED_ROUNDS} rated rounds is one tournament, which is what it takes to be
-          ranked. Below that there is not a tournament&rsquo;s worth of evidence to place a
+          {MIN_RATED_ROUNDS} rounds is one tournament, which is what it takes to be ranked.
+          Below that there is not a tournament&rsquo;s worth of evidence to place a
           partnership against the field at all. Everyone keeps a rating either way, and
           the board is ordered on the rating pulled toward the field average, so a
           partnership with few rounds sits near the middle of the field until it has
           confirmed more rather than riding a short run.
         </li>
         <li id="fn2">
+          A round counts here even where it could not be rated. Some opponents cannot be
+          named &mdash; a maverick debating alone, or an entry we know only half of &mdash;
+          and a round against one carries nothing to move a rating by. It is still a round
+          the partnership turned up and debated, and holding it against them would gate on
+          who they were paired with rather than on anything they did. So those rounds open
+          the gate and do nothing else: they move no rating and they narrow no deviation,
+          which is why a partnership that met several of them shows a wider &plusmn; than
+          its round count suggests. A partnership with no ratable round at all is not
+          ranked, because there would be no rating to show.
+        </li>
+        <li id="fn3">
           <b>Rating</b> is the raw estimate moved toward the field average, further when
           the deviation is wider. A partnership with a narrow deviation shows close to its
           full estimate; one with a wide deviation shows a number close to the average. It
@@ -77,7 +88,7 @@ async function RatingsBoard({ season, initialQuery }: { season: string; initialQ
           by winning. Sorting by <b>Raw estimate</b> shows the figure before the move.{' '}
           <Link href="/method#shrink">Two numbers, two jobs &rarr;</Link>
         </li>
-        <li id="fn3">
+        <li id="fn4">
           <b>Raw estimate</b> is the Glicko-2 figure itself. 1500 is the baseline, and 100
           points of difference means the stronger side wins about 66% of the time. The ± is the
           rating deviation, or how far the true strength could reasonably sit from the
@@ -85,7 +96,7 @@ async function RatingsBoard({ season, initialQuery }: { season: string; initialQ
           since the partnership last competed.{' '}
           <Link href="/method#why">Why Glicko-2 &rarr;</Link>
         </li>
-        <li id="fn4">
+        <li id="fn5">
           <b>XXI rank</b> is the partnership&rsquo;s place in the official season standings,
           shown for comparison. The two columns measure different things and are expected to
           disagree.

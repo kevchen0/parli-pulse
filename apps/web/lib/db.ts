@@ -1,5 +1,5 @@
 import { and, desc, eq, sql } from 'drizzle-orm';
-import { MIN_RATED_ROUNDS, fieldSpread } from '@parli-pulse/rating';
+import { MIN_CALIBRATION_ROUNDS, MIN_RATED_ROUNDS, fieldSpread } from '@parli-pulse/rating';
 import { weightedBreakdown } from '@parli-pulse/rules';
 import { createDb } from '@parli-pulse/db';
 import * as t from '@parli-pulse/db';
@@ -645,10 +645,17 @@ export interface RatingMethodFigures {
 
 export async function getRatingMethodFigures(season: SeasonId): Promise<RatingMethodFigures> {
   const { db } = handle();
+  // The CALIBRATION cohort, not the admission one. `fieldSpread` recovers the
+  // spread of true strengths by subtracting mean squared deviation from observed
+  // variance, so handing it everyone who merely clears the board's gate collapses
+  // the scale -- measured on 2025-26, tau falls from 117 to 72. This read the
+  // five-round constant, which is the exact confusion splitting the gate in two
+  // was meant to end, and it made this page describe a number the pipeline had
+  // not produced.
   const ranked = (await db.execute(sql`
     select rating, deviation from ${t.ratings}
     where season_id = ${season} and subject_kind = 'partnership'
-      and tournament_id is null and rounds_counted >= ${MIN_RATED_ROUNDS}
+      and tournament_id is null and rounds_counted >= ${MIN_CALIBRATION_ROUNDS}
   `)).rows as unknown as { rating: number; deviation: number }[];
 
   const tau = fieldSpread(
